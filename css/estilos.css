@@ -1,1 +1,247 @@
-/* Contendrá los estilos visuales de la app. */
+/* BúhoGondra: variables de diseño (Figma, "UI Kit") y estructura base. */
+
+:root {
+  /* Paleta: único lugar donde se escriben los valores de color */
+  --paleta-blanco: #ffffff;
+  --paleta-blanco-apagado: #fafaf8;
+
+  --paleta-calido-100: #fff8ec;
+  --paleta-calido-300: #f0e3cf;
+
+  --paleta-naranja-100: #ffe8d6;
+  --paleta-naranja-200: #ffd0ad;
+  --paleta-naranja-300: #ffb380;
+  --paleta-naranja-400: #ff9540;
+  --paleta-naranja-500: #ff7300;
+  --paleta-naranja-600: #e56700;
+  --paleta-naranja-700: #c25400;
+  --paleta-naranja-800: #9a4300;
+  --paleta-naranja-900: #5c2800;
+
+  --paleta-azul-100: #e0e5fa;
+  --paleta-azul-200: #b8c1ef;
+  --paleta-azul-300: #8493dc;
+  --paleta-azul-400: #4a5fc4;
+  --paleta-azul-500: #001b9a;
+  --paleta-azul-600: #001578;
+  --paleta-azul-700: #00105c;
+  --paleta-azul-800: #000b3e;
+  --paleta-azul-900: #00061f;
+
+  --paleta-gris-100: #f1f4f8;
+  --paleta-gris-200: #e4e9f0;
+  --paleta-gris-300: #c9d1de;
+  --paleta-gris-400: #8a95a8;
+  --paleta-gris-500: #738096;
+  --paleta-gris-600: #5b6b82;
+  --paleta-gris-700: #455162;
+  --paleta-gris-800: #2a3647;
+  --paleta-gris-900: #091c33;
+
+  --paleta-amarillo-500: #ffc000;
+  --paleta-lima-500: #d3d405;
+  --paleta-celeste-500: #7cd4ff;
+  --paleta-hoja-500: #2f8f3a;
+
+  --paleta-rojo-100: #fdecea;
+  --paleta-rojo-500: #d92d20;
+  --paleta-rojo-700: #b42318;
+
+  --paleta-verde-100: #e5f5ec;
+  --paleta-verde-600: #1b7f4b;
+  --paleta-verde-700: #146b3e;
+
+  /* Fondos */
+  --color-fondo-app: var(--paleta-blanco-apagado);
+  --color-fondo-secundario: var(--paleta-calido-100);
+  --color-superficie: var(--paleta-blanco);
+  --color-fondo-atenuado: var(--paleta-gris-100);
+  --color-fondo-marca-suave: var(--paleta-naranja-100);
+  --color-fondo-info-suave: var(--paleta-azul-100);
+  --color-fondo-error-suave: var(--paleta-rojo-100);
+  --color-fondo-exito-suave: var(--paleta-verde-100);
+
+  /* Textos */
+  --color-texto-principal: var(--paleta-gris-900);
+  --color-texto-secundario: var(--paleta-gris-600);
+  --color-texto-marca: var(--paleta-naranja-800);
+  --color-texto-deshabilitado: var(--paleta-gris-400);
+  --color-texto-enlace: var(--paleta-azul-500);
+  --color-texto-error: var(--paleta-rojo-500);
+  --color-texto-exito: var(--paleta-verde-600);
+  --color-texto-sobre-primario: var(--paleta-blanco);
+  --color-texto-sobre-secundario: var(--paleta-blanco);
+  --color-texto-sobre-peligro: var(--paleta-blanco);
+  --color-texto-sobre-error-suave: var(--paleta-rojo-700);
+  --color-texto-sobre-exito-suave: var(--paleta-verde-700);
+
+  /* Acciones */
+  --color-accion-primaria: var(--paleta-naranja-500);
+  --color-accion-primaria-presionada: var(--paleta-naranja-600);
+  --color-accion-secundaria: var(--paleta-azul-500);
+  --color-accion-secundaria-presionada: var(--paleta-azul-600);
+  --color-accion-peligro: var(--paleta-rojo-500);
+  --color-accion-peligro-presionada: var(--paleta-rojo-700);
+  --color-accion-deshabilitada: var(--paleta-gris-200);
+
+  /* Bordes y foco */
+  --color-borde-suave: var(--paleta-calido-300); /* también divisores */
+  --color-borde-normal: var(--paleta-gris-500);
+  --color-borde-foco: var(--paleta-azul-500);
+  --color-borde-error: var(--paleta-rojo-500);
+  --color-borde-deshabilitado: var(--paleta-gris-200);
+  --color-anillo-foco: var(--paleta-azul-500);
+
+  /* Estados */
+  --color-estado-error: var(--paleta-rojo-500);
+  --color-estado-exito: var(--paleta-verde-600);
+
+  /* Acentos, categorías y áreas */
+  --color-acento-combo: var(--paleta-amarillo-500);
+  --color-acento-casero: var(--paleta-lima-500);
+  --color-etiqueta-nuevo: var(--paleta-celeste-500);
+  --color-categoria-economicos: var(--paleta-hoja-500);
+  --color-categoria-platos-fuertes: var(--paleta-azul-500);
+  --color-categoria-complementos: var(--paleta-amarillo-500);
+  --color-categoria-tipicos: var(--paleta-naranja-500);
+  --color-area-cafeteria: var(--paleta-naranja-500);
+  --color-area-libreria: var(--paleta-azul-500);
+  --color-area-despensa: var(--paleta-amarillo-500);
+  --color-area-talleres-graficos: var(--paleta-lima-500);
+
+  /* Tipografía (en esta fase solo se usa Inter) */
+  --fuente-principal: "Inter", sans-serif;
+  --peso-normal: 400;
+  --peso-seminegrita: 600;
+  --peso-negrita: 700;
+
+  /* Tamaños de letra */
+  --letra-titulo-pantalla: 32px;
+  --letra-titulo-1: 28px;
+  --letra-titulo-2: 22px;
+  --letra-titulo-3: 18px;
+  --letra-precio-grande: 24px;
+  --letra-precio: 18px;
+  --letra-texto-grande: 16px;
+  --letra-texto: 14px;
+  --letra-texto-pequeno: 12px;
+  --letra-etiqueta: 14px;
+  --letra-etiqueta-pequena: 12px;
+  --letra-boton-grande: 16px;
+  --letra-boton-pequeno: 14px;
+  --letra-nota: 11px;
+
+  /* Altos de línea */
+  --linea-titulo-pantalla: 40px;
+  --linea-titulo-1: 36px;
+  --linea-titulo-2: 28px;
+  --linea-titulo-3: 24px;
+  --linea-precio-grande: 32px;
+  --linea-precio: 24px;
+  --linea-texto-grande: 24px;
+  --linea-texto: 20px;
+  --linea-texto-pequeno: 16px;
+  --linea-etiqueta: 20px;
+  --linea-etiqueta-pequena: 16px;
+  --linea-boton-grande: 24px;
+  --linea-boton-pequeno: 20px;
+  --linea-nota: 16px;
+
+  /* Espacio entre letras (porcentaje de Figma expresado en em).
+     Los estilos que no aparecen aquí usan 0. */
+  --interletra-titulo-pantalla: -0.03em;
+  --interletra-titulo-1: -0.02em;
+  --interletra-titulo-2: -0.015em;
+  --interletra-titulo-3: -0.01em;
+  --interletra-texto-pequeno: 0.01em;
+  --interletra-etiqueta-pequena: 0.01em;
+  --interletra-nota: 0.02em;
+
+  /* Espacios */
+  --espacio-0: 0px;
+  --espacio-4: 4px;
+  --espacio-8: 8px;
+  --espacio-12: 12px;
+  --espacio-16: 16px;
+  --espacio-20: 20px;
+  --espacio-24: 24px;
+  --espacio-32: 32px;
+  --espacio-40: 40px;
+  --espacio-48: 48px;
+  --margen-lateral-pantalla: var(--espacio-20);
+
+  /* Radios de borde */
+  --radio-ninguno: 0px;
+  --radio-chip: 12px;
+  --radio-imagen: 16px;
+  --radio-icono: 20px;
+  --radio-tarjeta: 24px;
+  --radio-hoja: 32px; /* también barra de navegación */
+  --radio-pildora: 999px; /* botones y campos */
+
+  /* Grosores de borde */
+  --borde-fino: 1px; /* tarjetas y divisores */
+  --borde-campo: 2px;
+  --borde-foco: 3px;
+
+  /* Medidas de la estructura */
+  --ancho-maximo-app: 430px; /* definido en los requisitos del proyecto */
+  --alto-navegacion: 64px; /* TODO: confirmar valor en Figma */
+}
+
+/* Reset básico */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+html {
+  /* Solo se ve a los lados cuando la ventana supera el ancho máximo */
+  background-color: var(--color-fondo-secundario);
+}
+
+/* Estructura: columna móvil (diseñada a 393 px), centrada en escritorio */
+body {
+  display: flex;
+  flex-direction: column;
+  max-width: var(--ancho-maximo-app);
+  min-height: 100vh;
+  min-height: 100dvh; /* descuenta las barras del navegador móvil */
+  margin-inline: auto;
+  background-color: var(--color-fondo-app);
+  color: var(--color-texto-principal);
+  font-family: var(--fuente-principal);
+  font-size: var(--letra-texto-grande);
+  line-height: var(--linea-texto-grande);
+}
+
+header,
+nav {
+  background-color: var(--color-superficie);
+  border-color: var(--color-borde-suave);
+  border-style: solid;
+  border-width: 0;
+}
+
+header {
+  padding: var(--espacio-16) var(--margen-lateral-pantalla);
+  border-bottom-width: var(--borde-fino);
+}
+
+h1 {
+  font-size: var(--letra-titulo-3);
+  font-weight: var(--peso-negrita);
+  line-height: var(--linea-titulo-3);
+}
+
+main {
+  flex: 1;
+  padding-inline: var(--margen-lateral-pantalla);
+}
+
+nav {
+  min-height: var(--alto-navegacion);
+  border-top-width: var(--borde-fino);
+}

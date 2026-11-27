@@ -1,1 +1,2 @@
-// Contendrá el código JavaScript de la app.
+// Confirma en la consola que el JavaScript está conectado.
+document.addEventListener("DOMContentLoaded", () => console.log("BúhoGondra cargada"));
