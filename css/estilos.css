@@ -276,6 +276,19 @@
   /* Comentarios y calificaciones */
   --tamano-estrella: 14px;
   --tamano-flecha: 20px;
+  --tamano-avatar: 48px;
+  --tamano-imagen-avatar: 72px;
+  --avatar-imagen-izquierda: -13px;
+  --avatar-imagen-arriba: -5px;
+  --separacion-texto-comentario: 2px;
+  --ancho-promedio: 96px;
+  --ancho-numero-estrellas: 10px;
+  --ancho-barra: 100px;
+  --alto-barra: 6px;
+  --radio-barra: 3px;
+  --ancho-numero-opiniones: 12px;
+  --alto-fondo-buho: 168px;
+  --tamano-buho-sin-opiniones: 126px;
 
   /* Menú de la semana */
   --ancho-pestana-dia: 62px;
@@ -1001,7 +1014,8 @@ main.contenido--completo {
 }
 
 /* ---------- Menú de la semana (Figma 1176:7342) ---------- */
-.semana__encabezado {
+/* Encabezado de las pantallas internas: volver y título */
+.encabezado-interno {
   display: flex;
   align-items: center;
   gap: var(--espacio-12);
@@ -1335,6 +1349,274 @@ main.contenido--completo {
 }
 
 .fila-opcion__detalle {
+  color: var(--color-texto-secundario);
+  font-size: var(--letra-texto);
+  line-height: var(--linea-texto);
+}
+
+/* ---------- Comentarios y calificaciones (Figma 1190:7381) ---------- */
+.opiniones {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-20);
+}
+
+.opiniones__cuerpo {
+  display: flex;
+  flex-direction: column;
+}
+
+.platillo-resumido {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-12);
+}
+
+.platillo-resumido__foto {
+  flex-shrink: 0;
+  width: var(--tamano-avatar);
+  height: var(--tamano-avatar);
+}
+
+.platillo-resumido__textos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--separacion-texto-comentario);
+  min-width: 0;
+}
+
+.platillo-resumido__categoria {
+  color: var(--color-categoria);
+  font-size: var(--letra-nota);
+  font-weight: var(--peso-media);
+  line-height: var(--linea-nota);
+  letter-spacing: var(--interletra-nota);
+  text-transform: uppercase;
+}
+
+.platillo-resumido.categoria--complementos .platillo-resumido__categoria {
+  color: var(--color-texto-principal);
+}
+
+.platillo-resumido__nombre {
+  font-family: var(--fuente-titulos);
+  font-size: var(--letra-titulo-3);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-titulo-tarjeta);
+  letter-spacing: var(--interletra-titulo-3);
+}
+
+/* Tarjeta resumen */
+.resumen {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-20);
+  padding: var(--espacio-20);
+  border: var(--borde-fino) solid var(--color-borde-suave);
+  border-radius: var(--radio-icono);
+  background: var(--color-superficie);
+}
+
+.resumen__promedio {
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--separacion-texto-comentario);
+  width: var(--ancho-promedio);
+}
+
+.resumen__numero {
+  font-family: var(--fuente-titulos);
+  font-size: var(--letra-titulo-pantalla);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-titulo-pantalla);
+  letter-spacing: var(--interletra-titulo-pantalla);
+}
+
+.resumen__conteo,
+.resumen__fila,
+.opiniones__titulo p,
+.comentario__fecha {
+  color: var(--color-texto-secundario);
+  font-size: var(--letra-nota);
+  font-weight: var(--peso-media);
+  line-height: var(--linea-nota);
+  letter-spacing: var(--interletra-nota);
+}
+
+.resumen__barras {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--espacio-4);
+  min-width: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.resumen__fila {
+  display: grid;
+  grid-template-columns:
+    var(--ancho-numero-estrellas) minmax(0, var(--ancho-barra))
+    minmax(var(--ancho-numero-opiniones), max-content);
+  align-items: center;
+  gap: var(--espacio-8);
+}
+
+.resumen__cantidad {
+  text-align: right;
+}
+
+.resumen__barra {
+  display: block;
+  overflow: hidden;
+  height: var(--alto-barra);
+  border-radius: var(--radio-barra);
+  background: var(--color-fondo-atenuado);
+}
+
+.resumen__relleno {
+  display: block;
+  height: 100%;
+  border-radius: var(--radio-barra);
+  background: var(--color-acento-combo);
+}
+
+/* El botón es un enlace */
+.opiniones__escribir {
+  text-decoration: none;
+}
+
+.resumen + .opiniones__escribir,
+.sin-opiniones + .opiniones__escribir {
+  margin-top: var(--espacio-16);
+}
+
+.opiniones__lista {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-16);
+  margin-top: calc(var(--espacio-24) + var(--espacio-4));
+}
+
+.opiniones__titulo {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--espacio-12);
+}
+
+.opiniones__titulo h2 {
+  font-family: var(--fuente-titulos);
+  font-size: var(--letra-titulo-3);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-titulo-3);
+  letter-spacing: var(--interletra-titulo-3);
+}
+
+.lista-opiniones {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-16);
+  padding: 0;
+  list-style: none;
+}
+
+/* TODO: Figma no dibuja "Ver más" (su nota 1199:7739 pide cargar al bajar).
+   Se usa el botón de tipo Texto del kit */
+.opiniones__ver-mas[hidden] {
+  display: none;
+}
+
+/* Comentario (Figma 1189:4679) */
+.comentario {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-8);
+}
+
+/* Divisor entre opiniones */
+.comentario + .comentario {
+  padding-top: var(--espacio-16);
+  border-top: var(--borde-fino) solid var(--color-borde-suave);
+}
+
+.comentario__autor {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-12);
+}
+
+.comentario__textos {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--separacion-texto-comentario);
+  min-width: 0;
+}
+
+.comentario__nombre {
+  font-size: var(--letra-etiqueta);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-etiqueta);
+}
+
+.comentario__texto {
+  color: var(--color-texto-secundario);
+  font-size: var(--letra-texto);
+  line-height: var(--linea-texto);
+  overflow-wrap: anywhere;
+}
+
+/* Avatar de búho pequeño (Figma 901:3528) */
+.avatar {
+  position: relative;
+  flex-shrink: 0;
+  overflow: hidden;
+  width: var(--tamano-avatar);
+  height: var(--tamano-avatar);
+  border: var(--borde-fino) solid var(--color-borde-suave);
+  border-radius: var(--radio-pildora);
+  background: var(--color-fondo-info-suave);
+}
+
+.avatar__buho {
+  position: absolute;
+  top: var(--avatar-imagen-arriba);
+  left: var(--avatar-imagen-izquierda);
+  width: var(--tamano-imagen-avatar);
+  height: var(--tamano-imagen-avatar);
+  object-fit: cover;
+}
+
+/* Sin opiniones (Figma 1440:11107) */
+.sin-opiniones {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--espacio-8);
+  padding-block: var(--espacio-24) var(--espacio-8);
+  text-align: center;
+}
+
+.sin-opiniones__imagen {
+  width: var(--tamano-buho-sin-opiniones);
+  height: var(--tamano-buho-sin-opiniones);
+  margin: calc((var(--alto-fondo-buho) - var(--tamano-buho-sin-opiniones)) / 2) 0;
+  object-fit: contain;
+}
+
+.sin-opiniones__titulo {
+  margin-top: var(--espacio-16);
+  font-family: var(--fuente-titulos);
+  font-size: var(--letra-titulo-3);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-titulo-3);
+  letter-spacing: var(--interletra-titulo-3);
+}
+
+.sin-opiniones__texto {
   color: var(--color-texto-secundario);
   font-size: var(--letra-texto);
   line-height: var(--linea-texto);

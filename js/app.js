@@ -30,7 +30,7 @@ const pantallas = {
   },
 };
 
-// Rutas que terminan en el id de un platillo: #/platillo/ID y #/apartar/ID
+// Rutas con el id de un platillo: #/platillo/ID, #/apartar/ID y #/comentarios/ID
 const pantallasConId = {
   platillo: {
     titulo: "Platillo",
@@ -40,6 +40,14 @@ const pantallasConId = {
     preparar: dibujarDetalle,
   },
   apartar: { titulo: "Apartar", enBarra: false, pestana: "#/menu", preparar: dibujarProximamente },
+  comentarios: {
+    titulo: "Comentarios y calificaciones",
+    enBarra: false,
+    sinEncabezado: true,
+    pestana: "#/menu",
+    plantilla: "plantilla-comentarios",
+    preparar: dibujarComentarios,
+  },
 };
 const pantallaInicial = "#/menu";
 // Milisegundos. Notas de Figma 1440:11261 y 1429:10299: el aviso se va solo a los 3 s
@@ -54,7 +62,7 @@ function buscarPantalla(hash) {
   if (Object.hasOwn(pantallas, ruta)) {
     return { ...pantallas[ruta], ruta, parametros };
   }
-  const partes = ruta.match(/^#\/(platillo|apartar)\/([^/]+)$/);
+  const partes = ruta.match(/^#\/(platillo|apartar|comentarios)\/([^/]+)$/);
   return partes ? { ...pantallasConId[partes[1]], ruta, parametros, id: partes[2] } : null;
 }
 

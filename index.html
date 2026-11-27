@@ -99,7 +99,7 @@
   <!-- Menú de la semana (Figma 1176:7342) -->
   <template id="plantilla-semana">
     <div class="menu">
-      <header class="semana__encabezado">
+      <header class="encabezado-interno">
         <h1 class="semana__titulo">Menú de la semana</h1>
       </header>
 
@@ -170,6 +170,46 @@
       <p class="menu__nota" hidden></p>
       <ul class="menu__rejilla"></ul>
     </section>
+  </template>
+
+  <!-- Comentarios y calificaciones (Figma 1190:7381; sin opiniones, 1440:11032) -->
+  <template id="plantilla-comentarios">
+    <div class="menu">
+      <header class="encabezado-interno">
+        <h1>Comentarios y calificaciones</h1>
+      </header>
+
+      <div class="opiniones">
+        <!-- Aquí va la fila del platillo -->
+        <div class="opiniones__cuerpo">
+          <section class="resumen" aria-label="Resumen de calificaciones">
+            <div class="resumen__promedio">
+              <p class="resumen__numero"></p>
+              <p class="resumen__conteo"></p>
+            </div>
+            <ul class="resumen__barras"></ul>
+          </section>
+
+          <!-- Solo se ve cuando el platillo no tiene opiniones -->
+          <section class="sin-opiniones">
+            <img class="sin-opiniones__imagen" src="img/buhi-sin-opiniones.png" alt="" width="126" height="126">
+            <h2 class="sin-opiniones__titulo">Todavía no hay opiniones</h2>
+            <p class="sin-opiniones__texto">Sé la primera persona en calificar este platillo.</p>
+          </section>
+
+          <a class="boton opiniones__escribir">Escribir mi opinión</a>
+
+          <section class="opiniones__lista" aria-labelledby="titulo-opiniones">
+            <div class="opiniones__titulo">
+              <h2 id="titulo-opiniones">Opiniones</h2>
+              <p>Más recientes primero</p>
+            </div>
+            <ul class="lista-opiniones"></ul>
+            <button type="button" class="boton boton--texto opiniones__ver-mas">Ver más</button>
+          </section>
+        </div>
+      </div>
+    </div>
   </template>
 
   <!-- Contenedor de la ruta oculta #/componentes -->

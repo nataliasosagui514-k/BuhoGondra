@@ -277,7 +277,7 @@ function dibujarSemana(contenedor, { parametros }) {
   let idCategoria = leerCategoria(parametros);
 
   contenedor
-    .querySelector(".semana__encabezado")
+    .querySelector(".encabezado-interno")
     .prepend(crearBotonVolver(() => volverAlMenuDesdeSemana(idCategoria)));
 
   const aviso = contenedor.querySelector(".semana__aviso");

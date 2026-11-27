@@ -84,3 +84,185 @@ function crearFilaDeComentarios(platilloId, opiniones) {
   );
   return fila;
 }
+
+/* ---------- Pantalla de comentarios ---------- */
+
+const OPINIONES_POR_PAGINA = 20;
+// TODO: búho de quien no ha elegido uno. M5d muestra el 3; elegirlo es de la fase de Registro
+const BUHO_SIN_ELEGIR = 3;
+
+// "Hace un momento", "Hace 2 días", "Hace 1 semana"…
+// TODO: Figma no muestra las formas con minutos, horas, meses ni años
+function formatearFechaRelativa(fecha, ahora = new Date()) {
+  const antes = new Date(fecha);
+  const hace = (cantidad, una, varias) => `Hace ${cantidad} ${cantidad === 1 ? una : varias}`;
+  const minutos = Math.floor((ahora - antes) / 60000);
+  if (minutos < 1) {
+    return "Hace un momento";
+  }
+  if (minutos < 60) {
+    return hace(minutos, "minuto", "minutos");
+  }
+  if (minutos < 24 * 60) {
+    return hace(Math.floor(minutos / 60), "hora", "horas");
+  }
+  // Desde las 24 horas se cuentan días del calendario
+  const medianoche = (una) => new Date(una.getFullYear(), una.getMonth(), una.getDate());
+  const dias = Math.round((medianoche(ahora) - medianoche(antes)) / 86400000);
+  if (dias < 7) {
+    return hace(dias, "día", "días");
+  }
+  if (dias < 30) {
+    return hace(Math.floor(dias / 7), "semana", "semanas");
+  }
+  if (dias < 365) {
+    return hace(Math.floor(dias / 30), "mes", "meses");
+  }
+  return hace(Math.floor(dias / 365), "año", "años");
+}
+
+// Única función que crea una opinión: el componente Comentario (Figma 1189:4679).
+function crearComentario(opinion) {
+  const buho = document.createElement("img");
+  buho.className = "avatar__buho";
+  buho.src = `img/avatar-buho-${opinion.buho ?? BUHO_SIN_ELEGIR}.png`;
+  buho.alt = "";
+  const avatar = crearElemento("span", "avatar");
+  avatar.append(buho);
+
+  const fecha = crearElemento("time", "comentario__fecha", formatearFechaRelativa(opinion.fecha));
+  fecha.dateTime = opinion.fecha;
+  const textos = crearElemento("div", "comentario__textos");
+  textos.append(crearElemento("p", "comentario__nombre", opinion.autor), fecha);
+
+  const autor = crearElemento("div", "comentario__autor");
+  autor.append(
+    avatar,
+    textos,
+    crearEtiquetaDeCalificacion(
+      String(opinion.calificacion),
+      `${opinion.calificacion} de 5 estrellas`,
+    ),
+  );
+
+  const comentario = crearElemento("li", "comentario");
+  comentario.append(autor);
+  // Sin texto, solo se ven las estrellas
+  if (opinion.texto) {
+    comentario.append(crearElemento("p", "comentario__texto", opinion.texto));
+  }
+  return comentario;
+}
+
+// Foto pequeña, categoría y nombre del platillo (Figma 1190:7388).
+function crearPlatilloResumido(platillo) {
+  const idCategoria = obtenerCategoriaVisual(platillo.categoria);
+  const textos = crearElemento("div", "platillo-resumido__textos");
+  textos.append(
+    crearElemento("p", "platillo-resumido__categoria", CATEGORIAS[idCategoria].nombre),
+    crearElemento("p", "platillo-resumido__nombre", platillo.nombre),
+  );
+  const fila = crearElemento("div", `platillo-resumido categoria--${idCategoria}`);
+  fila.append(crearFoto(platillo, "platillo-resumido__foto"), textos);
+  return fila;
+}
+
+// Una barra por cada número de estrellas. Su ancho es cantidad ÷ total.
+function crearBarraDeResumen(estrellas, cantidad, total) {
+  const pista = crearElemento("span", "resumen__barra");
+  const relleno = crearElemento("span", "resumen__relleno");
+  relleno.style.width = `${(cantidad / total) * 100}%`;
+  pista.append(relleno);
+
+  const fila = crearElemento("li", "resumen__fila");
+  fila.setAttribute(
+    "aria-label",
+    `${estrellas} ${estrellas === 1 ? "estrella" : "estrellas"}: ${formatearConteo(cantidad)}`,
+  );
+  fila.append(
+    crearElemento("span", "resumen__estrellas", String(estrellas)),
+    pista,
+    crearElemento("span", "resumen__cantidad", String(cantidad)),
+  );
+  return fila;
+}
+
+function llenarResumen(resumen, opiniones) {
+  const numero = resumen.querySelector(".resumen__numero");
+  numero.textContent = calcularPromedio(opiniones).toFixed(1);
+  numero.after(crearEtiquetaDeCalificacion("de 5", "de 5 estrellas"));
+  resumen.querySelector(".resumen__conteo").textContent = formatearConteo(opiniones.length);
+  resumen.querySelector(".resumen__barras").append(
+    ...[5, 4, 3, 2, 1].map((estrellas) =>
+      crearBarraDeResumen(
+        estrellas,
+        opiniones.filter((opinion) => opinion.calificacion === estrellas).length,
+        opiniones.length,
+      ),
+    ),
+  );
+}
+
+// Muestra las opiniones de 20 en 20; "Ver más" agrega las siguientes.
+function llenarLista(seccion, opiniones) {
+  const lista = seccion.querySelector(".lista-opiniones");
+  const verMas = seccion.querySelector(".opiniones__ver-mas");
+  const agregarPagina = () => {
+    const desde = lista.children.length;
+    lista.append(...opiniones.slice(desde, desde + OPINIONES_POR_PAGINA).map(crearComentario));
+    verMas.hidden = lista.children.length >= opiniones.length;
+  };
+  verMas.addEventListener("click", agregarPagina);
+  agregarPagina();
+}
+
+// Regresa a la pantalla anterior si es la esperada; si se entró directo, va a "ruta".
+function volverA(rutaEsperada, ruta = rutaEsperada) {
+  if ((history.state?.desde ?? "").split("?")[0] === rutaEsperada) {
+    history.back();
+  } else {
+    location.replace(ruta);
+  }
+}
+
+// Parte común de las pantallas de opiniones: botón de volver y fila del platillo.
+// Devuelve el platillo, o null si el id no existe (y deja el mensaje en pantalla).
+function prepararPantallaDeOpiniones(contenedor, id, alVolver) {
+  const encontrado = buscarPlatilloEnSemana(id, obtenerFechaInicial());
+  if (!encontrado) {
+    // Se pasa un menú cualquiera: lo que falta es el platillo
+    contenedor.replaceChildren(crearVistaDeDetalle(null, MENU_SEMANA));
+    return null;
+  }
+  contenedor
+    .querySelector(".encabezado-interno")
+    .prepend(crearBotonVolver(() => alVolver(encontrado)));
+  contenedor.querySelector(".opiniones").prepend(crearPlatilloResumido(encontrado.platillo));
+  return encontrado.platillo;
+}
+
+function dibujarComentarios(contenedor, { id }) {
+  const platillo = prepararPantallaDeOpiniones(contenedor, id, ({ fecha }) =>
+    volverA(`#/platillo/${id}`, `#/platillo/${id}?dia=${fecha}`),
+  );
+  if (!platillo) {
+    return;
+  }
+
+  const opiniones = obtenerOpiniones(id);
+  const resumen = contenedor.querySelector(".resumen");
+  const lista = contenedor.querySelector(".opiniones__lista");
+  const escribir = contenedor.querySelector(".opiniones__escribir");
+  escribir.href = `#/comentarios/${id}/escribir`;
+  // Sin opiniones, escribir es la acción principal (M5c)
+  escribir.classList.add(opiniones.length ? "boton--contorno" : "boton--primario");
+
+  if (!opiniones.length) {
+    resumen.remove();
+    lista.remove();
+    return;
+  }
+  contenedor.querySelector(".sin-opiniones").remove();
+  llenarResumen(resumen, opiniones);
+  llenarLista(lista, opiniones);
+}

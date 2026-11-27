@@ -13,6 +13,14 @@ function obtenerPlatillo(id, fecha) {
   return platillos.find((platillo) => platillo.id === id) ?? null;
 }
 
+// Busca un platillo en toda la semana, empezando por la fecha preferida.
+// Devuelve { platillo, fecha } o null.
+function buscarPlatilloEnSemana(id, fechaPreferida) {
+  const fechas = [fechaPreferida, ...Object.values(MENU_SEMANA).map((dia) => dia.fecha)];
+  const fecha = fechas.find((una) => obtenerPlatillo(id, una));
+  return fecha ? { platillo: obtenerPlatillo(id, fecha), fecha } : null;
+}
+
 // Fecha más reciente de la semana que tiene menú.
 function obtenerUltimaFechaConMenu() {
   return Object.values(MENU_SEMANA)
