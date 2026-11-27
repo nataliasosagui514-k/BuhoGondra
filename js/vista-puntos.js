@@ -191,16 +191,109 @@ function crearTarjetaDePremio(premio, acciones) {
 
 /* ---------- Puntos (Figma 1003:4398) ---------- */
 
+function abrirTicketDePremio(premio) {
+  location.hash = `#/puntos/premio/${premio.id}`;
+}
+
 function dibujarPuntos(contenedor) {
-  const lista = contenedor.querySelector(".premios");
-  const acciones = {
-    alCanjear: () => {},
-    alVerTicket: () => {},
+  const pintar = () => {
+    contenedor
+      .querySelector(".puntos__progreso")
+      .replaceChildren(crearProgresoDePuntos(calcularPuntosTotales()));
+    contenedor
+      .querySelector(".premios")
+      .replaceChildren(
+        ...obtenerPremiosDeLaSesion().map((premio) => crearTarjetaDePremio(premio, acciones)),
+      );
   };
-  contenedor
-    .querySelector(".puntos__progreso")
-    .replaceChildren(crearProgresoDePuntos(calcularPuntosTotales()));
-  lista.replaceChildren(
-    ...obtenerPremiosDeLaSesion().map((premio) => crearTarjetaDePremio(premio, acciones)),
+  const acciones = {
+    alCanjear: (premio) => {
+      if (canjearPremio(premio.id)) {
+        abrirTicketDePremio(premio);
+        return;
+      }
+      // No se pudo guardar, o el premio cambió mientras la pantalla estaba abierta
+      pintar();
+      if (obtenerPremiosDeLaSesion().some(
+        (uno) => uno.id === premio.id && uno.estado === "Disponible",
+      )) {
+        // TODO: Figma no define este mensaje
+        mostrarAviso("error", "No se pudo canjear tu premio");
+      }
+    },
+    alVerTicket: (premio) => {
+      // Pudo vencer mientras la pantalla estaba abierta
+      if (obtenerPremiosDeLaSesion().some(
+        (uno) => uno.id === premio.id && uno.estado === "Por recoger",
+      )) {
+        abrirTicketDePremio(premio);
+      } else {
+        pintar();
+      }
+    },
+  };
+  pintar();
+}
+
+/* ---------- Premio canjeado (Figma 1003:4490) ---------- */
+
+// La foto grande de arriba. Los premios sin foto grande usan la del talón.
+function crearFotoDelPremio(premio) {
+  const foto = document.createElement("img");
+  foto.className = premio.fotoGrande
+    ? "premio-pantalla__imagen"
+    : "premio-pantalla__imagen premio-pantalla__imagen--marcador";
+  foto.src = premio.fotoGrande ?? premio.foto;
+  foto.alt = "";
+  const caja = crearElemento("div", "premio-pantalla__foto");
+  caja.append(foto);
+  return caja;
+}
+
+function crearTicketDePremio(premio) {
+  return crearTicketConPin({
+    etiqueta: `PREMIO · ${premio.nivel.toUpperCase()}`,
+    // TODO: Figma solo muestra "Postre gratis"; los otros premios siguen la misma forma
+    titulo: `${premio.nombre} gratis`,
+    detalles: [
+      crearCajaGris(
+        [`Válido hasta el ${formatearDiaYMes(premio.venceEl)}`],
+        "En cualquier cafetería UCA",
+      ),
+    ],
+    pin: premio.pin,
+    instruccion: "Muestra este PIN en caja para canjear tu premio.",
+  });
+}
+
+// Solo se abre el ticket de un premio "Por recoger": ni bloqueado, ni sin canjear,
+// ni vencido, ni sin sesión.
+function dibujarPremio(contenedor, { id }) {
+  const premio = obtenerSesion()
+    ? obtenerPremiosDeLaSesion().find((uno) => uno.id === id)
+    : null;
+  if (premio?.estado !== "Por recoger") {
+    location.replace("#/puntos");
+    return;
+  }
+
+  const titulos = crearElemento("header", "ticket-pantalla__titulos");
+  titulos.append(
+    crearElemento("h1", "ticket-pantalla__titulo", "¡Tu premio está listo!"),
+    crearElemento(
+      "p",
+      "ticket-pantalla__indicacion",
+      "Muestra este PIN en caja en cualquier cafetería UCA. Tus puntos se mantienen.",
+    ),
   );
+
+  const acciones = crearElemento("div", "ticket-pantalla__acciones");
+  acciones.append(
+    crearElemento("p", "ticket__instruccion", "También lo encuentras en Puntos › Ver ticket"),
+    crearBotonInferior("Volver a Puntos", () => volverA("#/puntos")),
+  );
+
+  const pantalla = contenedor.querySelector(".ticket-pantalla");
+  pantalla.classList.add("premio-pantalla");
+  pantalla.append(crearFotoDelPremio(premio), titulos, crearTicketDePremio(premio), acciones);
 }

@@ -37,7 +37,8 @@ const pantallas = {
 };
 
 // Rutas con el id de un platillo: #/platillo/ID, #/personalizar/ID, #/apartar/ID,
-// #/comentarios/ID y #/comentarios/ID/escribir. Y el del ticket: #/ticket/PEDIDO
+// #/comentarios/ID y #/comentarios/ID/escribir. Y las del ticket (#/ticket/PEDIDO)
+// y del premio canjeado (#/puntos/premio/ID)
 const pantallasConId = {
   personalizar: {
     titulo: "Personaliza tu plato",
@@ -72,6 +73,16 @@ const pantallasConId = {
     plantilla: "plantilla-ticket",
     preparar: dibujarTicket,
   },
+  // "Premio canjeado": el id es el del premio. Sin barra (Figma 1003:4490)
+  "puntos/premio": {
+    titulo: "Premio canjeado",
+    enBarra: false,
+    sinEncabezado: true,
+    sinNavegacion: true,
+    pestana: "#/puntos",
+    plantilla: "plantilla-ticket",
+    preparar: dibujarPremio,
+  },
   comentarios: {
     titulo: "Comentarios y calificaciones",
     enBarra: false,
@@ -102,7 +113,9 @@ function buscarPantalla(hash) {
   if (Object.hasOwn(pantallas, ruta)) {
     return { ...pantallas[ruta], ruta, parametros };
   }
-  const partes = ruta.match(/^#\/(platillo|personalizar|apartar|ticket|comentarios)\/([^/]+?)(\/escribir)?$/);
+  const partes = ruta.match(
+    /^#\/(platillo|personalizar|apartar|ticket|comentarios|puntos\/premio)\/([^/]+?)(\/escribir)?$/,
+  );
   const tipo = partes && `${partes[1]}${partes[3] ?? ""}`;
   return Object.hasOwn(pantallasConId, tipo)
     ? { ...pantallasConId[tipo], ruta, parametros, id: partes[2] }

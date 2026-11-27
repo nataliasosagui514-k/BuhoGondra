@@ -175,14 +175,19 @@ function describirRecogidaEnTicket(horaRecogida) {
     : describirRecogidaEnRevision(horaRecogida);
 }
 
-// Caja gris con la hora y la cafetería. La usan la revisión y el ticket.
-function crearCajaDeRecogida(horas, idCafeteria) {
+// Caja gris con cuándo (una o varias líneas) y dónde se recoge.
+function crearCajaGris(destacadas, lugar) {
   const caja = crearElemento("div", "recogida");
   caja.append(
-    ...horas.map((hora) => crearElemento("p", "recogida__hora", hora)),
-    crearElemento("p", "recogida__lugar", nombrarCafeteria(idCafeteria)),
+    ...destacadas.map((linea) => crearElemento("p", "recogida__hora", linea)),
+    crearElemento("p", "recogida__lugar", lugar),
   );
   return caja;
+}
+
+// La caja con la hora y la cafetería. La usan la revisión y el ticket del pedido.
+function crearCajaDeRecogida(horas, idCafeteria) {
+  return crearCajaGris(horas, nombrarCafeteria(idCafeteria));
 }
 
 function nombrarCafeteria(idCafeteria) {
@@ -771,32 +776,42 @@ function crearTicket(pedido, articulos) {
     crearElemento("p", "pago-en-caja__total", formatearPrecio(pedido.total)),
   );
 
+  return crearTicketConPin({
+    etiqueta: `PEDIDO #${pedido.numero}`,
+    titulo: titularTicket(articulos),
+    detalles: [
+      crearCajaDeRecogida(describirRecogidaEnTicket(pedido.horaRecogida), pedido.cafeteria),
+      desglose,
+      pago,
+    ],
+    pin: pedido.pin,
+    instruccion: "Dile este PIN a quien te atienda para recoger tu pedido.",
+  });
+}
+
+// La forma común del "Ticket con PIN" (Figma 874:3386): los datos, el corte y el PIN.
+// La usan el ticket del pedido y el del premio.
+function crearTicketConPin({ etiqueta, titulo, detalles, pin, instruccion }) {
   const datos = crearElemento("div", "ticket__datos");
   datos.append(
-    crearElemento("p", "ticket__numero", `PEDIDO #${pedido.numero}`),
-    crearElemento("h2", "ticket__titulo", titularTicket(articulos)),
-    crearCajaDeRecogida(describirRecogidaEnTicket(pedido.horaRecogida), pedido.cafeteria),
-    desglose,
-    pago,
+    crearElemento("p", "ticket__numero", etiqueta),
+    crearElemento("h2", "ticket__titulo", titulo),
+    ...detalles,
   );
 
   const digitos = crearElemento("p", "ticket__digitos");
-  digitos.setAttribute("aria-label", [...pedido.pin].join(" "));
+  digitos.setAttribute("aria-label", [...pin].join(" "));
   digitos.setAttribute("role", "img");
-  digitos.append(...[...pedido.pin].map((cifra) => crearElemento("span", "ticket__digito", cifra)));
-  const pin = crearElemento("div", "ticket__pin");
-  pin.append(
+  digitos.append(...[...pin].map((cifra) => crearElemento("span", "ticket__digito", cifra)));
+  const zonaDelPin = crearElemento("div", "ticket__pin");
+  zonaDelPin.append(
     crearElemento("p", "ticket__pin-etiqueta", "Tu PIN"),
     digitos,
-    crearElemento(
-      "p",
-      "ticket__instruccion",
-      "Dile este PIN a quien te atienda para recoger tu pedido.",
-    ),
+    crearElemento("p", "ticket__instruccion", instruccion),
   );
 
   const ticket = crearElemento("article", "ticket");
-  ticket.append(datos, crearElemento("div", "ticket__corte"), pin);
+  ticket.append(datos, crearElemento("div", "ticket__corte"), zonaDelPin);
   return ticket;
 }
 

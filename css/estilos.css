@@ -368,6 +368,11 @@
   --tamano-muesca-premio: 20px;
   --alto-insignia: 28px;
   --sombra-nivel-2: 0 8px 24px rgb(9 28 51 / 14%);
+
+  /* Premio canjeado (Figma 1003:4490) */
+  --alto-foto-premio-grande: 160px;
+  --ancho-foto-premio-grande: 256px;
+  --tamano-foto-premio-marcador: 128px;
 }
 
 /* Reset básico */
@@ -3261,4 +3266,31 @@ dialog:focus {
   stroke: currentColor;
   stroke-width: 1.5;
   stroke-linecap: round;
+}
+
+/* ---------- Premio canjeado (Figma 1003:4490) ---------- */
+/* Usa la pantalla del ticket; empieza más arriba porque lleva la foto */
+.premio-pantalla {
+  padding-top: var(--margen-superior-menu);
+}
+
+.premio-pantalla__foto {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  height: var(--alto-foto-premio-grande);
+  overflow: hidden;
+  border-radius: var(--radio-imagen);
+  background: var(--color-fondo-marca-suave);
+}
+
+.premio-pantalla__imagen {
+  width: var(--ancho-foto-premio-grande);
+  height: var(--alto-foto-premio-grande);
+}
+
+.premio-pantalla__imagen--marcador {
+  width: var(--tamano-foto-premio-marcador);
+  height: var(--tamano-foto-premio-marcador);
 }
