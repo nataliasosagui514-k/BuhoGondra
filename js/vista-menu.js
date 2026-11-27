@@ -183,23 +183,30 @@ function dibujarCategorias(lugar, { dia, idCategoria, fecha, alElegir }) {
   mostrarCategoria(lugar, dia, idCategoria, fecha);
 }
 
-// Aviso para un día sin menú.
-// TODO: Figma no tiene pantalla para un día sin menú. Se usa el aviso "Menú sin actualizar"
-// (1399:9826) sin su primera frase, que habla de un menú anterior que aquí no se muestra.
+// Aviso para un día sin menú. El texto es el de la nota de Figma 1176:7472, que no
+// tiene pantalla propia: se muestra con el diseño del aviso "Menú sin actualizar".
 function crearAvisoSinMenu() {
-  const { hora, periodo } = separarHora(HORARIOS.apartar.desde);
-  return crearAviso(
-    "desactualizado",
-    "Menú sin actualizar",
-    `Por ahora no se puede apartar; Funda Gondra lo publica antes de las ${hora.replace(":00", "")} ${periodo}`,
-  );
+  return crearAviso("desactualizado", "Funda Gondra todavía no publica el menú de este día.");
+}
+
+// Día que abren el menú, la semana y el detalle cuando la dirección no dice otro:
+// hoy, o en sábado y domingo el último día con menú (ver el TODO de datos.js).
+function obtenerFechaInicial(ahora = new Date()) {
+  const finDeSemana = ahora.getDay() === 0 || ahora.getDay() === 6;
+  return finDeSemana ? obtenerUltimaFechaConMenu() : obtenerFechaDeHoy(ahora);
 }
 
 function dibujarMenu(contenedor, { parametros }) {
   const ahora = new Date();
-  contenedor.querySelector(".menu__fecha").textContent = formatearFechaLarga(ahora);
+  const fecha = obtenerFechaInicial(ahora);
+  // El encabezado lleva la fecha del menú que se ve
+  contenedor.querySelector(".menu__fecha").textContent = formatearFechaLarga(
+    convertirAFecha(fecha),
+  );
 
-  const dia = obtenerMenuDelDia(obtenerFechaDeHoy(ahora));
+  const dia = obtenerMenuDelDia(fecha);
+  // Si el menú no es el de hoy, las tarjetas abren el detalle de ese día (sin Apartar)
+  const fechaDeOtroDia = fecha === obtenerFechaDeHoy(ahora) ? undefined : fecha;
   if (!dia) {
     contenedor.querySelector(".menu__del-dia").replaceWith(crearAvisoSinMenu());
     return;
@@ -218,6 +225,7 @@ function dibujarMenu(contenedor, { parametros }) {
   dibujarCategorias(contenedor.querySelector(".menu__lista"), {
     dia,
     idCategoria,
+    fecha: fechaDeOtroDia,
     alElegir: (elegida) => {
       cambiarDireccion(crearRutaDelMenu(elegida));
       calendario.href = crearRutaDeLaSemana(elegida);
@@ -243,15 +251,15 @@ function crearPestanaDeDia(dia, alElegir) {
   return pestana;
 }
 
-// Día con el que abre la semana: el de la dirección; si no, hoy; si no, el primero.
-// TODO: en fin de semana Figma pide el lunes siguiente, pero MENU_SEMANA no lo tiene.
+// Día con el que abre la semana: el de la dirección; si no, el inicial; y si ese
+// no tiene menú, el primero de la semana.
 function leerFecha(parametros) {
   const pedida = parametros.get("dia") ?? "";
   if (/^\d{4}-\d{2}-\d{2}$/.test(pedida) && !Number.isNaN(convertirAFecha(pedida).getTime())) {
     return pedida;
   }
-  const hoy = obtenerFechaDeHoy();
-  return obtenerMenuDelDia(hoy) ? hoy : Object.values(MENU_SEMANA)[0].fecha;
+  const inicial = obtenerFechaInicial();
+  return obtenerMenuDelDia(inicial) ? inicial : Object.values(MENU_SEMANA)[0].fecha;
 }
 
 // Regresa al Menú de hoy con la categoría que está seleccionada en la semana.
@@ -613,9 +621,9 @@ function crearVistaDeDetalle(platillo, dia) {
   return crearDetalle(platillo, dia);
 }
 
-// Sin ?dia=AAAA-MM-DD en la dirección, el detalle es del menú de hoy.
+// Sin ?dia=AAAA-MM-DD en la dirección, el detalle es del día inicial.
 function dibujarDetalle(contenedor, { id, parametros }) {
-  const dia = obtenerMenuDelDia(parametros.get("dia") ?? obtenerFechaDeHoy());
+  const dia = obtenerMenuDelDia(parametros.get("dia") ?? obtenerFechaInicial());
   const platillo = dia && buscarPlatilloParaVista(id, dia);
   if (platillo) {
     document.title = `${platillo.nombre} · BúhoGondra`;

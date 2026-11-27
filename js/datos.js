@@ -190,6 +190,9 @@ function crearDia(nombre, fecha, platillosPorCategoria) {
   return { nombre, fecha, categorias };
 }
 
+/* TODO: en sábado y domingo la app abre el último día con menú de MENU_SEMANA (viernes 27).
+   Figma (nota 1176:7472) pide el lunes siguiente: cambiar cuando haya datos de la semana
+   siguiente. */
 const MENU_SEMANA = {
   lunes: crearDia("Lunes", "2026-11-23", {
     economicos: [

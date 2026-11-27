@@ -12,3 +12,11 @@ function obtenerPlatillo(id, fecha) {
   const platillos = categorias.flatMap((categoria) => categoria.platillos);
   return platillos.find((platillo) => platillo.id === id) ?? null;
 }
+
+// Fecha más reciente de la semana que tiene menú.
+function obtenerUltimaFechaConMenu() {
+  return Object.values(MENU_SEMANA)
+    .map((dia) => dia.fecha)
+    .sort()
+    .at(-1);
+}

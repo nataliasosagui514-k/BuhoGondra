@@ -42,7 +42,9 @@ const pantallasConId = {
   apartar: { titulo: "Apartar", enBarra: false, pestana: "#/menu", preparar: dibujarProximamente },
 };
 const pantallaInicial = "#/menu";
-const duracionAviso = 4000; // milisegundos. TODO: Figma no define la duración
+// Milisegundos. Notas de Figma 1440:11261 y 1429:10299: el aviso se va solo a los 3 s
+// (la de la pantalla 01, que aún no existe, pide 5 s).
+const duracionAviso = 3000;
 
 // Devuelve la pantalla de un hash (con su ruta, su id y los datos que van después
 // del "?"), o null si no existe.

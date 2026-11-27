@@ -239,7 +239,12 @@
   --tamano-boton-volver: 44px;
   --tamano-icono: 24px;
   --tamano-punto: 8px;
-  --ancho-maximo-aviso: 350px;
+
+  /* Aviso flotante: arriba (Figma 1440:11251 y 1429:10222) y aparece con el fundido
+     del prototipo (M5b → M5d) */
+  --posicion-aviso-flotante: 54px;
+  --duracion-aparicion-aviso: 250ms;
+  --curva-aparicion-aviso: ease-out;
 
   /* Menú de hoy y detalle */
   --margen-superior-menu: 54px;
@@ -617,7 +622,8 @@ h1 {
 }
 
 /* Figma (820:2456) no tiene componente para Nuevo, Combo ni Casero: solo define
-   sus colores de acento. La forma es la general de Etiqueta. */
+   sus colores de acento (revisado en el UI Kit y en Pantallas NEW).
+   La forma es la general de Etiqueta. */
 .etiqueta--nuevo,
 .etiqueta--combo,
 .etiqueta--casero {
@@ -662,20 +668,30 @@ h1 {
   background: var(--color-texto-deshabilitado);
 }
 
-/* Zona flotante de avisos.
-   TODO: Figma no define posición, animación ni el cristal del aviso flotante */
+/* Zona flotante de avisos, encima de la pantalla. No bloquea los toques */
 .zona-avisos {
   position: fixed;
-  /* Encima de la barra, para no tapar el título ni el botón de volver */
-  bottom: calc(var(--distancia-navegacion) + var(--alto-navegacion) + var(--espacio-16));
+  z-index: 2;
+  top: var(--posicion-aviso-flotante);
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   gap: var(--espacio-8);
   width: calc(100% - 2 * var(--margen-lateral-pantalla));
-  max-width: var(--ancho-maximo-aviso);
+  max-width: calc(var(--ancho-maximo-app) - 2 * var(--margen-lateral-pantalla));
   pointer-events: none;
+}
+
+/* TODO: Figma no define cómo se va el aviso; se quita sin animación */
+.zona-avisos .aviso {
+  animation: aparecer-aviso var(--duracion-aparicion-aviso) var(--curva-aparicion-aviso);
+}
+
+@keyframes aparecer-aviso {
+  from {
+    opacity: 0;
+  }
 }
 
 .aviso {
