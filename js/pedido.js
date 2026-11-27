@@ -94,7 +94,8 @@ function obtenerSiguienteNumero(pedidos) {
 /* ---------- El pedido que se guarda ---------- */
 
 // El autor es el correo de la sesión. "invitado" queda en los pedidos hechos antes de
-// que apartar pidiera una cuenta (no suman puntos y no se modifican).
+// que apartar pidiera una cuenta (no suman puntos; el chat deja cambiarlos sin sesión
+// mientras sigan activos).
 const AUTOR_INVITADO = "invitado";
 
 // Arma el pedido con los datos del diseño y ningún otro. "articulos" son las líneas

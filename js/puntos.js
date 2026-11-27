@@ -20,8 +20,13 @@ function listarPedidosConRecogida() {
   return obtenerPedidosDeLaSesion().filter((pedido) => pedido.horaRecogida);
 }
 
+// Un pedido cancelado no suma. Conserva su campo "puntos" como registro.
+function contarPuntos(pedido) {
+  return pedido.cancelado ? 0 : (pedido.puntos ?? 0);
+}
+
 function sumarPuntos(pedidos) {
-  return pedidos.reduce((suma, pedido) => suma + (pedido.puntos ?? 0), 0);
+  return pedidos.reduce((suma, pedido) => suma + contarPuntos(pedido), 0);
 }
 
 function calcularPuntosTotales() {
@@ -58,7 +63,7 @@ function sumarDias(fecha, dias) {
 function buscarFechaDeDesbloqueo(meta, pedidos) {
   let suma = 0;
   const pedido = pedidos.find((uno) => {
-    suma += uno.puntos ?? 0;
+    suma += contarPuntos(uno);
     return suma >= meta;
   });
   return pedido?.fecha ?? null;
@@ -136,4 +141,19 @@ function canjearPremio(id, { hoy = obtenerFechaDeHoy(), azar = Math.random } = {
     pin: generarPinLibre(listarPinesActivos(obtenerPremiosCanjeados(), hoy), azar),
     disponibleDesde: premio.disponibleDesde,
   });
+}
+
+// Cuando bajan los puntos (un pedido cancelado), se borran los canjes todavía
+// pendientes de los niveles que ya no se alcanzan: su PIN deja de servir. Si se vuelve
+// a llegar al nivel, el premio aparece otra vez para canjearlo. Los vencidos se quedan.
+// Devuelve false si no se pudo guardar.
+function quitarCanjesSinPuntos(autor, hoy = obtenerFechaDeHoy()) {
+  const puntos = sumarPuntos(obtenerPedidos().filter((pedido) => pedido.autor === autor));
+  const canjes = obtenerPremiosCanjeados();
+  const quedan = canjes.filter((canje) => {
+    const meta = NIVELES_PUNTOS.find((nivel) => nivel.id === canje.id)?.puntos ?? 0;
+    const pendiente = hoy <= sumarDias(canje.disponibleDesde, DIAS_PARA_RECOGER_PREMIO);
+    return !(canje.autor === autor && pendiente && puntos < meta);
+  });
+  return quedan.length === canjes.length || guardarPremiosCanjeados(quedan);
 }

@@ -275,11 +275,6 @@ function crearRegistroVacio() {
   return { correo: "", contraseña: "", verificado: false, nombre: "", apellido: "", buho: null };
 }
 
-// TODO: lo usa lo que todavía no existe: el chat de Búhi
-function avisarPantallaPendiente() {
-  mostrarAviso("info", "Próximamente");
-}
-
 // Etiqueta o aviso del tipo de cuenta según el correo escrito (Figma 02, 02b y 02e).
 function crearIndicadorDeTipo(tipo) {
   if (tipo === "no-uca") {

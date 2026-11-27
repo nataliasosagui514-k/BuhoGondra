@@ -792,15 +792,17 @@ function crearBotonAlMenu() {
 
 /* ---------- Historial (Figma 50 y 50b) ---------- */
 
-// Solo hay dos estados porque la app solo conoce la fecha del pedido (ver estaEnCurso).
-// TODO: "Cancelado" y "No recogido" (51c, 51d y 51e) necesitan un dato que no existe
+// TODO: "Cancelado por la cafetería" (51d) y "No recogido" (51e) necesitan datos que
+// no existen
 const ESTADOS_DE_PEDIDO = {
+  cancelado: { texto: "Cancelado", trazos: [[4, 4, "M0 0L6.42 6.42M6.42 0L0 6.42"]] },
   curso: { texto: "En curso", trazos: null },
   entregado: { texto: "Entregado", trazos: [[2.92, 4.38, "M0 2.92L2.62 5.54L8.17 0"]] },
 };
 
 function crearEtiquetaDeEstado(pedido) {
-  const clave = estaEnCurso(pedido) ? "curso" : "entregado";
+  const vigente = estaEnCurso(pedido) ? "curso" : "entregado";
+  const clave = pedido.cancelado ? "cancelado" : vigente;
   const { texto, trazos } = ESTADOS_DE_PEDIDO[clave];
   const etiqueta = crearElemento("span", `etiqueta estado estado--${clave}`);
   etiqueta.append(
@@ -952,15 +954,31 @@ function crearDesgloseDePedido(pedido, articulos) {
     crearElemento("span", "", "Total"),
     crearElemento("span", "detalle-pedido__monto", formatearPrecio(pedido.total)),
   );
+  const pago = estaEnCurso(pedido) ? "Pagas en caja al recoger" : "Pagado en caja";
   return crearSeccionDeDetalle(
     "Tu pedido",
     lineas,
     total,
-    crearElemento("p", "mas__nota", estaEnCurso(pedido) ? "Pagas en caja al recoger" : "Pagado en caja"),
+    crearElemento("p", "mas__nota", pedido.cancelado ? "No se te cobró nada" : pago),
+  );
+}
+
+// 51c: cuándo se canceló. "cancelado" guarda "AAAA-MM-DDTHH:MM".
+function crearCancelacionDePedido(pedido) {
+  const [fecha, hora] = pedido.cancelado.split("T");
+  return crearSeccionDeDetalle(
+    "¿Qué pasó?",
+    crearCajaGris(
+      ["Cancelaste este pedido"],
+      `El ${formatearDiaYMes(fecha)} a ${conArticulo(hora)}, desde el chat de Búhi.`,
+    ),
   );
 }
 
 function crearEntregaDePedido(pedido) {
+  if (pedido.cancelado) {
+    return crearCancelacionDePedido(pedido);
+  }
   if (estaEnCurso(pedido)) {
     return crearSeccionDeDetalle(
       "Detalles de la entrega",
@@ -975,15 +993,23 @@ function crearEntregaDePedido(pedido) {
   );
 }
 
-// En curso: ver el ticket y pedir ayuda. Entregado: calificar lo que falte.
+// En curso: ver el ticket y, mientras esté activo, pedir ayuda en el chat. Entregado:
+// calificar lo que falte. Cancelado: nada (Figma 51c).
 function crearAccionesDePedido(pedido, articulos) {
+  if (pedido.cancelado) {
+    return [];
+  }
   if (estaEnCurso(pedido)) {
+    const ayuda = () => {
+      location.hash = `#/chatbot?pedido=${pedido.id}`;
+    };
     return [
       crearBotonInferior("Ver mi ticket", () => {
         location.hash = `#/ticket/${pedido.id}`;
       }),
-      // TODO: Figma abre el chat de Búhi, que todavía no existe
-      crearBotonDeTexto("Ayuda con este pedido", avisarPantallaPendiente),
+      ...(buscarPedidoActivo(pedido.id)
+        ? [crearBotonDeTexto("Ayuda con este pedido", ayuda)]
+        : []),
     ];
   }
   const sinCalificar = articulos.find(({ platillo }) => !obtenerMiOpinion(platillo.id));
@@ -1488,7 +1514,6 @@ function dibujarCentroDeAyuda(contenedor) {
 
 /* ---------- Preguntas frecuentes y Términos (Figma 91 y 92) ---------- */
 
-// TODO: varias respuestas hablan del chat de Búhi, que todavía no existe
 // En 91d la pregunta abierta es más larga; se usa el texto de la lista cerrada
 const PREGUNTAS_FRECUENTES = [
   {

@@ -855,8 +855,23 @@ function crearTicket(pedido, articulos) {
     crearElemento("p", "pago-en-caja__total", formatearPrecio(pedido.total)),
   );
 
+  const etiqueta = `PEDIDO #${pedido.numero}`;
+  // TODO: Figma no tiene el ticket cancelado. No muestra hora ni PIN, porque "el
+  // ticket ya no sirve" (31b); la etiqueta y la nota son las de 51c
+  if (pedido.cancelado) {
+    return crearTicketConPin({
+      etiqueta,
+      titulo: titularTicket(articulos),
+      detalles: [
+        crearEtiquetaDeEstado(pedido),
+        desglose,
+        crearElemento("p", "mas__nota", "No se te cobró nada"),
+      ],
+    });
+  }
+
   return crearTicketConPin({
-    etiqueta: `PEDIDO #${pedido.numero}`,
+    etiqueta,
     titulo: titularTicket(articulos),
     detalles: [
       crearCajaDeRecogida(describirRecogidaEnTicket(pedido.horaRecogida), pedido.cafeteria),
@@ -869,7 +884,7 @@ function crearTicket(pedido, articulos) {
 }
 
 // La forma común del "Ticket con PIN" (Figma 874:3386): los datos, el corte y el PIN.
-// La usan el ticket del pedido y el del premio.
+// La usan el ticket del pedido y el del premio. Sin PIN, solo quedan los datos.
 function crearTicketConPin({ etiqueta, titulo, detalles, pin, instruccion }) {
   const datos = crearElemento("div", "ticket__datos");
   datos.append(
@@ -877,6 +892,12 @@ function crearTicketConPin({ etiqueta, titulo, detalles, pin, instruccion }) {
     crearElemento("h2", "ticket__titulo", titulo),
     ...detalles,
   );
+
+  const ticket = crearElemento("article", "ticket");
+  if (!pin) {
+    ticket.append(datos);
+    return ticket;
+  }
 
   const digitos = crearElemento("p", "ticket__digitos");
   digitos.setAttribute("aria-label", [...pin].join(" "));
@@ -889,7 +910,6 @@ function crearTicketConPin({ etiqueta, titulo, detalles, pin, instruccion }) {
     crearElemento("p", "ticket__instruccion", instruccion),
   );
 
-  const ticket = crearElemento("article", "ticket");
   ticket.append(datos, crearElemento("div", "ticket__corte"), zonaDelPin);
   return ticket;
 }
@@ -929,7 +949,11 @@ function dibujarTicket(contenedor, { id }) {
   const titulos = crearElemento("header", "ticket-pantalla__titulos");
   titulos.append(
     crearElemento("h1", "ticket-pantalla__titulo", "Tu ticket"),
-    crearElemento("p", "ticket-pantalla__indicacion", avisos.indicacion),
+    crearElemento(
+      "p",
+      "ticket-pantalla__indicacion",
+      pedido.cancelado ? "El ticket ya no sirve." : avisos.indicacion,
+    ),
   );
 
   const acciones = crearElemento("div", "ticket-pantalla__acciones");

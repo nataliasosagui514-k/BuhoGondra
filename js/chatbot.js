@@ -104,7 +104,11 @@ function cancelarPedido(id, ahora = obtenerAhora()) {
     return { ok: false, motivo: "tarde" };
   }
   // El pedido no se borra: queda en el Historial como cancelado
-  return guardarCambio({ ...pedido, cancelado: marcarMomento(ahora) });
+  const resultado = guardarCambio({ ...pedido, cancelado: marcarMomento(ahora) });
+  if (resultado.ok) {
+    quitarCanjesSinPuntos(pedido.autor);
+  }
+  return resultado;
 }
 
 // "ventana" solo hace falta en un pedido mixto, que tiene dos horas

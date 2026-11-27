@@ -5366,3 +5366,13 @@ dialog:focus {
 .chat__conversacion ~ .cuenta__acciones {
   scroll-margin-bottom: var(--margen-inferior-cuenta);
 }
+
+/* Estado "Cancelado" (Figma 51c) */
+.estado--cancelado {
+  background: var(--color-fondo-error-suave);
+  color: var(--color-texto-sobre-error-suave);
+}
+
+.ticket__datos .estado {
+  align-self: flex-start;
+}

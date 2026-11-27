@@ -62,6 +62,11 @@ function obtenerPremiosCanjeados() {
   return Array.isArray(premios) ? premios : [];
 }
 
+// Reemplaza la lista completa. Devuelve true si se guardó.
+function guardarPremiosCanjeados(premios) {
+  return escribirDato(CLAVE_PREMIOS, premios);
+}
+
 // Devuelve lo guardado, o null si no se pudo guardar.
 function guardarPremioCanjeado(premio) {
   return escribirDato(CLAVE_PREMIOS, [...obtenerPremiosCanjeados(), premio]) ? premio : null;
