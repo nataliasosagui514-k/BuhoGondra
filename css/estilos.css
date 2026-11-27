@@ -118,7 +118,7 @@
   --color-cristal-contorno-presionado: color-mix(in srgb, var(--color-fondo-info-suave) 70%, transparent);
   --brillo-barra: linear-gradient(180deg, rgb(255 255 255 / 50%) 0%, rgb(255 255 255 / 0%) 40%, rgb(255 255 255 / 12%) 100%);
   --brillo-pestana: linear-gradient(180deg, rgb(255 255 255 / 35%) 0%, rgb(255 255 255 / 0%) 40%, rgb(255 255 255 / 12%) 100%);
-  --brillo-volver: linear-gradient(180deg, rgb(255 255 255 / 50%) 0%, rgb(255 255 255 / 0%) 40%, rgb(255 255 255 / 10%) 100%);
+  --fondo-volver-encabezado: linear-gradient(180deg, var(--color-fondo-atenuado) 0%, rgb(241 244 248 / 0%) 40%, var(--color-fondo-atenuado) 100%);
   --brillo-primario: linear-gradient(180deg, rgb(255 255 255 / 40%) 0%, rgb(255 255 255 / 4%) 50%, rgb(255 255 255 / 0%) 100%);
   --brillo-contorno: linear-gradient(180deg, rgb(255 255 255 / 50%) 0%, rgb(255 255 255 / 5%) 55%, rgb(255 255 255 / 0%) 100%);
   --sombra-interior-barra: inset 0 1.5px 0 rgb(255 255 255 / 80%);
@@ -192,7 +192,8 @@
   --espacio-32: 32px;
   --espacio-40: 40px;
   --espacio-48: 48px;
-  --margen-lateral-pantalla: var(--espacio-20);
+  /* Las pantallas de "Pantallas NEW" usan 24 px (la ficha de espaciado dice 20) */
+  --margen-lateral-pantalla: var(--espacio-24);
 
   /* Radios de borde */
   --radio-ninguno: 0px;
@@ -216,6 +217,7 @@
   --alto-pestana: 48px;
   --alto-boton: 52px; /* tamaño Grande */
   --alto-etiqueta: 28px;
+  --alto-encabezado: 52px;
   --tamano-boton-volver: 44px;
   --tamano-icono: 24px;
   --tamano-punto: 8px;
@@ -257,28 +259,29 @@ main {
     calc(var(--alto-navegacion) + var(--distancia-navegacion) + var(--espacio-16));
 }
 
-/* Encabezado: botón de volver a la izquierda y título al centro */
+/* Encabezado sin fondo ni borde: botón de volver y, a su lado, el título */
 header {
   display: flex;
   align-items: center;
   gap: var(--espacio-12);
+  min-height: var(--alto-encabezado);
   padding: var(--espacio-4) var(--margen-lateral-pantalla);
 }
 
-/* Espacio igual al del botón para que el título quede centrado */
-header::after {
-  content: "";
-  width: var(--tamano-boton-volver);
-}
-
+/* Título junto al botón de volver (Heading/H3) */
 h1 {
-  flex: 1;
   font-family: var(--fuente-titulos);
   font-size: var(--letra-titulo-3);
   font-weight: var(--peso-seminegrita);
   line-height: var(--linea-titulo-3);
   letter-spacing: var(--interletra-titulo-3);
-  text-align: center;
+}
+
+/* En las pestañas no hay botón y el título es más grande (Heading/H1) */
+.boton-volver[hidden] + h1 {
+  font-size: var(--letra-titulo-1);
+  line-height: var(--linea-titulo-1);
+  letter-spacing: var(--interletra-titulo-1);
 }
 
 .icono {
@@ -303,8 +306,7 @@ h1 {
   padding: 0;
   border: var(--borde-fino) solid var(--color-brillo-70);
   border-radius: var(--radio-pildora);
-  background: var(--brillo-volver), var(--color-superficie);
-  box-shadow: var(--sombra-interior-barra);
+  background: var(--fondo-volver-encabezado); /* así se ve en los encabezados de Figma */
   backdrop-filter: var(--desenfoque-suave);
   color: var(--color-texto-principal);
   cursor: pointer;
@@ -314,9 +316,9 @@ h1 {
   background: var(--color-fondo-atenuado);
 }
 
-/* Oculto en las pantallas de la barra, pero conserva su espacio */
+/* Oculto en las pantallas de la barra */
 .boton-volver[hidden] {
-  visibility: hidden;
+  display: none;
 }
 
 /* Barra de navegación inferior flotante */
