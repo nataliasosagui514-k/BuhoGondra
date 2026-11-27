@@ -266,3 +266,69 @@ function dibujarComentarios(contenedor, { id }) {
   llenarResumen(resumen, opiniones);
   llenarLista(lista, opiniones);
 }
+
+/* ---------- Escribir mi opinión ---------- */
+
+// Texto que va debajo de las estrellas, de 1 a 5 (Figma, nota 1199:7740)
+const TEXTOS_DE_ESTRELLAS = ["Malo", "Regular", "Bueno", "Muy bueno", "Excelente"];
+
+// Selector de 1 a 5 estrellas (Figma 827:2507). Son botones de opción, así que
+// también funciona con el teclado. "inicial" es 0 cuando no hay ninguna elegida.
+function prepararSelectorDeEstrellas(bloque, inicial, alElegir) {
+  const lugar = bloque.querySelector(".selector-estrellas");
+  const estrellas = TEXTOS_DE_ESTRELLAS.map((texto, posicion) => {
+    const valor = posicion + 1;
+    const entrada = document.createElement("input");
+    entrada.className = "selector-estrellas__entrada";
+    entrada.type = "radio";
+    entrada.name = "calificacion";
+    entrada.value = valor;
+    entrada.checked = valor === inicial;
+    entrada.setAttribute("aria-label", `${valor} de 5: ${texto}`);
+    entrada.addEventListener("change", () => marcar(valor));
+
+    const dibujo = crearEstrella("estrella estrella--vacia");
+    const opcion = crearElemento("label", "selector-estrellas__opcion");
+    opcion.append(entrada, dibujo);
+    lugar.append(opcion);
+    return dibujo;
+  });
+
+  // Rellena las estrellas hasta el valor elegido y escribe su texto
+  const marcar = (valor) => {
+    estrellas.forEach((dibujo, posicion) => {
+      dibujo.classList.toggle("estrella--llena", posicion < valor);
+      dibujo.classList.toggle("estrella--vacia", posicion >= valor);
+    });
+    bloque.querySelector(".calificar__texto").textContent = TEXTOS_DE_ESTRELLAS[valor - 1] ?? "";
+    alElegir(valor);
+  };
+  marcar(inicial);
+}
+
+function dibujarEscribirOpinion(contenedor, { id }) {
+  const volverAComentarios = () => volverA(`#/comentarios/${id}`);
+  if (!prepararPantallaDeOpiniones(contenedor, id, volverAComentarios)) {
+    return;
+  }
+
+  const formulario = contenedor.querySelector(".formulario-opinion");
+  const entrada = formulario.querySelector(".campo__entrada");
+  const publicar = formulario.querySelector(".formulario-opinion__publicar");
+  const contarCaracteres = () => {
+    formulario.querySelector(".campo__ayuda").textContent =
+      `${entrada.value.length}/${entrada.maxLength} caracteres`;
+  };
+  entrada.addEventListener("input", contarCaracteres);
+  contarCaracteres();
+
+  let calificacion = 0;
+  prepararSelectorDeEstrellas(formulario.querySelector(".calificar"), calificacion, (valor) => {
+    calificacion = valor;
+    publicar.disabled = valor === 0; // sin estrellas no se puede publicar
+  });
+
+  formulario.addEventListener("submit", (evento) => {
+    evento.preventDefault(); // el guardado se agrega en el siguiente paso
+  });
+}

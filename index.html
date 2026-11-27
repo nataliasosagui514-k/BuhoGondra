@@ -212,6 +212,36 @@
     </div>
   </template>
 
+  <!-- Escribir mi opinión (Figma 1190:7510) -->
+  <template id="plantilla-escribir">
+    <div class="menu escribir">
+      <header class="encabezado-interno">
+        <h1>Escribir mi opinión</h1>
+      </header>
+
+      <form class="opiniones formulario-opinion">
+        <!-- Aquí va la fila del platillo -->
+        <div class="formulario-opinion__campos">
+          <fieldset class="calificar">
+            <legend class="calificar__pregunta">¿Qué te pareció?</legend>
+            <!-- Aquí van las cinco estrellas -->
+            <div class="selector-estrellas"></div>
+            <p class="calificar__texto" aria-live="polite"></p>
+          </fieldset>
+
+          <!-- Campo de texto (Figma 725:2427) -->
+          <div class="campo">
+            <label class="campo__etiqueta" for="opinion-texto">Tu comentario (opcional)</label>
+            <input class="campo__entrada" id="opinion-texto" type="text" maxlength="200" autocomplete="off" aria-describedby="opinion-contador">
+            <p class="campo__ayuda" id="opinion-contador"></p>
+          </div>
+        </div>
+
+        <button type="submit" class="boton boton--primario formulario-opinion__publicar">Publicar</button>
+      </form>
+    </div>
+  </template>
+
   <!-- Contenedor de la ruta oculta #/componentes -->
   <template id="plantilla-componentes">
     <div class="catalogo"></div>

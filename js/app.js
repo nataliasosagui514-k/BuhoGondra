@@ -30,7 +30,8 @@ const pantallas = {
   },
 };
 
-// Rutas con el id de un platillo: #/platillo/ID, #/apartar/ID y #/comentarios/ID
+// Rutas con el id de un platillo: #/platillo/ID, #/apartar/ID, #/comentarios/ID
+// y #/comentarios/ID/escribir
 const pantallasConId = {
   platillo: {
     titulo: "Platillo",
@@ -48,6 +49,14 @@ const pantallasConId = {
     plantilla: "plantilla-comentarios",
     preparar: dibujarComentarios,
   },
+  "comentarios/escribir": {
+    titulo: "Escribir mi opinión",
+    enBarra: false,
+    sinEncabezado: true,
+    pestana: "#/menu",
+    plantilla: "plantilla-escribir",
+    preparar: dibujarEscribirOpinion,
+  },
 };
 const pantallaInicial = "#/menu";
 // Milisegundos. Notas de Figma 1440:11261 y 1429:10299: el aviso se va solo a los 3 s
@@ -62,8 +71,11 @@ function buscarPantalla(hash) {
   if (Object.hasOwn(pantallas, ruta)) {
     return { ...pantallas[ruta], ruta, parametros };
   }
-  const partes = ruta.match(/^#\/(platillo|apartar|comentarios)\/([^/]+)$/);
-  return partes ? { ...pantallasConId[partes[1]], ruta, parametros, id: partes[2] } : null;
+  const partes = ruta.match(/^#\/(platillo|apartar|comentarios)\/([^/]+?)(\/escribir)?$/);
+  const tipo = partes && `${partes[1]}${partes[3] ?? ""}`;
+  return Object.hasOwn(pantallasConId, tipo)
+    ? { ...pantallasConId[tipo], ruta, parametros, id: partes[2] }
+    : null;
 }
 
 // Cada entrada del historial recuerda desde qué pantalla se llegó a ella.

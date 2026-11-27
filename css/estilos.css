@@ -281,6 +281,9 @@
   --avatar-imagen-izquierda: -13px;
   --avatar-imagen-arriba: -5px;
   --separacion-texto-comentario: 2px;
+  --tamano-estrella-selector: 32px;
+  --tamano-toque-estrella: 44px;
+  --alto-campo: 52px;
   --ancho-promedio: 96px;
   --ancho-numero-estrellas: 10px;
   --ancho-barra: 100px;
@@ -1620,6 +1623,131 @@ main.contenido--completo {
   color: var(--color-texto-secundario);
   font-size: var(--letra-texto);
   line-height: var(--linea-texto);
+}
+
+/* ---------- Escribir mi opinión (Figma 1190:7510) ---------- */
+.escribir,
+.formulario-opinion {
+  flex: 1;
+}
+
+.formulario-opinion__campos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-24);
+  margin-top: calc(var(--espacio-32) - var(--espacio-20));
+}
+
+.calificar {
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  text-align: center;
+}
+
+.calificar__pregunta {
+  width: 100%;
+  padding: 0 0 var(--espacio-8);
+  font-family: var(--fuente-titulos);
+  font-size: var(--letra-titulo-2);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-titulo-2);
+  letter-spacing: var(--interletra-titulo-2);
+}
+
+.selector-estrellas {
+  display: flex;
+  justify-content: center;
+}
+
+.selector-estrellas__opcion {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tamano-toque-estrella);
+  height: var(--tamano-toque-estrella);
+  border-radius: var(--radio-pildora);
+  cursor: pointer;
+}
+
+/* El botón de opción ocupa toda la zona táctil, pero no se ve */
+.selector-estrellas__entrada {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.selector-estrellas__opcion:has(:focus-visible) {
+  outline: var(--borde-campo) solid var(--color-anillo-foco);
+}
+
+.selector-estrellas .estrella {
+  width: var(--tamano-estrella-selector);
+  height: var(--tamano-estrella-selector);
+  pointer-events: none;
+}
+
+.estrella--vacia {
+  fill: none;
+  stroke: var(--color-borde-normal);
+  stroke-width: 2.267;
+}
+
+/* Reserva el renglón aunque todavía no haya estrellas elegidas */
+.calificar__texto {
+  min-height: var(--linea-etiqueta);
+  margin-top: var(--espacio-8);
+  color: var(--color-texto-secundario);
+  font-size: var(--letra-etiqueta);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-etiqueta);
+}
+
+/* Campo de texto (Figma 725:2427) */
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-8);
+}
+
+.campo__etiqueta {
+  font-size: var(--letra-etiqueta);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-etiqueta);
+}
+
+.campo__entrada {
+  width: 100%;
+  height: var(--alto-campo);
+  padding: 0 var(--espacio-20);
+  border: var(--borde-campo) solid var(--color-borde-normal);
+  border-radius: var(--radio-pildora);
+  background: var(--color-superficie);
+  color: var(--color-texto-principal);
+  font-family: var(--fuente-texto);
+  font-size: var(--letra-texto-grande); /* 16 px: el teléfono no amplía al escribir */
+  line-height: var(--linea-texto-grande);
+}
+
+.campo__entrada:focus {
+  border-color: var(--color-borde-foco);
+  outline: 0;
+}
+
+.campo__ayuda {
+  padding-left: var(--espacio-12);
+  color: var(--color-texto-secundario);
+  font-size: var(--letra-texto-pequeno);
+  line-height: var(--linea-texto-pequeno);
+  letter-spacing: var(--interletra-texto-pequeno);
+}
+
+/* "Publicar" va al final de la pantalla */
+.formulario-opinion__publicar {
+  flex-shrink: 0;
+  margin-top: auto;
 }
 
 /* Caja de opciones */
