@@ -45,6 +45,13 @@ La Web Crypto API solo funciona al abrir el archivo directamente, en `localhost`
 - Todas las cuentas, en la clave `buhogondra.cuentas`: tipo, búho, nombre, apellido, sal, hash y fecha en que se aceptaron los Términos.
 - La sesión (`buhogondra.sesion`): solo correo, tipo de cuenta, búho y fecha de inicio.
 
+## Panel «Más» (modo de demostración)
+
+- **Historial y Notificaciones** salen de los pedidos guardados en este navegador. La app no sabe si un pedido se recogió: los de días anteriores aparecen como "Entregado".
+- **Eliminar cuenta** pide la contraseña y borra la cuenta, sus pedidos, premios, comentarios y avisos de este navegador. No se puede con pedidos en curso.
+- **Reportes** de "Problemas con mi cuenta": se guardan en `buhogondra.reportes` (nombre, correo, mensaje y fecha). **No se envían a nadie**; falta definir el canal de envío.
+- **Cambiar correo**: el código de verificación solo aparece en la consola del navegador.
+
 ## Pruebas
 
 Al abrir `index.html` sin nada después, aparece el Splash 4.5 segundos y luego "Inicia sesión" (o el menú, si ya hay sesión). Con una ruta, como `index.html#/menu`, se entra directo.
@@ -55,7 +62,7 @@ La sesión se cierra en Más › Perfil › "Cerrar sesión". Como respaldo, tam
 
 Los puntos se calculan con los pedidos confirmados con la sesión de cada cuenta; los pedidos antiguos que quedaron como "invitado" no suman.
 
-Para probar los premios sin confirmar muchos pedidos, con la sesión abierta pega este comando: guarda un pedido de prueba de 50 puntos (repítelo para llegar a 100 y 150).
+Para probar los premios sin confirmar muchos pedidos, con la sesión abierta pega este comando: guarda un pedido de prueba de 50 puntos (repítelo para llegar a 100 y 150). Estos pedidos de prueba suman puntos, pero no aparecen en Historial ni generan avisos de pedido.
 
 ```js
 guardarPedido({ id: `prueba-${Date.now()}`, fecha: obtenerFechaDeHoy(), platillos: [], puntos: 50, autor: obtenerSesion().correo });
