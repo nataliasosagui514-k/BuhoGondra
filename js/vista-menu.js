@@ -204,6 +204,8 @@ function dibujarMenu(contenedor, { parametros }) {
     convertirAFecha(fecha),
   );
 
+  mostrarAccesoAlChat(contenedor);
+
   const dia = obtenerMenuDelDia(fecha);
   // Si el menú no es el de hoy, las tarjetas abren el detalle de ese día (sin Apartar)
   const fechaDeOtroDia = fecha === obtenerFechaDeHoy(ahora) ? undefined : fecha;

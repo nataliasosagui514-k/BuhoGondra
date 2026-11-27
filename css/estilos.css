@@ -350,6 +350,20 @@
   --tamano-marco-area: 136px;
   --alto-foto-servicio: 170px;
 
+  /* Botón ChatBot y burbuja de ayuda (Figma 839:2584 y 1792:4731 en M1c) */
+  --color-brillo-50: rgb(255 255 255 / 50%);
+  --sombra-interior-chat: inset 0 1.5px 0 rgb(255 255 255 / 60%);
+  --sombra-burbuja-ayuda: drop-shadow(0 2px 8px rgb(0 0 0 / 12%));
+  --tamano-icono-chat: 20px;
+  --alto-boton-chat: 37px;
+  --separacion-boton-chat: 2px;
+  --ancho-burbuja-ayuda: 127px;
+  --alto-burbuja-ayuda: 28px;
+  --alto-cuerpo-burbuja-ayuda: 20.74px;
+  --letra-burbuja-ayuda: 8.43px;
+  --solape-burbuja-ayuda: 5px;
+  --margen-burbuja-ayuda: 3px;
+
   /* Avatar grande de Mi perfil (Figma 1051:5422) */
   --tamano-avatar-perfil: 96px;
   --tamano-imagen-avatar-perfil: 144px;
@@ -5153,4 +5167,82 @@ dialog:focus {
 
 .linea-descuento > span:last-child {
   flex-shrink: 0;
+}
+
+/* ---------- Botón ChatBot y burbuja de ayuda (Figma 1526:11315) ---------- */
+/* Fijo abajo a la derecha de la columna de la app, justo encima de la barra */
+.ayuda-chat {
+  position: fixed;
+  z-index: 1;
+  right: calc(max(0px, (100% - var(--ancho-maximo-app)) / 2) + var(--margen-lateral-pantalla));
+  bottom: calc(var(--distancia-navegacion) + var(--alto-navegacion) + var(--separacion-boton-chat));
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-decoration: none;
+}
+
+.ayuda-chat__burbuja {
+  position: relative;
+  z-index: 1;
+  width: var(--ancho-burbuja-ayuda);
+  height: var(--alto-burbuja-ayuda);
+  margin-right: var(--margen-burbuja-ayuda);
+  margin-bottom: calc(-1 * var(--solape-burbuja-ayuda));
+  filter: var(--sombra-burbuja-ayuda);
+}
+
+.ayuda-chat__forma {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  fill: var(--color-superficie);
+  stroke: var(--color-borde-suave);
+}
+
+.ayuda-chat__texto {
+  position: absolute;
+  inset: 0 0 auto;
+  color: var(--color-texto-principal);
+  font-size: var(--letra-burbuja-ayuda);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--alto-cuerpo-burbuja-ayuda);
+  text-align: center;
+}
+
+.ayuda-chat__boton {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-4);
+  height: var(--alto-boton-chat);
+  padding-inline: var(--espacio-12);
+  border: var(--borde-fino) solid var(--color-brillo-50);
+  border-radius: var(--radio-pildora);
+  background: var(--brillo-pestana), var(--color-accion-secundaria);
+  box-shadow: var(--sombra-interior-chat);
+  color: var(--color-texto-sobre-secundario);
+  font-family: var(--fuente-titulos);
+  font-size: var(--letra-etiqueta);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-etiqueta);
+}
+
+.ayuda-chat__icono {
+  flex-shrink: 0;
+  width: var(--tamano-icono-chat);
+  height: var(--tamano-icono-chat);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Deja subir las últimas tarjetas por encima del botón */
+.menu.menu--con-chat {
+  padding-bottom: calc(
+    var(--alto-navegacion) + var(--distancia-navegacion) + var(--espacio-24) +
+      var(--alto-boton-chat) + var(--alto-burbuja-ayuda)
+  );
 }
