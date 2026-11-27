@@ -130,13 +130,33 @@ function crearTarjeta(platillo, fecha) {
   return elemento;
 }
 
-// Foto en círculo. Sin foto, queda el fondo gris de carga.
+// El lado con el que se ve la foto en cada lugar (los tamaños están en el CSS). La
+// portada del detalle de pedido ocupa el ancho de la pantalla: usa el del archivo.
+const LADOS_DE_FOTO = {
+  tarjeta__foto: 112,
+  detalle__foto: 180,
+  "platillo-resumido__foto": 48,
+  ticket__foto: 48,
+  pedido__foto: 88,
+  "detalle-pedido__foto": 600,
+};
+// Las que van en listas largas se cargan al acercarse a ellas
+const FOTOS_PEREZOSAS = ["tarjeta__foto", "pedido__foto"];
+
+// Única función que crea la imagen de un platillo. El marco tiene el fondo gris de carga
+// de Figma (bg/muted): se ve mientras carga, si no hay foto y si el archivo falla.
 function crearFoto(platillo, clase) {
   const marco = crearElemento("span", `foto ${clase}`);
   if (platillo.foto) {
     const imagen = document.createElement("img");
+    imagen.width = imagen.height = LADOS_DE_FOTO[clase];
+    // "loading" y el aviso de error van antes de "src", para que apliquen desde el inicio
+    if (FOTOS_PEREZOSAS.includes(clase)) {
+      imagen.loading = "lazy";
+    }
+    imagen.addEventListener("error", () => imagen.remove()); // sin icono roto
+    imagen.alt = `Foto de ${platillo.nombre}`;
     imagen.src = platillo.foto;
-    imagen.alt = "";
     marco.append(imagen);
   }
   return marco;

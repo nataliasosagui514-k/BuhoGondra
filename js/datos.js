@@ -28,6 +28,40 @@ const CATEGORIAS = {
   "mas-complementos": { nombre: "Más complementos", sinPrecio: true },
 };
 
+// Los platillos que tienen foto en Figma. El archivo es img/platillos/ID.webp.
+const PLATILLOS_CON_FOTO = new Set([
+  "croissant-de-jamon-y-queso",
+  "croquetas-de-pollo",
+  "hamburguesa-de-res-y-pollo",
+  "espagueti-con-carne",
+  "papa-con-huevo",
+  "quesadilla-mexicana",
+  "chilaquila",
+  "club-sandwich",
+  "relleno-de-coli",
+  "filete-de-pollo",
+  "sopa-de-pollo",
+  "cuarto-de-pollo-horneado",
+  "chop-suey",
+  "crepa-de-res",
+  "empanada-de-leche",
+  "arroz-en-leche",
+  "pastelito-de-pollo",
+  "tamal-de-pollo",
+  "tamal-de-chipilin",
+  "pupusas",
+  "ensalada-cesar",
+  "papa-francesa",
+  "papa-sazonada",
+]);
+// En Figma estos platillos usan la misma foto que otro: apuntan a su archivo
+const FOTOS_COMPARTIDAS = { "empanada-de-frijol": "empanada-de-leche" };
+
+function buscarFoto(id) {
+  const archivo = FOTOS_COMPARTIDAS[id] ?? id;
+  return PLATILLOS_CON_FOTO.has(archivo) ? `img/platillos/${archivo}.webp` : null;
+}
+
 // Crea un platillo. "extras" cambia solo lo que no es igual al valor normal.
 function crearPlatillo(id, nombre, categoria, precio, extras = {}) {
   return {
@@ -39,7 +73,7 @@ function crearPlatillo(id, nombre, categoria, precio, extras = {}) {
     puntos: PUNTOS_POR_CATEGORIA[categoria],
     ventana_recogida: VENTANA_POR_CATEGORIA[categoria],
     disponible: true,
-    foto: null, // las fotos llegan en otra fase
+    foto: buscarFoto(id),
     ...extras,
   };
 }

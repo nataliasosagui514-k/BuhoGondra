@@ -279,6 +279,7 @@
   --tamano-estrella: 14px;
   --tamano-flecha: 20px;
   --tamano-avatar: 48px;
+  --tamano-foto-ticket: 48px;
   --tamano-imagen-avatar: 72px;
   --avatar-imagen-izquierda: -13px;
   --avatar-imagen-arriba: -5px;
@@ -1373,6 +1374,7 @@ main.contenido--completo {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  color: transparent; /* el texto alternativo no se dibuja mientras carga */
 }
 
 .tarjeta__foto {
@@ -5375,4 +5377,19 @@ dialog:focus {
 
 .ticket__datos .estado {
   align-self: flex-start;
+}
+
+/* Foto pequeña de cada platillo en el ticket */
+.ticket__linea--con-foto {
+  align-items: center;
+}
+
+.ticket__linea--con-foto .ticket__platillo {
+  flex: 1;
+}
+
+.ticket__foto {
+  flex-shrink: 0;
+  width: var(--tamano-foto-ticket);
+  height: var(--tamano-foto-ticket);
 }

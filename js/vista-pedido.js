@@ -810,8 +810,10 @@ function crearTicket(pedido, articulos) {
   const lista = crearElemento("ul", "ticket__lineas");
   lista.append(
     ...articulos.map((articulo) => {
-      const elemento = crearElemento("li", "ticket__linea");
+      const elemento = crearElemento("li", "ticket__linea ticket__linea--con-foto");
+      // Figma no pone foto en el ticket: se agregó de 48 px por pedido de este proyecto
       elemento.append(
+        crearFoto(articulo.platillo, "ticket__foto"),
         crearElemento("span", "ticket__platillo", nombrarConCantidad(articulo)),
         crearElemento("span", "ticket__precio", formatearPrecio(calcularTotal([articulo]))),
       );
