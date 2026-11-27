@@ -11,6 +11,15 @@ const PUNTOS_POR_CATEGORIA = {
   "mas-complementos": null,
 };
 
+// Cuándo se recoge cada categoría: "almuerzo" o "tipicos" (las horas están en HORARIOS).
+const VENTANA_POR_CATEGORIA = {
+  economicos: "almuerzo",
+  "platos-fuertes": "almuerzo",
+  tipicos: "tipicos",
+  complementos: "almuerzo",
+  "mas-complementos": "almuerzo",
+};
+
 const CATEGORIAS = {
   economicos: { nombre: "Económicos" },
   "platos-fuertes": { nombre: "Platos fuertes" },
@@ -28,6 +37,7 @@ function crearPlatillo(id, nombre, categoria, precio, extras = {}) {
     precio,
     eligeCantidad: false,
     puntos: PUNTOS_POR_CATEGORIA[categoria],
+    ventana_recogida: VENTANA_POR_CATEGORIA[categoria],
     disponible: true,
     foto: null, // las fotos llegan en otra fase
     ...extras,
@@ -90,16 +100,33 @@ const sopa = (id, nombre, precio) =>
   crearPlatillo(id, nombre, "platos-fuertes", precio, { opciones: [BEBIDA, TORTILLAS] });
 
 // Platillos que se repiten en varios días
-const croissant = economico("croissant-de-jamon-y-queso", "Croissant de jamón y queso", 2.75);
+const croissant = economico("croissant-de-jamon-y-queso", "Croissant de jamón y queso", 2.75, {
+  incluye: "papas y refresco pequeño",
+});
 const filetePollo = platoFuerte("filete-de-pollo", "Filete de pollo", 4.0);
-const empanadaLeche = tipico("empanada-de-leche", "Empanada de leche", 0.75);
-const empanadaFrijol = tipico("empanada-de-frijol", "Empanada de frijol", 0.75);
+const empanadaLeche = tipico("empanada-de-leche", "Empanada de leche", 0.75, {
+  eligeCantidad: true,
+});
+const empanadaFrijol = tipico("empanada-de-frijol", "Empanada de frijol", 0.75, {
+  eligeCantidad: true,
+});
 const pastelitoPollo = tipico("pastelito-de-pollo", "Pastelito de pollo", 0.65);
 const pastelitoRes = tipico("pastelito-de-res", "Pastelito de res", 0.65);
 const tamalPollo = tipico("tamal-de-pollo", "Tamal de pollo", 0.95);
 const tamalChipilin = tipico("tamal-de-chipilin", "Tamal de chipilín", 0.95);
 const tamales = tipico("tamales", "Tamales", 0.95);
-const pupusas = tipico("pupusas", "Pupusas", 0.8, { eligeCantidad: true });
+// Los dos tipos cuestan lo mismo: el precio es el del platillo, por unidad
+const pupusas = tipico("pupusas", "Pupusas", 0.8, {
+  eligeCantidad: true,
+  opciones: [
+    {
+      id: "tipo",
+      nombre: "Tipo",
+      valores: [{ nombre: "Frijol con queso" }, { nombre: "Revuelta" }],
+      porDefecto: null,
+    },
+  ],
+});
 
 // Complementos: iguales todos los días
 const COMPLEMENTOS = [
@@ -146,7 +173,7 @@ function crearDia(nombre, fecha, platillosPorCategoria) {
 const MENU_SEMANA = {
   lunes: crearDia("Lunes", "2026-11-23", {
     economicos: [
-      { ...croissant, incluye: "papas y refresco pequeño" },
+      croissant,
       economico("croquetas-de-pollo", "Croquetas de pollo", 2.75, {
         opciones: [SOLO_LA_PORCION],
       }),
@@ -159,23 +186,13 @@ const MENU_SEMANA = {
       platoFuerte("crepa-de-res", "Crepa de res", 4.0),
     ],
     tipicos: [
-      { ...empanadaLeche, eligeCantidad: true },
-      { ...empanadaFrijol, eligeCantidad: true },
+      empanadaLeche,
+      empanadaFrijol,
       tipico("arroz-en-leche", "Arroz en leche", 0.8),
       pastelitoPollo,
       tamalPollo,
       tamalChipilin,
-      {
-        ...pupusas,
-        opciones: [
-          {
-            id: "tipo",
-            nombre: "Tipo",
-            valores: [{ nombre: "Frijol con queso" }, { nombre: "Revuelta" }],
-            porDefecto: null,
-          },
-        ],
-      },
+      pupusas,
     ],
   }),
 
