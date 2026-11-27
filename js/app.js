@@ -5,6 +5,13 @@ const pantallas = {
   "#/menu": { titulo: "Menú", enBarra: true },
   "#/puntos": { titulo: "Puntos", enBarra: true },
   "#/mas": { titulo: "Más", enBarra: true },
+  // Ruta oculta: no tiene enlace en la app
+  "#/componentes": {
+    titulo: "Componentes",
+    enBarra: false,
+    plantilla: "plantilla-componentes",
+    preparar: dibujarCatalogo,
+  },
 };
 const pantallaInicial = "#/menu";
 const duracionAviso = 4000; // milisegundos. TODO: Figma no define la duración
@@ -15,14 +22,21 @@ function mostrarPantalla() {
   if (!Object.hasOwn(pantallas, location.hash)) {
     history.replaceState(null, "", pantallaInicial);
   }
-  const { titulo, enBarra } = pantallas[location.hash];
+  const {
+    titulo,
+    enBarra,
+    plantilla = "plantilla-pantalla",
+    preparar,
+  } = pantallas[location.hash];
 
   document.title = `${titulo} · BúhoGondra`;
   document.getElementById("titulo-pantalla").textContent = titulo;
   document.getElementById("boton-volver").hidden = enBarra;
 
-  const plantilla = document.getElementById("plantilla-pantalla");
-  document.getElementById("contenido").replaceChildren(plantilla.content.cloneNode(true));
+  const contenido = document.getElementById("contenido");
+  contenido.replaceChildren(document.getElementById(plantilla).content.cloneNode(true));
+  preparar?.(contenido); // contenido extra que necesite la pantalla
+  window.scrollTo(0, 0);
 
   marcarPestanaActiva();
 }
