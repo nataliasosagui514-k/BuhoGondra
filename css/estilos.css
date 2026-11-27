@@ -788,6 +788,17 @@ h1 {
   pointer-events: none;
 }
 
+/* Sobre una ventana abierta (ver mostrarAviso): se quitan los estilos de "popover"
+   que pone el navegador */
+.zona-avisos[popover] {
+  inset: var(--posicion-aviso-flotante) auto auto 50%;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  border: 0;
+  background: transparent;
+}
+
 /* TODO: Figma no define cómo se va el aviso; se quita sin animación */
 .zona-avisos .aviso {
   animation: aparecer-aviso var(--duracion-aparicion-aviso) var(--curva-aparicion-aviso);
@@ -2446,6 +2457,15 @@ dialog:focus {
 
 .ventana .detalle__boton {
   margin-top: var(--espacio-24);
+}
+
+.ventana .detalle__boton + .detalle__boton {
+  margin-top: var(--espacio-12);
+}
+
+.ventana--invitado .ventana__circulo {
+  background: var(--color-fondo-info-suave);
+  color: var(--color-accion-secundaria);
 }
 
 /* ---------- Hoja inferior "Revisa tu pedido" (Figma 1374:9609) ---------- */

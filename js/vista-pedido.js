@@ -211,9 +211,12 @@ const ICONOS_DE_VENTANA = {
     ],
   },
 };
+// La de invitado (Figma 1003:4839) usa el mismo icono, en azul
+ICONOS_DE_VENTANA.invitado = ICONOS_DE_VENTANA.informacion;
 
-// Ventana centrada sobre un fondo oscuro, con un solo botón.
-function crearVentana({ tipo, titulo, destacado, mensaje, textoBoton, alTocar }) {
+// Ventana centrada sobre un fondo oscuro, con uno o dos botones ("segundo": { texto,
+// alTocar }). Si recibe "alCerrar", también se cierra al tocar fuera.
+function crearVentana({ tipo, titulo, destacado, mensaje, textoBoton, alTocar, segundo, alCerrar }) {
   const { caja, trazos } = ICONOS_DE_VENTANA[tipo];
   const circulo = crearElemento("span", "ventana__circulo");
   circulo.append(crearIconoSvg("ventana__icono", caja, trazos));
@@ -228,12 +231,23 @@ function crearVentana({ tipo, titulo, destacado, mensaje, textoBoton, alTocar })
     ...(destacado ? [crearElemento("p", "ventana__destacado", destacado)] : []),
     crearElemento("p", "ventana__mensaje", mensaje),
     crearBotonInferior(textoBoton, alTocar),
+    ...(segundo ? [crearBotonInferior(segundo.texto, segundo.alTocar, "contorno")] : []),
   );
-  // La tecla Escape hace lo mismo que el botón
+  // La tecla Escape cierra la ventana o, si no se puede cerrar, hace lo mismo que el botón
   ventana.addEventListener("cancel", (evento) => {
     evento.preventDefault();
-    alTocar();
+    (alCerrar ?? alTocar)();
   });
+  if (alCerrar) {
+    // Un toque en el fondo llega al diálogo, pero fuera de su rectángulo
+    ventana.addEventListener("click", (evento) => {
+      const { left, right, top, bottom } = ventana.getBoundingClientRect();
+      const { clientX: x, clientY: y } = evento;
+      if (evento.target === ventana && (x < left || x > right || y < top || y > bottom)) {
+        alCerrar();
+      }
+    });
+  }
   return ventana;
 }
 
@@ -244,6 +258,8 @@ function abrirDialogo(contenedor, dialogo) {
   dialogo.tabIndex = -1;
   contenedor.append(dialogo);
   dialogo.showModal();
+  // Algunos navegadores no respetan "autofocus" en el propio diálogo
+  dialogo.focus();
 }
 
 // "Horario cerrado" (Figma 1374:9939): no deja avanzar.

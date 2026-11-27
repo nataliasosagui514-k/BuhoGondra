@@ -215,8 +215,21 @@ function crearAviso(tipo, titulo, texto) {
 // Muestra un aviso y lo quita después de unos segundos.
 function mostrarAviso(tipo, titulo, texto) {
   const aviso = crearAviso(tipo, titulo, texto);
-  document.getElementById("zona-avisos").append(aviso);
-  setTimeout(() => aviso.remove(), duracionAviso);
+  const zona = document.getElementById("zona-avisos");
+  zona.append(aviso);
+  // Una ventana abierta queda por encima de todo: para que el aviso se vea, la zona
+  // se sube a esa misma capa
+  zona.removeAttribute("popover");
+  if (document.querySelector("dialog[open]") && zona.showPopover) {
+    zona.popover = "manual";
+    zona.showPopover();
+  }
+  setTimeout(() => {
+    aviso.remove();
+    if (!zona.children.length) {
+      zona.removeAttribute("popover");
+    }
+  }, duracionAviso);
 }
 
 // Eventos
