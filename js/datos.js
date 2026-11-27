@@ -284,6 +284,9 @@ const MENU_SEMANA = {
   }),
 };
 
+// Una const no se agrega sola a window: se expone para revisarla como window.MENU_SEMANA
+window.MENU_SEMANA = MENU_SEMANA;
+
 // Cafeterías
 const CAFETERIAS = [
   { id: "jardines", nombre: "Jardines", predeterminada: false },
