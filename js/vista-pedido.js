@@ -71,10 +71,10 @@ function describirLinea(platillo, linea) {
   return unirConPuntos(partes.filter(Boolean));
 }
 
-// Junta cada línea con su platillo del menú de hoy y con lo que cuesta.
-function detallarLineas(lineas) {
+// Junta cada línea con su platillo del menú de ese día y con lo que cuesta.
+function detallarLineas(lineas, fecha = obtenerFechaDeHoy()) {
   return lineas.flatMap((linea) => {
-    const platillo = obtenerPlatillo(linea.id, obtenerFechaDeHoy());
+    const platillo = obtenerPlatillo(linea.id, fecha);
     return platillo
       ? [{ linea, platillo, precio: platillo.precio, cantidad: linea.cantidad }]
       : [];
@@ -125,6 +125,10 @@ function nombrarCafeteria(idCafeteria) {
 /* ---------- Ventana (Figma 834:2458) ---------- */
 
 const ICONOS_DE_VENTANA = {
+  exito: {
+    caja: 56,
+    trazos: ["M19 28L25.5455 34.5L37 21.5"],
+  },
   informacion: {
     caja: 28,
     trazos: [
@@ -456,12 +460,172 @@ function dibujarApartar(contenedor, { id }) {
         hora: datos.get("hora"),
         cafeteria: datos.get("cafeteria"),
         alAgregar: () => agregarOtroPlatillo(lineas),
-        alConfirmar: () => {},
+        alConfirmar: (boton) => {
+          boton.disabled = true; // un segundo toque no debe crear otro pedido
+          confirmarPedido(contenedor, {
+            articulos,
+            hora: datos.get("hora"),
+            cafeteria: datos.get("cafeteria"),
+          });
+        },
       }),
     );
   });
 
   contenedor.querySelector(".menu").append(formulario);
+}
+
+/* ---------- Confirmar ---------- */
+
+// El ticket del pedido que se acaba de confirmar abre con "¡Pedido apartado!"
+let pedidoRecienApartado = null;
+
+function confirmarPedido(contenedor, { articulos, hora, cafeteria }) {
+  // Pudieron pasar las 11:00 mientras se revisaba (nota de Figma 1375:9324)
+  if (!estaAbiertoApartar()) {
+    mostrarHorarioCerrado(contenedor);
+    return;
+  }
+  const pedido = crearPedido({
+    articulos,
+    fecha: obtenerFechaDeHoy(),
+    cafeteria,
+    horaRecogida: hora,
+    anteriores: obtenerPedidos(),
+  });
+  if (!guardarPedido(pedido)) {
+    contenedor.querySelector("dialog.hoja")?.remove(); // el aviso debe verse
+    // TODO: Figma no define este mensaje
+    mostrarAviso("error", "No se pudo guardar tu pedido");
+    return;
+  }
+  guardarPuntos(obtenerPuntos() + pedido.puntos);
+  borrarPedidoEnCurso();
+  pedidoRecienApartado = pedido.id;
+  // El ticket reemplaza a "Hora y cafetería": volver atrás no repite el pedido
+  location.replace(`#/ticket/${pedido.id}`);
+}
+
+/* ---------- Tu ticket (Figma 1374:9674) ---------- */
+
+// Componente "Ticket con PIN", tipo Pedido (Figma 874:3386).
+function crearTicket(pedido, articulos) {
+  const lista = crearElemento("ul", "ticket__lineas");
+  lista.append(
+    ...articulos.map((articulo) => {
+      const elemento = crearElemento("li", "ticket__linea");
+      elemento.append(
+        crearElemento("span", "ticket__platillo", nombrarConCantidad(articulo)),
+        crearElemento("span", "ticket__precio", formatearPrecio(calcularTotal([articulo]))),
+      );
+      return elemento;
+    }),
+  );
+  const desglose = crearElemento("div", "ticket__desglose");
+  desglose.append(crearElemento("h3", "ticket__subtitulo", "Lo que pediste"), lista);
+
+  const textosDePago = crearElemento("div", "pago-en-caja__textos");
+  textosDePago.append(
+    crearElemento("p", "pago-en-caja__titulo", "Pago en caja"),
+    crearElemento("p", "pago-en-caja__mensaje", "Se paga al recoger tu pedido, no antes."),
+  );
+  const pago = crearElemento("div", "pago-en-caja");
+  pago.append(
+    crearIconoSvg("pago-en-caja__icono", 24, [
+      "M5 6H19C20.66 6 22 7.34 22 9V15C22 16.66 20.66 18 19 18H5C3.34 18 2 16.66 2 15V9" +
+        "C2 7.34 3.34 6 5 6Z",
+      "M14.5 12C14.5 13.38 13.38 14.5 12 14.5C10.62 14.5 9.5 13.38 9.5 12" +
+        "C9.5 10.62 10.62 9.5 12 9.5C13.38 9.5 14.5 10.62 14.5 12Z",
+      "M6 12H6.01M18 12H18.01",
+    ]),
+    textosDePago,
+    crearElemento("p", "pago-en-caja__total", formatearPrecio(pedido.total)),
+  );
+
+  const datos = crearElemento("div", "ticket__datos");
+  datos.append(
+    crearElemento("p", "ticket__numero", `PEDIDO #${pedido.numero}`),
+    // TODO: Figma solo muestra el título de un pedido de un platillo
+    crearElemento(
+      "h2",
+      "ticket__titulo",
+      articulos.map(({ platillo }) => nombrarEnElPedido(platillo)).join(" + "),
+    ),
+    crearCajaDeRecogida(pedido.horaRecogida, pedido.cafeteria),
+    desglose,
+    pago,
+  );
+
+  const digitos = crearElemento("p", "ticket__digitos");
+  digitos.setAttribute("aria-label", [...pedido.pin].join(" "));
+  digitos.setAttribute("role", "img");
+  digitos.append(...[...pedido.pin].map((cifra) => crearElemento("span", "ticket__digito", cifra)));
+  const pin = crearElemento("div", "ticket__pin");
+  pin.append(
+    crearElemento("p", "ticket__pin-etiqueta", "Tu PIN"),
+    digitos,
+    crearElemento(
+      "p",
+      "ticket__instruccion",
+      "Dile este PIN a quien te atienda para recoger tu pedido.",
+    ),
+  );
+
+  const ticket = crearElemento("article", "ticket");
+  ticket.append(datos, crearElemento("div", "ticket__corte"), pin);
+  return ticket;
+}
+
+function dibujarTicket(contenedor, { id }) {
+  const pedido = obtenerPedidos().find((uno) => uno.id === id);
+  if (!pedido) {
+    location.replace("#/menu");
+    return;
+  }
+  const lugar = nombrarCafeteria(pedido.cafeteria);
+  const hora = formatearHora(pedido.horaRecogida);
+
+  const titulos = crearElemento("header", "ticket-pantalla__titulos");
+  titulos.append(
+    crearElemento("h1", "ticket-pantalla__titulo", "Tu ticket"),
+    crearElemento("p", "ticket-pantalla__indicacion", `Llévalo a ${lugar} a las ${hora}`),
+  );
+
+  const acciones = crearElemento("div", "ticket-pantalla__acciones");
+  // TODO: "Más › Historial" todavía no existe
+  acciones.append(
+    crearElemento(
+      "p",
+      "ticket-pantalla__nota",
+      "También lo encuentras en Más › Historial, aunque no tengas internet.",
+    ),
+    crearBotonInferior("Listo", () => {
+      borrarPedidoEnCurso();
+      location.hash = "#/menu";
+    }),
+  );
+
+  const pantalla = contenedor.querySelector(".ticket-pantalla");
+  pantalla.append(
+    titulos,
+    crearTicket(pedido, detallarLineas(pedido.platillos, pedido.fecha)),
+    acciones,
+  );
+
+  if (pedidoRecienApartado === pedido.id) {
+    pedidoRecienApartado = null;
+    const ventana = crearVentana({
+      tipo: "exito",
+      titulo: "¡Pedido apartado!",
+      mensaje: `Te esperamos hoy a las ${hora} en ${lugar}. Pagas en caja al recoger.`,
+      textoBoton: "Ver mi ticket",
+      alTocar: () => {
+        ventana.close();
+        ventana.remove();
+      },
+    });
+    abrirDialogo(contenedor, ventana);
+  }
 }
 
 /* ---------- Personaliza tu plato (Figma 1346:8841 y 1347:9194) ---------- */

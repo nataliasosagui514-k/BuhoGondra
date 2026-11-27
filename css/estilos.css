@@ -327,6 +327,18 @@
   --alto-asa: 5px;
   --radio-asa: 3px;
 
+  /* Tu ticket y "Ticket con PIN" (Figma 1374:9674 y 874:3386) */
+  --margen-superior-ticket: 78px;
+  --margen-inferior-ticket: 34px;
+  --separacion-desglose: 6px;
+  --alto-corte: 24px;
+  --grosor-corte: 2px;
+  --trazo-corte: 6px;
+  --ancho-digito: 56px;
+  --alto-digito: 64px;
+  --letra-digito: 32px;
+  --linea-digito: 40px;
+
   /* Menú de la semana */
   --ancho-pestana-dia: 62px;
   --alto-pestana-dia: 60px;
@@ -427,6 +439,11 @@ h1 {
 
 .boton-volver:active {
   background: var(--color-fondo-atenuado);
+}
+
+/* El ticket no lleva barra */
+.barra-navegacion[hidden] {
+  display: none;
 }
 
 /* Oculto en las pantallas de la barra */
@@ -2491,4 +2508,248 @@ dialog:focus {
   padding: var(--espacio-16);
   border-radius: var(--radio-imagen);
   background: var(--color-fondo-atenuado);
+}
+
+/* La ventana de éxito: círculo verde que crece, como en el prototipo */
+.ventana--exito .ventana__circulo {
+  background: var(--color-fondo-exito-suave);
+  color: var(--color-estado-exito);
+}
+
+.ventana--exito .ventana__icono {
+  width: 100%;
+  height: 100%;
+  stroke-width: 2.5;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ventana--exito .ventana__circulo {
+    animation: crecer 2s linear infinite;
+  }
+}
+
+@keyframes crecer {
+  0% { scale: 0.3; animation-timing-function: cubic-bezier(0.2, 0, 0.2, 1); }
+  17.5%, 100% { scale: 1.25; }
+}
+
+/* ---------- Tu ticket (Figma 1374:9674) ---------- */
+.ticket-pantalla {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--espacio-24);
+  padding: var(--margen-superior-ticket) var(--margen-lateral-pantalla)
+    var(--margen-inferior-ticket);
+}
+
+.ticket-pantalla__titulos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-8);
+}
+
+.ticket-pantalla__titulo {
+  font-size: var(--letra-titulo-1);
+  line-height: var(--linea-titulo-1);
+  letter-spacing: var(--interletra-titulo-1);
+}
+
+.ticket-pantalla__indicacion {
+  color: var(--color-texto-secundario);
+}
+
+.ticket-pantalla__acciones {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-8);
+  margin-top: auto;
+}
+
+.ticket-pantalla__acciones .detalle__boton {
+  margin-top: 0;
+}
+
+.ticket-pantalla__nota,
+.ticket__instruccion {
+  color: var(--color-texto-secundario);
+  font-size: var(--letra-texto-pequeno);
+  line-height: var(--linea-texto-pequeno);
+  letter-spacing: var(--interletra-texto-pequeno);
+  text-align: center;
+}
+
+/* Componente "Ticket con PIN" */
+.ticket {
+  overflow: hidden; /* las muescas salen a los lados */
+  border: var(--borde-fino) solid var(--color-borde-suave);
+  border-radius: var(--radio-tarjeta);
+  background: var(--color-superficie);
+}
+
+.ticket__datos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-12);
+  padding: var(--espacio-20) var(--espacio-20) var(--espacio-16);
+}
+
+.ticket__numero {
+  color: var(--color-texto-secundario);
+  font-size: var(--letra-nota);
+  font-weight: var(--peso-media);
+  line-height: var(--linea-nota);
+  letter-spacing: var(--interletra-nota);
+}
+
+.ticket__titulo {
+  font-family: var(--fuente-titulos);
+  font-size: var(--letra-titulo-2);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-titulo-2);
+  letter-spacing: var(--interletra-titulo-2);
+}
+
+.ticket .recogida {
+  padding: var(--espacio-12);
+}
+
+.ticket__desglose {
+  display: flex;
+  flex-direction: column;
+  gap: var(--separacion-desglose);
+}
+
+.ticket__subtitulo,
+.pago-en-caja__titulo {
+  font-size: var(--letra-etiqueta);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-etiqueta);
+}
+
+.ticket__lineas {
+  display: flex;
+  flex-direction: column;
+  gap: var(--separacion-desglose);
+  padding: 0;
+  list-style: none;
+}
+
+.ticket__linea {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--espacio-12);
+  color: var(--color-texto-secundario);
+  font-size: var(--letra-texto-pequeno);
+  line-height: var(--linea-texto-pequeno);
+  letter-spacing: var(--interletra-texto-pequeno);
+}
+
+.pago-en-caja {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-12);
+  padding: var(--espacio-12);
+  border-radius: var(--radio-imagen);
+  background: var(--color-fondo-marca-suave);
+  color: var(--color-texto-marca);
+}
+
+.pago-en-caja__icono {
+  flex-shrink: 0;
+  width: var(--tamano-icono);
+  height: var(--tamano-icono);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.pago-en-caja__textos {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--separacion-texto-cafeteria);
+  min-width: 0;
+}
+
+.pago-en-caja__mensaje {
+  font-size: var(--letra-texto-pequeno);
+  line-height: var(--linea-texto-pequeno);
+  letter-spacing: var(--interletra-texto-pequeno);
+}
+
+.pago-en-caja__total {
+  color: var(--color-texto-principal);
+  font-family: var(--fuente-titulos);
+  font-size: var(--letra-precio);
+  font-weight: var(--peso-negrita);
+  line-height: var(--linea-precio);
+}
+
+/* Línea punteada con una muesca en cada borde */
+.ticket__corte {
+  position: relative;
+  height: var(--alto-corte);
+}
+
+.ticket__corte::before,
+.ticket__corte::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: var(--alto-corte);
+  height: var(--alto-corte);
+  border-radius: var(--radio-pildora);
+  background: var(--color-fondo-app);
+}
+
+.ticket__corte::before {
+  left: calc(-1 * var(--espacio-12));
+}
+
+.ticket__corte::after {
+  right: calc(-1 * var(--espacio-12));
+}
+
+.ticket__corte {
+  background: repeating-linear-gradient(90deg, var(--color-borde-normal) 0 var(--trazo-corte),
+      transparent var(--trazo-corte) calc(2 * var(--trazo-corte)))
+    center / calc(100% - 2 * var(--espacio-20)) var(--grosor-corte) no-repeat;
+}
+
+.ticket__pin {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--espacio-12);
+  padding: var(--espacio-16) var(--espacio-20) var(--espacio-24);
+}
+
+.ticket__pin-etiqueta {
+  color: var(--color-texto-secundario);
+  font-size: var(--letra-etiqueta-pequena);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-etiqueta-pequena);
+  letter-spacing: var(--interletra-etiqueta-pequena);
+}
+
+.ticket__digitos {
+  display: flex;
+  gap: var(--espacio-8);
+}
+
+.ticket__digito {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--ancho-digito);
+  height: var(--alto-digito);
+  border-radius: var(--radio-imagen);
+  background: var(--color-fondo-atenuado);
+  font-family: var(--fuente-titulos);
+  font-size: var(--letra-digito);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-digito);
+  letter-spacing: var(--interletra-titulo-pantalla);
 }

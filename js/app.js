@@ -31,7 +31,7 @@ const pantallas = {
 };
 
 // Rutas con el id de un platillo: #/platillo/ID, #/personalizar/ID, #/apartar/ID,
-// #/comentarios/ID y #/comentarios/ID/escribir
+// #/comentarios/ID y #/comentarios/ID/escribir. Y el del ticket: #/ticket/PEDIDO
 const pantallasConId = {
   personalizar: {
     titulo: "Personaliza tu plato",
@@ -55,6 +55,16 @@ const pantallasConId = {
     pestana: "#/menu",
     plantilla: "plantilla-apartar",
     preparar: dibujarApartar,
+  },
+  // El id es el del pedido. No lleva barra ni botón de volver (nota de Figma 1375:9321)
+  ticket: {
+    titulo: "Tu ticket",
+    enBarra: false,
+    sinEncabezado: true,
+    sinNavegacion: true,
+    pestana: "#/menu",
+    plantilla: "plantilla-ticket",
+    preparar: dibujarTicket,
   },
   comentarios: {
     titulo: "Comentarios y calificaciones",
@@ -86,7 +96,7 @@ function buscarPantalla(hash) {
   if (Object.hasOwn(pantallas, ruta)) {
     return { ...pantallas[ruta], ruta, parametros };
   }
-  const partes = ruta.match(/^#\/(platillo|personalizar|apartar|comentarios)\/([^/]+?)(\/escribir)?$/);
+  const partes = ruta.match(/^#\/(platillo|personalizar|apartar|ticket|comentarios)\/([^/]+?)(\/escribir)?$/);
   const tipo = partes && `${partes[1]}${partes[3] ?? ""}`;
   return Object.hasOwn(pantallasConId, tipo)
     ? { ...pantallasConId[tipo], ruta, parametros, id: partes[2] }
@@ -121,6 +131,7 @@ function mostrarPantalla() {
     plantilla = "plantilla-pantalla",
     preparar,
     sinEncabezado = false,
+    sinNavegacion = false,
     ruta,
     pestana = ruta,
     id,
@@ -131,6 +142,7 @@ function mostrarPantalla() {
   document.getElementById("titulo-pantalla").textContent = titulo;
   document.getElementById("boton-volver").hidden = enBarra;
   document.querySelector("body > header").hidden = sinEncabezado;
+  document.getElementById("navegacion-inferior").hidden = sinNavegacion;
 
   const contenido = document.getElementById("contenido");
   contenido.classList.toggle("contenido--completo", sinEncabezado);

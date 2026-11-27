@@ -26,6 +26,65 @@ function calcularTotal(articulos) {
   return centavos / 100;
 }
 
+/* ---------- Puntos, PIN y número ---------- */
+
+const PRIMER_NUMERO_DE_PEDIDO = 1043;
+const CIFRAS_DEL_PIN = 4;
+
+// Los puntos se dan una vez por pedido, no por cantidad: los de su categoría.
+// TODO: falta decidir cuántos da un pedido que junta categorías de la misma ventana
+// (por ejemplo, plato fuerte y económico). Por ahora cuenta la que más puntos da.
+function calcularPuntos(platillos) {
+  return Math.max(0, ...platillos.map((platillo) => platillo.puntos ?? 0));
+}
+
+// PIN al azar de 4 dígitos que no tenga otro pedido de ese día en esa cafetería.
+// Es texto para no perder los ceros del principio ("0427").
+function generarPin(pedidos, fecha, cafeteria, azar = Math.random) {
+  const usados = new Set(
+    pedidos
+      .filter((pedido) => pedido.fecha === fecha && pedido.cafeteria === cafeteria)
+      .map((pedido) => pedido.pin),
+  );
+  let pin;
+  do {
+    pin = String(Math.floor(azar() * 10 ** CIFRAS_DEL_PIN)).padStart(CIFRAS_DEL_PIN, "0");
+  } while (usados.has(pin));
+  return pin;
+}
+
+// Consecutivo: "A-1043", "A-1044"…
+function obtenerSiguienteNumero(pedidos) {
+  const usados = pedidos
+    .map((pedido) => Number(String(pedido.numero).replace("A-", "")))
+    .filter(Number.isInteger);
+  return `A-${Math.max(PRIMER_NUMERO_DE_PEDIDO - 1, ...usados) + 1}`;
+}
+
+/* ---------- El pedido que se guarda ---------- */
+
+// TODO (fase de Registro): sin sesión, el autor es "invitado". Falta la regla de lo
+// que puede hacer una persona invitada.
+const AUTOR_INVITADO = "invitado";
+
+// Arma el pedido con los datos del diseño y ningún otro. "articulos" son las líneas
+// junto con su platillo, precio y cantidad; "anteriores", los pedidos ya guardados.
+function crearPedido({ articulos, fecha, cafeteria, horaRecogida, anteriores }) {
+  const numero = obtenerSiguienteNumero(anteriores);
+  return {
+    id: `${fecha}-${numero}`,
+    fecha,
+    cafeteria,
+    horaRecogida,
+    platillos: articulos.map(({ linea }) => linea),
+    total: calcularTotal(articulos),
+    pin: generarPin(anteriores, fecha, cafeteria),
+    numero,
+    puntos: calcularPuntos(articulos.map(({ platillo }) => platillo)),
+    autor: AUTOR_INVITADO,
+  };
+}
+
 /* ---------- Horarios ---------- */
 
 // La hora con la que trabaja Apartar.
