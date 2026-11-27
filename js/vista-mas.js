@@ -845,6 +845,16 @@ function crearTarjetaDePedido(pedido) {
     crearEtiquetaDeEstado(pedido),
     crearElemento("span", "pedido__datos", describirEnLista(pedido)),
   );
+  // TODO: Figma 50 no muestra el descuento; se usa el texto de la revisión (M30c)
+  if (pedido.descuento) {
+    textos.append(
+      crearElemento(
+        "span",
+        "pedido__datos linea-descuento",
+        `${ETIQUETA_DE_DESCUENTO} ${formatearDescuento(pedido.descuento)}`,
+      ),
+    );
+  }
   const tarjeta = crearElemento("a", "pedido");
   tarjeta.href = `#/mas/historial/${pedido.id}`;
   tarjeta.append(
@@ -927,6 +937,16 @@ function crearDesgloseDePedido(pedido, articulos) {
       return linea;
     }),
   );
+  // TODO: Figma 51 no muestra el descuento; se usa la fila de la revisión (M30c)
+  if (pedido.descuento) {
+    lineas.append(
+      crearLineaDeDescuento(pedido.descuento, {
+        fila: "detalle-pedido__linea",
+        nombre: "detalle-pedido__platillo",
+        monto: "detalle-pedido__precio",
+      }),
+    );
+  }
   const total = crearElemento("p", "detalle-pedido__total");
   total.append(
     crearElemento("span", "", "Total"),
