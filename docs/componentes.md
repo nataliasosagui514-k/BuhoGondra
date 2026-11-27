@@ -45,7 +45,7 @@ Un guion (—) en el id significa que no se encontró un componente para esa var
 | Etiqueta | Casero | Normal | — (solo color de acento, `507:372`) | TODO de color |
 | Etiqueta | Disponible | Normal | `820:2416` | Hecho |
 | Etiqueta | Agotado | Normal | `820:2419` | Hecho |
-| Etiqueta | Calificación | Normal | `820:2412` | Pendiente |
+| Etiqueta | Calificación | Normal | `820:2412` | Hecho en detalle y comentarios (aún no aparece en #/componentes) |
 | Etiqueta | Entregado | Normal | `820:2422` | Pendiente |
 | Etiqueta | Cancelado | Normal | `820:2426` | Pendiente |
 | Etiqueta | Menú actualizado | Normal | `870:2946` | Pendiente |
@@ -63,17 +63,26 @@ Un guion (—) en el id significa que no se encontró un componente para esa var
 | Aviso | Error | Normal | `820:2430` | Hecho |
 | Aviso | Información | Normal | `820:2444` | Hecho en el detalle de otro día (aún no aparece en #/componentes) |
 | Aviso | Menú sin actualizar | Normal | `905:4113` | Hecho en el Menú (aún no aparece en #/componentes) |
-| Aviso | Flotante (posición, animación y cristal) | Visible | — | Pendiente |
+| Aviso | Flotante (arriba, fundido de entrada, 3 s) | Visible | `1440:11251` | Hecho; Figma no define la salida |
 
-El aviso flotante actual usa una posición y una duración provisionales, marcadas con TODO en el código.
+La posición, la entrada y la duración del aviso flotante vienen de Figma. Solo la salida queda con TODO.
 
 ## TODO abiertos en el código
 
 | Dónde | Qué falta definir en Figma |
 |---|---|
 | `css/estilos.css`, `.etiqueta--nuevo`, `--combo`, `--casero` | Color del texto de las tres etiquetas (se usa el texto principal). |
-| `css/estilos.css`, `.zona-avisos` | Posición, animación y cristal del aviso flotante. |
-| `js/app.js`, `duracionAviso` | Duración del aviso (se usan 4 segundos). |
+| `css/estilos.css`, `.zona-avisos .aviso` | Cómo se va el aviso flotante. |
+
+## Comentarios y calificaciones
+
+| Componente | Variante | Estado | Nodo en Figma | Implementación |
+|---|---|---|---|---|
+| Fila de opción | Comentarios | Normal | `1176:7257` | Hecho |
+| Comentario | Con y sin texto | Normal | `1189:4679` | Hecho |
+| Avatar de búho (pequeño) | Búhos 1 a 6 | Normal | `901:3528` | Hecho |
+| Calificación (selector) | Valor 0 a 5 | Normal | `827:2507` | Hecho |
+| Campo de texto | Vacío, Foco y Lleno | — | `725:2427` | Hecho en «Tu comentario»; Error y Deshabilitado pendientes |
 
 ## Botones
 

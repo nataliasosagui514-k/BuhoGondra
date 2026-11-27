@@ -254,6 +254,9 @@ function dibujarComentarios(contenedor, { id }) {
   const lista = contenedor.querySelector(".opiniones__lista");
   const escribir = contenedor.querySelector(".opiniones__escribir");
   escribir.href = `#/comentarios/${id}/escribir`;
+  if (obtenerMiOpinion(id)) {
+    escribir.textContent = "Editar mi opinión";
+  }
   // Sin opiniones, escribir es la acción principal (M5c)
   escribir.classList.add(opiniones.length ? "boton--contorno" : "boton--primario");
 
@@ -319,16 +322,43 @@ function dibujarEscribirOpinion(contenedor, { id }) {
     formulario.querySelector(".campo__ayuda").textContent =
       `${entrada.value.length}/${entrada.maxLength} caracteres`;
   };
+  // Si ya opinó, el formulario se abre con lo que escribió
+  const anterior = obtenerMiOpinion(id);
+  entrada.value = anterior?.texto ?? "";
   entrada.addEventListener("input", contarCaracteres);
   contarCaracteres();
 
-  let calificacion = 0;
+  entrada.maxLength = MAXIMO_CARACTERES_OPINION;
+
+  let calificacion = anterior?.calificacion ?? 0;
   prepararSelectorDeEstrellas(formulario.querySelector(".calificar"), calificacion, (valor) => {
     calificacion = valor;
     publicar.disabled = valor === 0; // sin estrellas no se puede publicar
   });
 
   formulario.addEventListener("submit", (evento) => {
-    evento.preventDefault(); // el guardado se agrega en el siguiente paso
+    evento.preventDefault();
+    if (!calificacion) {
+      return;
+    }
+    const guardada = guardarOpinion({
+      platilloId: id,
+      autor: AUTOR_SIN_SESION,
+      calificacion,
+      texto: entrada.value.trim(),
+      fecha: new Date().toISOString(),
+    });
+    if (!guardada) {
+      // TODO: Figma no define el aviso para cuando el teléfono no deja guardar
+      mostrarAviso("error", "No se pudo guardar tu opinión");
+      return;
+    }
+    volverAComentarios();
+    // Aviso "Éxito" de M5d
+    mostrarAviso(
+      "exito",
+      "¡Gracias por tu opinión!",
+      "Tu calificación ya cuenta en el promedio de este platillo.",
+    );
   });
 }

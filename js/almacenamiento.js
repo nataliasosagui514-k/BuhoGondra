@@ -1,8 +1,9 @@
-// Guardado local de pedidos y puntos con localStorage.
+// Guardado local de pedidos, puntos y opiniones con localStorage.
 // Si no está disponible, las funciones devuelven un valor vacío y la app sigue.
 
 const CLAVE_PEDIDOS = "buhogondra.pedidos";
 const CLAVE_PUNTOS = "buhogondra.puntos";
+const CLAVE_OPINIONES = "buhogondra.opiniones";
 
 // Lee un valor guardado; devuelve null si no existe o no se puede leer.
 function leerDato(clave) {
@@ -52,9 +53,59 @@ function guardarPuntos(cantidad) {
   return escribirDato(CLAVE_PUNTOS, cantidad) ? cantidad : null;
 }
 
-// Opiniones de un platillo, de la más reciente a la más antigua.
-function obtenerOpiniones(platilloId) {
-  return OPINIONES_DE_EJEMPLO.filter((opinion) => opinion.platilloId === platilloId).sort(
-    (una, otra) => new Date(otra.fecha) - new Date(una.fecha),
+/* ---------- Opiniones ---------- */
+
+// TODO: sin sesión, el autor es "Tú". La revisión de sesión y de persona invitada
+// (que solo puede leer) se hace en la fase de Registro.
+const AUTOR_SIN_SESION = "Tú";
+const MAXIMO_CARACTERES_OPINION = 200;
+
+// Una opinión sirve si tiene platillo, autor, de 1 a 5 estrellas, texto corto y fecha.
+function esOpinionValida(opinion) {
+  return Boolean(
+    opinion &&
+      typeof opinion.platilloId === "string" &&
+      typeof opinion.autor === "string" &&
+      Number.isInteger(opinion.calificacion) &&
+      opinion.calificacion >= 1 &&
+      opinion.calificacion <= 5 &&
+      typeof opinion.texto === "string" &&
+      opinion.texto.length <= MAXIMO_CARACTERES_OPINION &&
+      !Number.isNaN(Date.parse(opinion.fecha)),
   );
+}
+
+// Las opiniones escritas en este teléfono (sin las de ejemplo).
+function obtenerOpinionesGuardadas() {
+  const opiniones = leerDato(CLAVE_OPINIONES);
+  return Array.isArray(opiniones) ? opiniones.filter(esOpinionValida) : [];
+}
+
+// Opiniones de un platillo (guardadas y de ejemplo), de la más reciente a la más antigua.
+function obtenerOpiniones(platilloId) {
+  return [...obtenerOpinionesGuardadas(), ...OPINIONES_DE_EJEMPLO]
+    .filter((opinion) => opinion.platilloId === platilloId)
+    .sort((una, otra) => new Date(otra.fecha) - new Date(una.fecha));
+}
+
+// La opinión propia sobre un platillo, o null si todavía no la ha escrito.
+function obtenerMiOpinion(platilloId) {
+  return (
+    obtenerOpinionesGuardadas().find(
+      (opinion) => opinion.platilloId === platilloId && opinion.autor === AUTOR_SIN_SESION,
+    ) ?? null
+  );
+}
+
+// Guarda una opinión. Cada persona tiene una sola por platillo: la nueva reemplaza
+// a la anterior. Solo se guardan estos cinco datos. Devuelve null si no se guardó.
+function guardarOpinion({ platilloId, autor, calificacion, texto, fecha }) {
+  const opinion = { platilloId, autor, calificacion, texto, fecha };
+  if (!esOpinionValida(opinion)) {
+    return null;
+  }
+  const otras = obtenerOpinionesGuardadas().filter(
+    (una) => !(una.platilloId === platilloId && una.autor === autor),
+  );
+  return escribirDato(CLAVE_OPINIONES, [...otras, opinion]) ? opinion : null;
 }
