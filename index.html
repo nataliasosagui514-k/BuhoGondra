@@ -6,15 +6,63 @@
   <title>BúhoGondra</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700&display=swap">
   <link rel="stylesheet" href="css/estilos.css">
 </head>
 <body>
   <header>
-    <h1>BúhoGondra</h1>
+    <button type="button" class="boton-volver" id="boton-volver" aria-label="Volver" hidden>
+      <svg class="icono" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M15 5L8 12L15 19"/>
+      </svg>
+    </button>
+    <h1 id="titulo-pantalla">BúhoGondra</h1>
   </header>
+
   <main id="contenido"></main>
-  <nav id="navegacion-inferior" aria-label="Navegación principal"></nav>
+
+  <!-- Iconos tomados de Figma; en línea para que cambien de color con el texto -->
+  <nav id="navegacion-inferior" class="barra-navegacion" aria-label="Navegación principal">
+    <ul>
+      <li>
+        <a class="pestana" href="#/menu">
+          <svg class="icono" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5.5 3V8C5.5 8.66304 5.76339 9.29893 6.23223 9.76777C6.70107 10.2366 7.33696 10.5 8 10.5C8.66304 10.5 9.29893 10.2366 9.76777 9.76777C10.2366 9.29893 10.5 8.66304 10.5 8V3"/>
+            <path d="M8 3V21"/>
+            <path d="M17.5 21V3C15.2 4.4 14 7 14 10.2V14H17.5"/>
+          </svg>
+          <span>Menú</span>
+        </a>
+      </li>
+      <li>
+        <a class="pestana" href="#/puntos">
+          <svg class="icono" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"/>
+            <path d="M12 7.5L13.18 10.78L16.66 10.89L13.9 13.02L14.88 16.36L12 14.4L9.12 16.36L10.1 13.02L7.34 10.89L10.82 10.78L12 7.5Z"/>
+          </svg>
+          <span>Puntos</span>
+        </a>
+      </li>
+      <li>
+        <a class="pestana" href="#/mas">
+          <svg class="icono" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 7H20"/>
+            <path d="M4 12H15"/>
+            <path d="M4 17H20"/>
+          </svg>
+          <span>Más</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <div class="zona-avisos" id="zona-avisos" role="status"></div>
+
+  <!-- Plantilla que comparten las pantallas; el título se muestra en el encabezado -->
+  <template id="plantilla-pantalla">
+    <p class="mensaje-construccion">Pantalla en construcción</p>
+  </template>
+
   <script src="js/app.js"></script>
 </body>
 </html>

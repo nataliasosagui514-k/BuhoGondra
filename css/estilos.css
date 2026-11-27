@@ -109,9 +109,33 @@
   --color-area-despensa: var(--paleta-amarillo-500);
   --color-area-talleres-graficos: var(--paleta-lima-500);
 
-  /* Tipografía (en esta fase solo se usa Inter) */
-  --fuente-principal: "Inter", sans-serif;
+  /* Efectos de cristal: brillos y sombras interiores de los componentes */
+  --color-brillo-55: rgb(255 255 255 / 55%);
+  --color-brillo-70: rgb(255 255 255 / 70%);
+  --color-cristal-contorno: rgb(255 255 255 / 38%);
+  --color-cristal-primario: color-mix(in srgb, var(--color-accion-primaria) 94%, transparent);
+  --color-cristal-primario-presionado: color-mix(in srgb, var(--color-accion-primaria-presionada) 94%, transparent);
+  --color-cristal-contorno-presionado: color-mix(in srgb, var(--color-fondo-info-suave) 70%, transparent);
+  --brillo-barra: linear-gradient(180deg, rgb(255 255 255 / 50%) 0%, rgb(255 255 255 / 0%) 40%, rgb(255 255 255 / 12%) 100%);
+  --brillo-pestana: linear-gradient(180deg, rgb(255 255 255 / 35%) 0%, rgb(255 255 255 / 0%) 40%, rgb(255 255 255 / 12%) 100%);
+  --brillo-volver: linear-gradient(180deg, rgb(255 255 255 / 50%) 0%, rgb(255 255 255 / 0%) 40%, rgb(255 255 255 / 10%) 100%);
+  --brillo-primario: linear-gradient(180deg, rgb(255 255 255 / 40%) 0%, rgb(255 255 255 / 4%) 50%, rgb(255 255 255 / 0%) 100%);
+  --brillo-contorno: linear-gradient(180deg, rgb(255 255 255 / 50%) 0%, rgb(255 255 255 / 5%) 55%, rgb(255 255 255 / 0%) 100%);
+  --sombra-interior-barra: inset 0 1.5px 0 rgb(255 255 255 / 80%);
+  --sombra-interior-pestana: inset 0 1.5px 0 rgb(255 255 255 / 50%);
+  --sombra-interior-primario: inset 0 -2px 4px rgb(153 64 0 / 18%), inset 0 1.5px 0 rgb(255 255 255 / 60%);
+  --sombra-interior-contorno: inset 0 1.5px 0 rgb(255 255 255 / 70%);
+
+  /* Desenfoques de cristal */
+  --desenfoque-suave: blur(8px);
+  --desenfoque-medio: blur(10px);
+  --desenfoque-barra: blur(12px);
+
+  /* Tipografía: Outfit en títulos, precios y botones; Inter en texto y etiquetas */
+  --fuente-titulos: "Outfit", sans-serif;
+  --fuente-texto: "Inter", sans-serif;
   --peso-normal: 400;
+  --peso-media: 500;
   --peso-seminegrita: 600;
   --peso-negrita: 700;
 
@@ -175,6 +199,7 @@
   --radio-chip: 12px;
   --radio-imagen: 16px;
   --radio-icono: 20px;
+  --radio-aviso: 20px;
   --radio-tarjeta: 24px;
   --radio-hoja: 32px; /* también barra de navegación */
   --radio-pildora: 999px; /* botones y campos */
@@ -186,7 +211,15 @@
 
   /* Medidas de la estructura */
   --ancho-maximo-app: 430px; /* definido en los requisitos del proyecto */
-  --alto-navegacion: 64px; /* TODO: confirmar valor en Figma */
+  --alto-navegacion: 64px;
+  --distancia-navegacion: 34px; /* separación del borde inferior */
+  --alto-pestana: 48px;
+  --alto-boton: 52px; /* tamaño Grande */
+  --alto-etiqueta: 28px;
+  --tamano-boton-volver: 44px;
+  --tamano-icono: 24px;
+  --tamano-punto: 8px;
+  --ancho-maximo-aviso: 350px;
 }
 
 /* Reset básico */
@@ -212,36 +245,308 @@ body {
   margin-inline: auto;
   background-color: var(--color-fondo-app);
   color: var(--color-texto-principal);
-  font-family: var(--fuente-principal);
+  font-family: var(--fuente-texto);
   font-size: var(--letra-texto-grande);
   line-height: var(--linea-texto-grande);
 }
 
-header,
-nav {
-  background-color: var(--color-superficie);
-  border-color: var(--color-borde-suave);
-  border-style: solid;
-  border-width: 0;
+main {
+  flex: 1;
+  /* El espacio inferior evita que la barra flotante tape el contenido */
+  padding: var(--espacio-16) var(--margen-lateral-pantalla)
+    calc(var(--alto-navegacion) + var(--distancia-navegacion) + var(--espacio-16));
 }
 
+/* Encabezado: botón de volver a la izquierda y título al centro */
 header {
-  padding: var(--espacio-16) var(--margen-lateral-pantalla);
-  border-bottom-width: var(--borde-fino);
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-12);
+  padding: var(--espacio-4) var(--margen-lateral-pantalla);
+}
+
+/* Espacio igual al del botón para que el título quede centrado */
+header::after {
+  content: "";
+  width: var(--tamano-boton-volver);
 }
 
 h1 {
-  font-size: var(--letra-titulo-3);
-  font-weight: var(--peso-negrita);
-  line-height: var(--linea-titulo-3);
-}
-
-main {
   flex: 1;
-  padding-inline: var(--margen-lateral-pantalla);
+  font-family: var(--fuente-titulos);
+  font-size: var(--letra-titulo-3);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-titulo-3);
+  letter-spacing: var(--interletra-titulo-3);
+  text-align: center;
 }
 
-nav {
-  min-height: var(--alto-navegacion);
-  border-top-width: var(--borde-fino);
+.icono {
+  flex-shrink: 0;
+  width: var(--tamano-icono);
+  height: var(--tamano-icono);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Botón de volver */
+.boton-volver {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--tamano-boton-volver);
+  height: var(--tamano-boton-volver);
+  padding: 0;
+  border: var(--borde-fino) solid var(--color-brillo-70);
+  border-radius: var(--radio-pildora);
+  background: var(--brillo-volver), var(--color-superficie);
+  box-shadow: var(--sombra-interior-barra);
+  backdrop-filter: var(--desenfoque-suave);
+  color: var(--color-texto-principal);
+  cursor: pointer;
+}
+
+.boton-volver:active {
+  background: var(--color-fondo-atenuado);
+}
+
+/* Oculto en las pantallas de la barra, pero conserva su espacio */
+.boton-volver[hidden] {
+  visibility: hidden;
+}
+
+/* Barra de navegación inferior flotante */
+.barra-navegacion {
+  position: fixed;
+  bottom: var(--distancia-navegacion);
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  height: var(--alto-navegacion);
+  padding: calc(var(--espacio-8) - var(--borde-fino));
+  border: var(--borde-fino) solid var(--color-brillo-70);
+  border-radius: var(--radio-pildora);
+  background: var(--brillo-barra), var(--color-superficie);
+  box-shadow: var(--sombra-interior-barra);
+  backdrop-filter: var(--desenfoque-barra);
+}
+
+.barra-navegacion ul {
+  display: flex;
+  gap: var(--espacio-4);
+  padding: 0;
+  list-style: none;
+}
+
+.pestana {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--espacio-8);
+  height: var(--alto-pestana);
+  padding-inline: var(--espacio-12);
+  border-radius: var(--radio-pildora);
+  color: var(--color-texto-secundario);
+  font-size: var(--letra-etiqueta);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-etiqueta);
+  text-decoration: none;
+}
+
+/* Pestaña activa: píldora azul con icono y nombre */
+.pestana[aria-current="page"] {
+  padding-inline: var(--espacio-16) var(--espacio-20);
+  background: var(--brillo-pestana), var(--color-accion-secundaria);
+  box-shadow: var(--sombra-interior-pestana);
+  color: var(--color-texto-sobre-secundario);
+}
+
+/* En las inactivas el nombre no se ve, pero los lectores de pantalla lo leen */
+.pestana:not([aria-current="page"]) span {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Pantalla en construcción */
+.mensaje-construccion {
+  color: var(--color-texto-secundario);
+  text-align: center;
+}
+
+/* Botones (tamaño Grande) */
+.boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--alto-boton);
+  padding-inline: var(--espacio-24);
+  border: var(--borde-fino) solid transparent;
+  border-radius: var(--radio-pildora);
+  font-family: var(--fuente-titulos);
+  font-size: var(--letra-boton-grande);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-boton-grande);
+  cursor: pointer;
+}
+
+.boton--primario {
+  border-color: var(--color-brillo-55);
+  background: var(--brillo-primario), var(--color-cristal-primario);
+  box-shadow: var(--sombra-interior-primario);
+  backdrop-filter: var(--desenfoque-suave);
+  color: var(--color-texto-sobre-primario);
+}
+
+.boton--primario:active {
+  background: var(--brillo-primario), var(--color-cristal-primario-presionado);
+}
+
+.boton--secundario {
+  background: var(--color-accion-secundaria);
+  color: var(--color-texto-sobre-secundario);
+}
+
+.boton--secundario:active {
+  background: var(--color-accion-secundaria-presionada);
+}
+
+.boton--contorno {
+  border: var(--borde-campo) solid var(--color-accion-secundaria);
+  background: var(--brillo-contorno), var(--color-cristal-contorno);
+  box-shadow: var(--sombra-interior-contorno);
+  backdrop-filter: var(--desenfoque-medio);
+  color: var(--color-texto-enlace);
+}
+
+.boton--contorno:active {
+  background: var(--brillo-contorno), var(--color-cristal-contorno-presionado);
+}
+
+/* Etiquetas */
+.etiqueta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espacio-4);
+  height: var(--alto-etiqueta);
+  padding-inline: var(--espacio-12);
+  border-radius: var(--radio-pildora);
+  font-size: var(--letra-etiqueta-pequena);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-etiqueta-pequena);
+  letter-spacing: var(--interletra-etiqueta-pequena);
+}
+
+/* Figma no tiene componente para estas tres: usan sus colores de acento */
+.etiqueta--nuevo,
+.etiqueta--combo,
+.etiqueta--casero {
+  color: var(--color-texto-principal); /* TODO: confirmar valor en Figma */
+}
+
+.etiqueta--nuevo {
+  background: var(--color-etiqueta-nuevo);
+}
+
+.etiqueta--combo {
+  background: var(--color-acento-combo);
+}
+
+.etiqueta--casero {
+  background: var(--color-acento-casero);
+}
+
+.etiqueta--disponible {
+  background: var(--color-fondo-exito-suave);
+  color: var(--color-texto-sobre-exito-suave);
+}
+
+.etiqueta--agotado {
+  background: var(--color-fondo-atenuado);
+  color: var(--color-texto-secundario);
+}
+
+.etiqueta--disponible::before,
+.etiqueta--agotado::before {
+  content: "";
+  width: var(--tamano-punto);
+  height: var(--tamano-punto);
+  border-radius: var(--radio-pildora);
+}
+
+.etiqueta--disponible::before {
+  background: var(--color-estado-exito);
+}
+
+.etiqueta--agotado::before {
+  background: var(--color-texto-deshabilitado);
+}
+
+/* Avisos: zona flotante donde aparecen (la posición no viene de Figma) */
+.zona-avisos {
+  position: fixed;
+  /* Encima de la barra, para no tapar el título ni el botón de volver */
+  bottom: calc(var(--distancia-navegacion) + var(--alto-navegacion) + var(--espacio-16));
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-8);
+  width: calc(100% - 2 * var(--margen-lateral-pantalla));
+  max-width: var(--ancho-maximo-aviso);
+  pointer-events: none;
+}
+
+.aviso {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--espacio-12);
+  padding: var(--espacio-16);
+  border-radius: var(--radio-aviso);
+  font-size: var(--letra-texto);
+  line-height: var(--linea-texto);
+}
+
+/* El círculo toma el color del estado; el símbolo es el de Figma */
+.aviso::before {
+  content: "";
+  flex-shrink: 0;
+  width: var(--tamano-icono);
+  height: var(--tamano-icono);
+  border-radius: var(--radio-pildora);
+}
+
+.aviso__titulo {
+  font-weight: var(--peso-seminegrita);
+}
+
+.aviso--exito {
+  background: var(--color-fondo-exito-suave);
+}
+
+.aviso--exito::before {
+  background: url("../img/icono-aviso-exito.svg") var(--color-estado-exito);
+}
+
+.aviso--exito .aviso__titulo {
+  color: var(--color-texto-sobre-exito-suave);
+}
+
+.aviso--error {
+  background: var(--color-fondo-error-suave);
+}
+
+.aviso--error::before {
+  background: url("../img/icono-aviso-error.svg") var(--color-estado-error);
+}
+
+.aviso--error .aviso__titulo {
+  color: var(--color-texto-sobre-error-suave);
 }
