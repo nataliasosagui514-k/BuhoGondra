@@ -26,6 +26,26 @@ function calcularTotal(articulos) {
   return centavos / 100;
 }
 
+/* ---------- Descuento de empleado UCA (Figma 1440:10850) ---------- */
+
+const PORCENTAJE_DE_DESCUENTO_DOCENTE = 10;
+
+// Solo las cuentas "docente" (docentes y empleados) tienen descuento. Se redondea a
+// centavos. Sin sesión no hay tipo de cuenta, así que no hay descuento.
+function calcularDescuento(subtotal, tipoCuenta) {
+  return tipoCuenta === "docente"
+    ? Math.round((aCentavos(subtotal) * PORCENTAJE_DE_DESCUENTO_DOCENTE) / 100) / 100
+    : 0;
+}
+
+// Lo que se cobra por un pedido: { subtotal, descuento, total }. El descuento es sobre
+// todo el pedido junto, también si es mixto.
+function calcularCobro(articulos, tipoCuenta) {
+  const subtotal = calcularTotal(articulos);
+  const descuento = calcularDescuento(subtotal, tipoCuenta);
+  return { subtotal, descuento, total: (aCentavos(subtotal) - aCentavos(descuento)) / 100 };
+}
+
 /* ---------- Puntos, PIN y número ---------- */
 
 const PRIMER_NUMERO_DE_PEDIDO = 1043;
@@ -83,15 +103,18 @@ function crearPedido({
   horaRecogida,
   anteriores,
   autor = AUTOR_INVITADO,
+  tipoCuenta,
 }) {
   const numero = obtenerSiguienteNumero(anteriores);
+  const { descuento, total } = calcularCobro(articulos, tipoCuenta);
   return {
     id: `${fecha}-${numero}`,
     fecha,
     cafeteria,
     horaRecogida,
     platillos: articulos.map(({ linea }) => linea),
-    total: calcularTotal(articulos),
+    descuento,
+    total, // ya con el descuento: es lo que se paga en caja
     pin: generarPin(anteriores, fecha, cafeteria),
     numero,
     puntos: calcularPuntos(articulos.map(({ platillo }) => platillo)),

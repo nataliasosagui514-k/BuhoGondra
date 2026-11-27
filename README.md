@@ -52,6 +52,10 @@ La Web Crypto API solo funciona al abrir el archivo directamente, en `localhost`
 - **Reportes** de "Problemas con mi cuenta": se guardan en `buhogondra.reportes` (nombre, correo, mensaje y fecha). **No se envían a nadie**; falta definir el canal de envío.
 - **Cambiar correo**: el código de verificación solo aparece en la consola del navegador.
 
+## Descuento de empleado UCA
+
+Las cuentas de docente o empleado (correo de solo letras) tienen 10 % de descuento sobre todo el pedido, redondeado a centavos. Se calcula en `js/pedido.js` y se guarda en el pedido como `descuento` (un número; 0 si no aplica). El `total` guardado ya lo trae restado. Los puntos no cambian.
+
 ## Pruebas
 
 Al abrir `index.html` sin nada después, aparece el Splash 4.5 segundos y luego "Inicia sesión" (o el menú, si ya hay sesión). Con una ruta, como `index.html#/menu`, se entra directo.

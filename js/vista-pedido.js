@@ -760,6 +760,7 @@ function confirmarPedido(contenedor, { articulos, horaRecogida, cafeteria }) {
     horaRecogida,
     anteriores: obtenerPedidos(),
     autor: obtenerSesion()?.correo,
+    tipoCuenta: obtenerSesion()?.tipo,
   });
   if (!guardarPedido(pedido)) {
     contenedor.querySelector("dialog.hoja")?.remove(); // el aviso debe verse
