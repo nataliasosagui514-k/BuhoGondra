@@ -85,6 +85,5 @@ window.addEventListener("hashchange", mostrarPantalla);
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("boton-volver").addEventListener("click", () => history.back());
   mostrarPantalla();
-  mostrarAviso("exito", "Bienvenida a BúhoGondra"); // PRUEBA: quitar después
   console.log("BúhoGondra cargada");
 });
