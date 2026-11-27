@@ -734,6 +734,19 @@ h1 {
   background: url("../img/icono-aviso-reloj.svg");
 }
 
+/* Aviso "Información" (Figma 1436:10283) */
+.aviso--info {
+  background: var(--color-fondo-info-suave);
+}
+
+.aviso--info::before {
+  background: url("../img/icono-aviso-info.svg") var(--color-accion-secundaria);
+}
+
+.aviso--info .aviso__titulo {
+  color: var(--color-texto-enlace);
+}
+
 /* ---------- Pantallas que dibujan su propio encabezado ---------- */
 main.contenido--completo {
   display: flex;
@@ -1092,6 +1105,11 @@ main.contenido--completo {
   margin-top: auto;
 }
 
+/* En otro día, el aviso va abajo, en el lugar del botón */
+.detalle__contenido .aviso {
+  margin-top: auto;
+}
+
 /* Caja de opciones */
 .caja {
   display: flex;
@@ -1212,6 +1230,10 @@ main.contenido--completo {
 .no-encontrado__titulo {
   font-size: var(--letra-titulo-2);
   line-height: var(--linea-titulo-2);
+}
+
+.no-encontrado .aviso {
+  text-align: left;
 }
 
 .no-encontrado .detalle__boton {

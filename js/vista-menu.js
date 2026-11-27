@@ -73,17 +73,10 @@ function crearResumenDeCategoria(categoria) {
   };
 }
 
-// Busca primero en el menú de hoy y después en el resto de la semana.
-function buscarPlatilloParaVista(id) {
-  const dia = obtenerMenuDelDia(obtenerFechaDeHoy()) ?? Object.values(MENU_SEMANA)[0];
+// Devuelve lo que se muestra en el detalle para ese día, o null si no está en su menú.
+function buscarPlatilloParaVista(id, dia) {
   const resumida = dia.categorias.find((categoria) => categoria.id === id && categoria.sinPrecio);
-  if (resumida) {
-    return crearResumenDeCategoria(resumida);
-  }
-  const deHoy = dia.categorias
-    .flatMap((categoria) => categoria.platillos)
-    .find((platillo) => platillo.id === id);
-  return deHoy ?? obtenerPlatillo(id);
+  return resumida ? crearResumenDeCategoria(resumida) : obtenerPlatillo(id, dia.fecha);
 }
 
 // Los complementos sin precio comparten color y nombre con Complementos.
@@ -314,8 +307,21 @@ function crearBotonInferior(texto, alTocar, tipo = "primario") {
   return boton;
 }
 
+// Aviso que ocupa el lugar del botón en un platillo de otro día (Figma 1436:10283).
+function crearAvisoDeOtroDia(dia) {
+  const nombre = dia.nombre.toLowerCase();
+  const numero = Number(dia.fecha.slice(-2));
+  let texto = `Solo puedes apartar el menú de hoy, de ${formatearRango(HORARIOS.apartar, " a ", true)}`;
+  // TODO: Figma solo muestra un día que aún no llega. En un día pasado se quita la
+  // frase "Vuelve el … para pedirlo.", porque no sería cierta.
+  if (dia.fecha > obtenerFechaDeHoy()) {
+    texto += ` Vuelve el ${nombre} para pedirlo.`;
+  }
+  return crearAviso("info", `Este platillo es del ${nombre} ${numero}`, texto);
+}
+
 // Devuelve la caja de opciones (si hay) y el botón, según el tipo de platillo.
-function crearAccionesDeDetalle(platillo) {
+function crearAccionesDeDetalle(platillo, esDeHoy) {
   if (obtenerPrecioVisible(platillo) === null) {
     const verPlatosFuertes = crearBotonInferior(
       "Ver platos fuertes",
@@ -342,7 +348,8 @@ function crearAccionesDeDetalle(platillo) {
       .map(crearLineaDeCombo);
     // En Figma, las sopas (sin guarnición) no llevan esta nota (1193:7745)
     const llevaGuarnicion = platillo.opciones.some((grupo) => grupo.id === "guarnicion");
-    const nota = llevaGuarnicion ? "Los eliges en el siguiente paso." : "";
+    // En otro día no hay siguiente paso
+    const nota = llevaGuarnicion && esDeHoy ? "Los eliges en el siguiente paso." : "";
     return [
       crearCajaDeOpciones("El combo incluye", incluye, nota),
       crearBotonInferior("Elegir acompañamientos", irAApartar),
@@ -386,8 +393,10 @@ function volverAlMenu(idCategoria) {
   }
 }
 
-// Única función que crea el detalle.
-function crearDetalle(platillo) {
+// Única función que crea el detalle. "dia" es el menú al que pertenece el platillo.
+function crearDetalle(platillo, dia) {
+  // Esta fase solo revisa la fecha; la hora se revisa en la fase de Apartar
+  const esDeHoy = dia.fecha === obtenerFechaDeHoy();
   const idCategoria = obtenerCategoriaVisual(platillo.categoria);
   const detalle = crearElemento("article", `detalle categoria--${idCategoria}`);
 
@@ -402,7 +411,8 @@ function crearDetalle(platillo) {
   const contenido = crearElemento("div", "detalle__contenido");
   const estado = crearElemento("div", "detalle__estado");
   estado.append(crearElemento("p", "detalle__categoria", CATEGORIAS[idCategoria].nombre));
-  if (platillo.disponible) {
+  // En Figma, el detalle de otro día no lleva etiqueta de estado (1436:10236)
+  if (platillo.disponible && esDeHoy) {
     estado.append(crearElemento("span", "etiqueta etiqueta--disponible", "Disponible"));
   }
 
@@ -424,16 +434,24 @@ function crearDetalle(platillo) {
       ),
     );
   }
-  contenido.append(...crearAccionesDeDetalle(platillo));
+  const acciones = crearAccionesDeDetalle(platillo, esDeHoy);
+  if (esDeHoy) {
+    contenido.append(...acciones);
+  } else {
+    // En otro día quedan las cajas, sin ningún botón, y el aviso
+    const cajas = acciones.filter((accion) => !accion.classList.contains("detalle__boton"));
+    contenido.append(...cajas, crearAvisoDeOtroDia(dia));
+  }
   detalle.append(portada, contenido);
   return detalle;
 }
 
-// TODO: Figma no define el mensaje de platillo no encontrado
-function crearPlatilloNoEncontrado() {
+// Pantalla para cuando no se puede mostrar el detalle: un mensaje y el regreso al menú.
+// TODO: Figma no define esta disposición ni el botón "Volver al menú"
+function crearMensajeConRegreso(mensaje) {
   const bloque = crearElemento("section", "no-encontrado");
   bloque.append(
-    crearElemento("h1", "no-encontrado__titulo", "No encontramos ese platillo"),
+    mensaje,
     crearBotonInferior("Volver al menú", () => {
       location.hash = "#/menu";
     }),
@@ -441,12 +459,28 @@ function crearPlatilloNoEncontrado() {
   return bloque;
 }
 
-function dibujarDetalle(contenedor, { id }) {
-  const platillo = buscarPlatilloParaVista(id);
+// Crea lo que va en la pantalla: el detalle, o el mensaje que explica por qué no está.
+function crearVistaDeDetalle(platillo, dia) {
+  if (!dia) {
+    return crearMensajeConRegreso(crearAvisoSinMenu());
+  }
+  if (!platillo) {
+    // TODO: Figma no define el mensaje de platillo no encontrado
+    return crearMensajeConRegreso(
+      crearElemento("h1", "no-encontrado__titulo", "No encontramos ese platillo"),
+    );
+  }
+  return crearDetalle(platillo, dia);
+}
+
+// Sin ?dia=AAAA-MM-DD en la dirección, el detalle es del menú de hoy.
+function dibujarDetalle(contenedor, { id, parametros }) {
+  const dia = obtenerMenuDelDia(parametros.get("dia") ?? obtenerFechaDeHoy());
+  const platillo = dia && buscarPlatilloParaVista(id, dia);
   if (platillo) {
     document.title = `${platillo.nombre} · BúhoGondra`;
   }
-  contenedor.replaceChildren(platillo ? crearDetalle(platillo) : crearPlatilloNoEncontrado());
+  contenedor.replaceChildren(crearVistaDeDetalle(platillo, dia));
 }
 
 // Ruta provisional: apartar se construye en la siguiente fase.
