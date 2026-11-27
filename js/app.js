@@ -10,7 +10,13 @@ const pantallas = {
     plantilla: "plantilla-menu",
     preparar: dibujarMenu,
   },
-  "#/puntos": { titulo: "Puntos", enBarra: true },
+  "#/puntos": {
+    titulo: "Puntos",
+    enBarra: true,
+    sinEncabezado: true,
+    plantilla: "plantilla-puntos",
+    preparar: dibujarPuntos,
+  },
   "#/mas": { titulo: "Más", enBarra: true },
   // Se abre con el calendario del menú; también dibuja su propio encabezado
   "#/semana": {

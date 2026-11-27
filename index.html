@@ -257,6 +257,24 @@
     <div class="ticket-pantalla"></div>
   </template>
 
+  <!-- Puntos (Figma 1003:4398); se llena en js/vista-puntos.js -->
+  <template id="plantilla-puntos">
+    <div class="puntos">
+      <header class="puntos__encabezado">
+        <h1 class="puntos__titulo">Puntos</h1>
+        <a class="boton boton--texto boton--pequeno puntos__ayuda" href="#/puntos/ayuda">¿Cómo funciona?</a>
+      </header>
+      <div class="puntos__progreso"></div>
+      <section class="puntos__premios" aria-labelledby="titulo-premios">
+        <div class="puntos__intro">
+          <h2 id="titulo-premios">Tus premios</h2>
+          <p>Cada nivel desbloquea un premio. Recógelo en cualquier cafetería UCA.</p>
+        </div>
+        <ul class="premios"></ul>
+      </section>
+    </div>
+  </template>
+
   <!-- Contenedor de la ruta oculta #/componentes -->
   <template id="plantilla-componentes">
     <div class="catalogo"></div>
@@ -271,6 +289,7 @@
   <script src="js/vista-menu.js"></script>
   <script src="js/vista-comentarios.js"></script>
   <script src="js/vista-pedido.js"></script>
+  <script src="js/vista-puntos.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

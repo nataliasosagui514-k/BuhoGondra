@@ -95,6 +95,13 @@ La posición, la entrada y la duración del aviso flotante vienen de Figma. Solo
 | Ventana de confirmación | Éxito e Informativa | Abierta | `834:2458` | Hecho; Confirmar y Peligro pendientes |
 | Ticket con PIN | Pedido | — | `874:3386` | Hecho; Premio pendiente |
 
+## Puntos
+
+| Componente | Nodo de Figma | Dónde está |
+|---|---|---|
+| Progreso de puntos (0 a 3 premios alcanzados) | `874:3463` | `crearProgresoDePuntos` en `js/vista-puntos.js` |
+| Tarjeta de premio (Disponible, Por recoger, Vencido, Bloqueado; "Canjeado" no se usa en el MVP) | `1002:4641` | `crearTarjetaDePremio` en `js/vista-puntos.js` |
+
 ## Botones
 
 Componente completo en Figma: `610:2516`.

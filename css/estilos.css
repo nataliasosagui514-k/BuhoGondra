@@ -343,6 +343,31 @@
   --ancho-pestana-dia: 62px;
   --alto-pestana-dia: 60px;
   --separacion-pestana-dia: 2px;
+
+  /* Puntos (Figma 1003:4398) */
+  --relleno-inferior-puntos: 122px;
+
+  /* Progreso de puntos (Figma 874:3463) */
+  --alto-progreso-encabezado: 104px;
+  --tamano-marco-buho: 100px;
+  --ancho-barra-niveles: 292px;
+  --alto-barra-niveles: 80px;
+  --alto-pista: 12px;
+  --posicion-pista: 6px;
+  --radio-pista: 6px;
+  --ancho-meta: 80px;
+  --separacion-cantidad: 6px;
+  --separacion-textos-progreso: 2px;
+
+  /* Tarjeta de premio (Figma 1002:4641) */
+  --ancho-talon: 88px;
+  --tamano-foto-premio: 64px;
+  --ancho-perforacion: 2px;
+  --grosor-perforacion: 1.5px;
+  --trazo-perforacion: 4px;
+  --tamano-muesca-premio: 20px;
+  --alto-insignia: 28px;
+  --sombra-nivel-2: 0 8px 24px rgb(9 28 51 / 14%);
 }
 
 /* Reset básico */
@@ -2806,4 +2831,434 @@ dialog:focus {
   font-weight: var(--peso-seminegrita);
   line-height: var(--linea-digito);
   letter-spacing: var(--interletra-titulo-pantalla);
+}
+
+/* ---------- Puntos (Figma 1003:4398) ---------- */
+.puntos {
+  display: flex;
+  flex-direction: column;
+  padding: var(--margen-superior-menu) var(--margen-lateral-pantalla)
+    var(--relleno-inferior-puntos);
+}
+
+.puntos__encabezado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espacio-12);
+  min-height: var(--alto-boton-compacto);
+}
+
+.puntos__titulo {
+  font-size: var(--letra-titulo-1);
+  line-height: var(--linea-titulo-1);
+  letter-spacing: var(--interletra-titulo-1);
+}
+
+/* El enlace con forma de botón de texto (Figma le da 20 px de relleno) */
+.puntos__ayuda {
+  padding-inline: var(--espacio-20);
+  text-decoration: none;
+}
+
+.puntos__progreso {
+  margin-top: var(--espacio-16);
+}
+
+.puntos__premios {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-16);
+  margin-top: var(--espacio-32);
+}
+
+.puntos__intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-8);
+}
+
+.puntos__intro h2 {
+  font-family: var(--fuente-titulos);
+  font-size: var(--letra-titulo-3);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-titulo-3);
+  letter-spacing: var(--interletra-titulo-3);
+}
+
+.puntos__intro p {
+  color: var(--color-texto-secundario);
+  font-size: var(--letra-texto);
+  line-height: var(--linea-texto);
+}
+
+/* ---------- Progreso de puntos (Figma 874:3463) ---------- */
+.progreso {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-16);
+  padding: var(--espacio-20);
+  border: var(--borde-fino) solid var(--color-borde-suave);
+  border-radius: var(--radio-tarjeta);
+  background: var(--color-superficie);
+}
+
+.progreso__encabezado {
+  display: flex;
+  gap: var(--espacio-12);
+  min-height: var(--alto-progreso-encabezado);
+}
+
+.progreso__textos {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--separacion-textos-progreso);
+  min-width: 0;
+}
+
+.progreso__etiqueta,
+.progreso__nivel,
+.progreso__mensaje {
+  font-size: var(--letra-texto-pequeno);
+  line-height: var(--linea-texto-pequeno);
+  letter-spacing: var(--interletra-texto-pequeno);
+}
+
+.progreso__etiqueta,
+.progreso__nivel {
+  font-weight: var(--peso-seminegrita);
+}
+
+.progreso__etiqueta,
+.progreso__mensaje,
+.progreso__unidad {
+  color: var(--color-texto-secundario);
+}
+
+.progreso__nivel {
+  color: var(--color-texto-marca);
+}
+
+.progreso__cantidad {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--separacion-cantidad);
+}
+
+.progreso__numero {
+  font-family: var(--fuente-titulos);
+  font-size: var(--letra-precio-grande);
+  font-weight: var(--peso-negrita);
+  line-height: var(--linea-precio-grande);
+}
+
+.progreso__unidad {
+  font-size: var(--letra-texto);
+  line-height: var(--linea-texto);
+}
+
+/* El búho crece con cada nivel */
+.progreso__marco-buho {
+  display: flex;
+  flex-shrink: 0;
+  align-items: flex-end;
+  justify-content: center;
+  width: var(--tamano-marco-buho);
+  height: var(--tamano-marco-buho);
+}
+
+.progreso__buho {
+  width: var(--ancho-buho);
+  height: var(--alto-buho);
+  filter: drop-shadow(var(--sombra-nivel-1));
+}
+
+.progreso--0 {
+  --ancho-buho: 57px;
+  --alto-buho: 61px;
+}
+
+.progreso--1 {
+  --ancho-buho: 68px;
+  --alto-buho: 73px;
+}
+
+.progreso--2 {
+  --ancho-buho: 79px;
+  --alto-buho: 85px;
+}
+
+.progreso--3 {
+  --ancho-buho: 90px;
+  --alto-buho: 97px;
+}
+
+/* En pantallas angostas la barra se encoge; las posiciones son proporcionales */
+.progreso__barra {
+  position: relative;
+  width: min(var(--ancho-barra-niveles), 100% - var(--espacio-8));
+  height: var(--alto-barra-niveles);
+}
+
+.progreso__pista {
+  position: absolute;
+  top: var(--posicion-pista);
+  left: 0;
+  width: 100%;
+  height: var(--alto-pista);
+  border-radius: var(--radio-pista);
+  background: var(--color-fondo-atenuado);
+}
+
+.progreso__avance {
+  display: block;
+  width: calc(var(--avance) * 100%);
+  height: 100%;
+  border-radius: var(--radio-pista);
+  background: var(--color-accion-primaria);
+}
+
+.progreso__metas {
+  padding: 0;
+  list-style: none;
+}
+
+.progreso__meta {
+  position: absolute;
+  top: 0;
+  left: calc(var(--posicion) * 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: var(--ancho-meta);
+  translate: -50%;
+  color: var(--color-texto-secundario);
+  text-align: center;
+}
+
+.progreso__circulo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tamano-circulo);
+  height: var(--tamano-circulo);
+  border: var(--borde-campo) solid var(--color-borde-normal);
+  border-radius: var(--radio-pildora);
+  background: var(--color-superficie);
+}
+
+.progreso__meta--alcanzada .progreso__circulo {
+  border-color: var(--color-accion-primaria);
+  background: var(--color-accion-primaria);
+  color: var(--color-texto-sobre-primario);
+}
+
+.progreso__palomita {
+  width: var(--tamano-palomita);
+  height: var(--tamano-palomita);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.progreso__nombre {
+  margin-top: var(--espacio-8);
+  font-size: var(--letra-etiqueta-pequena);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-etiqueta-pequena);
+  letter-spacing: var(--interletra-etiqueta-pequena);
+  white-space: pre-line;
+}
+
+.progreso__meta--alcanzada .progreso__nombre {
+  color: var(--color-texto-principal);
+}
+
+.progreso__pts {
+  margin-top: var(--separacion-textos-progreso);
+  font-size: var(--letra-nota);
+  font-weight: var(--peso-media);
+  line-height: var(--linea-nota);
+  letter-spacing: var(--interletra-nota);
+}
+
+/* ---------- Tarjeta de premio (Figma 1002:4641) ---------- */
+.premios {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-12);
+  padding: 0;
+  list-style: none;
+}
+
+/* Un ticket: talón, perforación y una muesca arriba y otra abajo */
+.premio {
+  position: relative;
+  display: flex;
+  overflow: hidden;
+  border-radius: var(--radio-imagen);
+  background: var(--color-superficie);
+}
+
+.premio::before,
+.premio::after {
+  content: "";
+  position: absolute;
+  left: calc(var(--ancho-talon) + var(--ancho-perforacion) / 2 - var(--tamano-muesca-premio) / 2);
+  width: var(--tamano-muesca-premio);
+  height: var(--tamano-muesca-premio);
+  border-radius: var(--radio-pildora);
+  background: var(--color-fondo-app);
+}
+
+.premio::before {
+  top: calc(var(--tamano-muesca-premio) / -2);
+}
+
+.premio::after {
+  bottom: calc(var(--tamano-muesca-premio) / -2);
+}
+
+.premio__talon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--ancho-talon);
+  background: var(--color-fondo-marca-suave);
+}
+
+.premio__foto {
+  width: var(--tamano-foto-premio);
+  height: var(--tamano-foto-premio);
+  border-radius: var(--radio-chip);
+  /* La sombra sigue la forma del plato, como en Figma */
+  filter: drop-shadow(var(--sombra-nivel-2));
+  object-fit: cover;
+}
+
+.premio__cuerpo {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--espacio-12);
+  min-width: 0;
+  margin-left: var(--ancho-perforacion);
+  padding: var(--espacio-16);
+}
+
+/* La línea punteada */
+.premio__cuerpo::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(-1 * var(--ancho-perforacion));
+  width: var(--grosor-perforacion);
+  background: repeating-linear-gradient(180deg,
+    var(--color-borde-normal) 0 var(--trazo-perforacion),
+    transparent var(--trazo-perforacion) calc(2 * var(--trazo-perforacion)));
+}
+
+.premio__textos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-4);
+  align-self: stretch;
+}
+
+.premio__nivel {
+  color: var(--color-texto-marca);
+  font-size: var(--letra-etiqueta-pequena);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-etiqueta-pequena);
+  letter-spacing: var(--interletra-etiqueta-pequena);
+  text-transform: uppercase;
+}
+
+.premio__nombre {
+  font-family: var(--fuente-titulos);
+  font-size: var(--letra-titulo-3);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-titulo-tarjeta);
+  letter-spacing: var(--interletra-titulo-3);
+}
+
+.premio__detalle {
+  color: var(--color-texto-secundario);
+  font-size: var(--letra-texto-pequeno);
+  line-height: var(--linea-texto-pequeno);
+  letter-spacing: var(--interletra-texto-pequeno);
+}
+
+.premio--por-recoger .premio__talon {
+  background: var(--color-fondo-info-suave);
+}
+
+.premio--vencido .premio__talon,
+.premio--bloqueado .premio__talon,
+.premio--bloqueado {
+  background: var(--color-fondo-atenuado);
+}
+
+.premio--vencido .premio__foto,
+.premio--bloqueado .premio__foto {
+  opacity: 0.6;
+}
+
+.premio--vencido .premio__nombre,
+.premio--bloqueado .premio__nombre,
+.premio--bloqueado .premio__nivel {
+  color: var(--color-texto-secundario);
+}
+
+/* Bloqueado: el candado va a la derecha de los textos y no se puede tocar */
+.premio--bloqueado .premio__cuerpo {
+  flex-direction: row;
+  align-items: center;
+}
+
+.premio--bloqueado .premio__textos {
+  flex: 1;
+}
+
+.premio__candado {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--tamano-boton-volver);
+  height: var(--tamano-boton-volver);
+  border-radius: var(--radio-pildora);
+  background: var(--color-superficie);
+  color: var(--color-texto-secundario);
+}
+
+.premio__insignia {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espacio-4);
+  height: var(--alto-insignia);
+  padding-inline: var(--espacio-12);
+  border-radius: var(--radio-pildora);
+  background: var(--color-fondo-atenuado);
+  color: var(--color-texto-secundario);
+  font-size: var(--letra-etiqueta-pequena);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-etiqueta-pequena);
+  letter-spacing: var(--interletra-etiqueta-pequena);
+}
+
+.premio__insignia-icono {
+  width: var(--tamano-palomita);
+  height: var(--tamano-palomita);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
 }
