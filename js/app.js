@@ -74,6 +74,13 @@ const pantallas = {
     conSesion: true,
   }),
   "#/mas/cotizar": crearPantallaDeMas("Cotizar eventos", (c) => dibujarCotizar(c)),
+  "#/mas/sobre": crearPantallaDeMas("Sobre Funda Gondra", (c) => dibujarSobre(c)),
+  ...Object.fromEntries(
+    AREAS.map((area) => [
+      `#/mas/sobre/${area.id}`,
+      crearPantallaDeMas(area.nombre, (c) => dibujarArea(c, area)),
+    ]),
+  ),
   // Se abre con el calendario del menú; también dibuja su propio encabezado
   "#/semana": {
     titulo: "Menú de la semana",

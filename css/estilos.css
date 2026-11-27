@@ -343,6 +343,13 @@
 
   --tamano-buho-cotizar: 168px;
 
+  /* Sobre Funda Gondra y sus áreas */
+  --ancho-logo-fundacion: 280px;
+  --alto-franja-area: 280px;
+  --posicion-logo-area: 96px;
+  --tamano-marco-area: 136px;
+  --alto-foto-servicio: 170px;
+
   /* Avatar grande de Mi perfil (Figma 1051:5422) */
   --tamano-avatar-perfil: 96px;
   --tamano-imagen-avatar-perfil: 144px;
@@ -4904,4 +4911,167 @@ dialog:focus {
   font-size: var(--letra-precio-grande);
   font-weight: var(--peso-negrita);
   line-height: var(--linea-precio-grande);
+}
+
+/* ---------- Sobre Funda Gondra (Figma 1134:6527) ---------- */
+.sobre {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--espacio-12);
+  margin-top: var(--espacio-32);
+}
+
+.sobre__logo {
+  align-self: center;
+  width: var(--ancho-logo-fundacion);
+  max-width: 100%;
+  height: auto;
+  margin-bottom: var(--espacio-4);
+}
+
+.sobre > .vacio__texto {
+  text-align: center;
+}
+
+.sobre > .mas__subtitulo,
+.sobre__contactos {
+  margin-top: var(--espacio-20);
+}
+
+.areas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--espacio-16) var(--espacio-12);
+  padding: 0;
+  list-style: none;
+}
+
+.area {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-8);
+  color: var(--color-texto-principal);
+  font-size: var(--letra-texto);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-texto);
+  text-align: center;
+  text-decoration: none;
+}
+
+.area__logo {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  border: var(--borde-fino) solid var(--color-borde-suave);
+  border-radius: var(--radio-icono);
+  object-fit: cover;
+}
+
+/* Cada área tiene su color (81 a 84) */
+.area-pantalla--cafeteria { --color-area: var(--color-area-cafeteria); }
+.area-pantalla--libreria { --color-area: var(--color-area-libreria); }
+.area-pantalla--despensa { --color-area: var(--color-area-despensa); }
+.area-pantalla--talleres-graficos { --color-area: var(--color-area-talleres-graficos); }
+
+.cuenta.area-pantalla {
+  padding: 0;
+  background: var(--color-area);
+}
+
+.area-pantalla__franja {
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+  justify-content: center;
+  height: var(--alto-franja-area);
+  padding-top: var(--posicion-logo-area);
+}
+
+.area-pantalla__marco {
+  display: flex;
+  width: var(--tamano-marco-area);
+  height: var(--tamano-marco-area);
+  padding: var(--espacio-8);
+  border-radius: var(--radio-hoja);
+  background: var(--color-superficie);
+}
+
+.area-pantalla__logo {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radio-tarjeta);
+  object-fit: cover;
+}
+
+.area-pantalla__hoja {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--espacio-12);
+  margin-top: calc(-1 * var(--espacio-32));
+  padding: var(--espacio-32) var(--margen-lateral-pantalla) var(--margen-inferior-cuenta);
+  position: relative;
+  border-radius: var(--radio-hoja) var(--radio-hoja) 0 0;
+  background: var(--color-fondo-app);
+}
+
+.area-pantalla__presentacion {
+  color: var(--color-texto-secundario);
+  font-size: var(--letra-texto);
+  line-height: var(--linea-texto);
+}
+
+.area-pantalla__hoja .mas__subtitulo {
+  margin-top: var(--espacio-20);
+}
+
+.servicios {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-16);
+  padding: 0;
+  list-style: none;
+}
+
+.servicio {
+  display: flex;
+  flex-direction: column;
+  padding: var(--espacio-16);
+  border: var(--borde-fino) solid var(--color-borde-suave);
+  border-radius: var(--radio-icono);
+  background: var(--color-superficie);
+}
+
+.servicio__foto {
+  width: 100%;
+  height: var(--alto-foto-servicio);
+  margin-bottom: var(--espacio-12);
+  border-radius: var(--radio-imagen);
+  object-fit: cover;
+}
+
+.servicio__titulo {
+  font-family: var(--fuente-titulos);
+  font-size: var(--letra-texto-grande);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-texto-grande);
+}
+
+.servicio__texto {
+  color: var(--color-texto-secundario);
+  font-size: var(--letra-texto);
+  line-height: var(--linea-texto);
+}
+
+/* Hoja de acciones de "Contáctanos" */
+.hoja--acciones .detalle__boton {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+}
+
+.hoja--acciones .boton--texto {
+  align-self: center;
 }

@@ -76,6 +76,9 @@ const ICONOS_DE_MAS = {
     CIRCULO_DE_ICONO,
     [7.34, 7.5, "M4.66 0L5.84 3.28L9.32 3.39L6.56 5.52L7.54 8.86L4.66 6.9L1.78 8.86L2.76 5.52L0 3.39L3.48 3.28L4.66 0Z"],
   ],
+  telefono: [
+    [3, 4, "M2 0L5 0L7 5L4.5 6.5C5.57 8.67 7.33 10.43 9.5 11.5L11 9L16 11L16 14C16 14.53 15.79 15.04 15.41 15.41C15.04 15.79 14.53 16 14 16C10.43 15.58 7.11 13.96 4.57 11.43C2.04 8.89 0.42 5.57 0 2C0 1.47 0.21 0.96 0.59 0.59C0.96 0.21 1.47 0 2 0Z"],
+  ],
 };
 
 /* ---------- Filas ---------- */
@@ -1202,4 +1205,216 @@ function dibujarCotizar(contenedor) {
     presentacion,
     acciones,
   );
+}
+
+/* ---------- Sobre Funda Gondra (Figma 80 a 84) ---------- */
+
+// Los textos son los de Figma. "id" va en la ruta (#/mas/sobre/ID) y en el color
+const AREAS = [
+  {
+    id: "cafeteria",
+    nombre: "Cafetería UCA",
+    logo: "img/area-cafeteria.png",
+    presentacion:
+      "Con más de 35 años elaborando alimentos y servicio de banquetes. Cafetería UCA pone a tus órdenes sus productos y servicios.",
+    servicios: [
+      {
+        foto: "img/servicio-catering.jpg",
+        titulo: "Catering Gondra",
+        texto:
+          "Servicio de catering para eventos sociales y empresariales, e implementación de cafeterías empresariales.",
+      },
+      {
+        foto: "img/servicio-comidas.jpg",
+        titulo: "Desayunos, almuerzos, cenas y típicos",
+        texto:
+          "Una gran variedad de opciones. Llevamos tu comida a la cafetería del campus más cercana para que la recojas ahí.",
+      },
+    ],
+  },
+  {
+    id: "libreria",
+    nombre: "Librería y Papelería UCA",
+    logo: "img/area-libreria.png",
+    presentacion:
+      "Con más de 36 años de experiencia, Librería UCA se ha convertido en un referente del mercado literario, donde encuentras tus títulos favoritos y espacios para cultivar el amor por la lectura.",
+    servicios: [
+      {
+        foto: "img/servicio-libros.jpg",
+        titulo: "Libros y UCA Editores",
+        texto:
+          "Una amplia variedad de títulos de diversas categorías, además de todo el contenido de UCA Editores.",
+      },
+    ],
+  },
+  {
+    id: "despensa",
+    nombre: "Despensa UCA",
+    logo: "img/area-despensa.png",
+    presentacion:
+      "Despensa UCA abrió en 1977 para atender la canasta básica de los empleados de la Universidad. Con el tiempo amplió su mercado a estudiantes y a clientes externos: particulares y empresas.",
+    servicios: [
+      {
+        foto: "img/servicio-despensa.jpg",
+        titulo: "Productos para tu día a día",
+        texto:
+          "Alimentos, cuidado personal, abarrotes, embutidos, carnes, bebidas, calzado y productos de limpieza y desinfección.",
+      },
+    ],
+  },
+  {
+    id: "talleres-graficos",
+    nombre: "Talleres Gráficos UCA",
+    logo: "img/area-talleres.png",
+    presentacion:
+      "Somos una imprenta con más de 51 años de experiencia en el mercado editorial y de artes gráficas. Contamos con talento calificado, tecnología a la vanguardia y mejora continua, y somos referentes en servicio, calidad de impresión y agilidad.",
+    servicios: [
+      {
+        foto: "img/servicio-impresion.jpg",
+        titulo: "Impresión y diseño",
+        texto:
+          "Impresión offset, digital y de gran formato. También diseño gráfico y diagramación.",
+      },
+    ],
+  },
+];
+
+const TELEFONO_DE_FUNDA_GONDRA = "+503 2210 6600";
+const CORREO_DE_FUNDA_GONDRA = "contacto@fundagondra.sv";
+const ASUNTO_DEL_CORREO = "Consulta desde BúhoGondra";
+
+// Los dos contactos, con lo que ofrece su hoja de acciones (nota de Figma en 80)
+const CONTACTOS = [
+  {
+    icono: "telefono",
+    titulo: TELEFONO_DE_FUNDA_GONDRA,
+    detalle: "Llamar a Funda Gondra",
+    accion: `Llamar ${TELEFONO_DE_FUNDA_GONDRA}`,
+    destino: `tel:${TELEFONO_DE_FUNDA_GONDRA.replace(/\s/g, "")}`,
+    copiar: "Copiar número",
+    copiado: "Número copiado",
+    mensajeCopiado: "Pégalo en WhatsApp o guárdalo en tus contactos.",
+  },
+  {
+    icono: "correo",
+    titulo: CORREO_DE_FUNDA_GONDRA,
+    detalle: "Escribir un correo",
+    accion: "Escribir correo",
+    destino: `mailto:${CORREO_DE_FUNDA_GONDRA}?subject=${encodeURIComponent(ASUNTO_DEL_CORREO)}`,
+    copiar: "Copiar correo",
+    copiado: "Correo copiado",
+  },
+];
+
+// TODO: Figma usa la hoja de acciones del iPhone; en la web es una hoja propia
+function abrirHojaDeContacto(contenedor, contacto) {
+  const cerrar = () => {
+    hoja.close();
+    hoja.remove();
+  };
+  const hoja = crearElemento("dialog", "hoja hoja--acciones");
+  hoja.setAttribute("aria-label", contacto.titulo);
+  const llamar = crearBotonDeEnlace(contacto.accion, contacto.destino);
+  llamar.addEventListener("click", () => setTimeout(cerrar));
+  hoja.append(
+    llamar,
+    crearBotonInferior(
+      contacto.copiar,
+      () => {
+        copiarYAvisar(contacto.titulo, contacto.copiado, contacto.mensajeCopiado);
+        cerrar();
+      },
+      "contorno",
+    ),
+    crearBotonDeTexto("Cancelar", cerrar),
+  );
+  hoja.addEventListener("cancel", (evento) => {
+    evento.preventDefault();
+    cerrar();
+  });
+  hoja.addEventListener("click", (evento) => {
+    if (evento.target === hoja && evento.clientY < hoja.getBoundingClientRect().top) {
+      cerrar();
+    }
+  });
+  abrirDialogo(contenedor, hoja);
+}
+
+function crearTarjetaDeArea({ id, nombre, logo }) {
+  const enlace = crearElemento("a", "area");
+  enlace.href = `#/mas/sobre/${id}`;
+  enlace.append(crearImagen("area__logo", logo), crearElemento("span", "area__nombre", nombre));
+  const elemento = crearElemento("li", "");
+  elemento.append(enlace);
+  return elemento;
+}
+
+function dibujarSobre(contenedor) {
+  const areas = crearElemento("ul", "areas");
+  areas.append(...AREAS.map(crearTarjetaDeArea));
+  const contactos = crearElemento("div", "mas__filas sobre__contactos");
+  contactos.append(
+    crearSubtitulo("Contáctanos"),
+    ...CONTACTOS.map((contacto) =>
+      crearFila({
+        icono: contacto.icono,
+        titulo: contacto.titulo,
+        detalle: contacto.detalle,
+        flecha: true,
+        alTocar: () => abrirHojaDeContacto(contenedor, contacto),
+      }),
+    ),
+  );
+  const pagina = crearElemento("div", "sobre");
+  pagina.append(
+    crearImagen("sobre__logo", "img/logo-funda-gondra.svg", "FundaGondra"),
+    crearElemento(
+      "p",
+      "vacio__texto",
+      "Innovamos gestionando modelos de negocios para construir experiencias únicas, con el fin de crear oportunidades para la formación de profesionales.",
+    ),
+    crearSubtitulo("Nuestras áreas"),
+    areas,
+    contactos,
+  );
+  montarPantallaDeMas(
+    contenedor,
+    { titulo: "Sobre Funda Gondra", anterior: "#/mas" },
+    crearElemento("h1", "solo-lectores", "Sobre Funda Gondra"),
+    pagina,
+  );
+}
+
+function crearServicio({ foto, titulo, texto }) {
+  const tarjeta = crearElemento("li", "servicio");
+  tarjeta.append(
+    crearImagen("servicio__foto", foto),
+    crearElemento("h3", "servicio__titulo", titulo),
+    crearElemento("p", "servicio__texto", texto),
+  );
+  return tarjeta;
+}
+
+// 81 a 84
+function dibujarArea(contenedor, area) {
+  const volver = crearBotonVolver(() => volverA("#/mas/sobre"));
+  volver.classList.add("boton-volver--sobre-foto");
+  const marco = crearElemento("span", "area-pantalla__marco");
+  marco.append(crearImagen("area-pantalla__logo", area.logo));
+  const franja = crearElemento("header", "area-pantalla__franja");
+  franja.append(volver, marco);
+
+  const servicios = crearElemento("ul", "servicios");
+  servicios.append(...area.servicios.map(crearServicio));
+  const hoja = crearElemento("div", "area-pantalla__hoja");
+  hoja.append(
+    crearElemento("h1", "cuenta__titulo", area.nombre),
+    crearElemento("p", "area-pantalla__presentacion", area.presentacion),
+    crearSubtitulo("Lo que ofrecemos"),
+    servicios,
+  );
+
+  const pantalla = contenedor.querySelector(".cuenta");
+  pantalla.classList.add("area-pantalla", `area-pantalla--${area.id}`);
+  pantalla.replaceChildren(franja, hoja);
 }
