@@ -266,16 +266,11 @@ const MENU_SEMANA = {
     ],
     tipicos: [
       tipico("platano-en-miel", "Plátano en miel", 1.75),
+      /* TODO: falta decidir si se elige entre yuca frita o sancochada. Ninguna pantalla de
+         Figma lo muestra; la nota 1320:8575 dice "dos opciones con el mismo precio" y lo
+         deja en la lista para revisar con Funda Gondra. */
       tipico("yuca-frita-o-sancochada", "Yuca frita o sancochada", 1.35, {
         recogida: "Recógela",
-        opciones: [
-          {
-            id: "preparacion",
-            nombre: "Preparación",
-            valores: [{ nombre: "Frita" }, { nombre: "Sancochada" }],
-            porDefecto: null,
-          },
-        ],
       }),
       tipico("poleada", "Poleada", 1.0, { recogida: "Recógela" }),
       tipico("enchilada", "Enchilada", 1.25, { recogida: "Recógela" }),
