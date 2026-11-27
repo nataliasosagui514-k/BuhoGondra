@@ -48,6 +48,24 @@ function obtenerSesion() {
   return typeof sesion?.correo === "string" ? sesion : null;
 }
 
+// Solo para probar Puntos (ver "Pruebas" en el README): abre una sesión con un correo
+// inventado, sin contraseña. Devuelve la sesión, o null si no se pudo guardar.
+// TODO (fase de Registro): reemplazar por el inicio de sesión de verdad.
+const CORREO_DE_PRUEBA = "prueba@ejemplo.com";
+
+function iniciarSesionDePrueba() {
+  const sesion = { correo: CORREO_DE_PRUEBA };
+  return escribirDato(CLAVE_SESION, sesion) ? sesion : null;
+}
+
+function cerrarSesionDePrueba() {
+  try {
+    localStorage.removeItem(CLAVE_SESION);
+  } catch {
+    // Sin almacenamiento no hay sesión que cerrar
+  }
+}
+
 // Los premios que ya se canjearon: { id, autor, pin, disponibleDesde }. Los puntos no
 // se guardan: se calculan con los pedidos (js/puntos.js).
 function obtenerPremiosCanjeados() {
