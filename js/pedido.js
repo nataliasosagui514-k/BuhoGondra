@@ -87,6 +87,18 @@ function crearPedido({ articulos, fecha, cafeteria, horaRecogida, anteriores }) 
   };
 }
 
+/* ---------- Agotados ---------- */
+
+// Los platillos del pedido que ya no tienen existencias (disponible: false en los
+// datos), cada uno una sola vez. Se revisa al confirmar.
+// TODO (fase de Menú de la semana y Platillo agotado, NUEVO 5): mostrar también el
+// estado de agotado en las tarjetas del menú (Figma N5a) y en el detalle (N5b).
+function buscarAgotados(articulos) {
+  return contarPorPlatillo(articulos)
+    .map(({ platillo }) => platillo)
+    .filter((platillo) => !platillo.disponible);
+}
+
 /* ---------- Horarios ---------- */
 
 // La hora con la que trabaja Apartar: la del teléfono o, para las demostraciones, la

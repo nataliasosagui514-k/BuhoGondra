@@ -208,7 +208,7 @@ const ICONOS_DE_VENTANA = {
 };
 
 // Ventana centrada sobre un fondo oscuro, con un solo botón.
-function crearVentana({ tipo, titulo, mensaje, textoBoton, alTocar }) {
+function crearVentana({ tipo, titulo, destacado, mensaje, textoBoton, alTocar }) {
   const { caja, trazos } = ICONOS_DE_VENTANA[tipo];
   const circulo = crearElemento("span", "ventana__circulo");
   circulo.append(crearIconoSvg("ventana__icono", caja, trazos));
@@ -220,6 +220,7 @@ function crearVentana({ tipo, titulo, mensaje, textoBoton, alTocar }) {
   ventana.append(
     circulo,
     encabezado,
+    ...(destacado ? [crearElemento("p", "ventana__destacado", destacado)] : []),
     crearElemento("p", "ventana__mensaje", mensaje),
     crearBotonInferior(textoBoton, alTocar),
   );
@@ -659,6 +660,39 @@ function dibujarApartar(contenedor, { id }) {
   contenedor.querySelector(".menu").append(formulario);
 }
 
+/* ---------- Se agotó (Figma 1374:9853) ---------- */
+
+// No se aparta nada. Lo agotado sale del pedido; lo demás se conserva en el pedido
+// en curso. "Ver otros platillos" lleva al menú en la categoría de lo agotado.
+function mostrarAgotado(contenedor, articulos, agotados) {
+  const restantes = articulos
+    .filter(({ platillo }) => !agotados.some((agotado) => agotado.id === platillo.id))
+    .map(({ linea }) => linea);
+  borrarPedidoEnCurso();
+  if (restantes.length) {
+    guardarPedidoEnCurso(restantes);
+  }
+  const categoria = obtenerCategoriaVisual(agotados[0].categoria);
+  abrirDialogo(
+    contenedor,
+    crearVentana({
+      tipo: "informacion",
+      titulo: "Este platillo se agotó",
+      // TODO: Figma no pone el nombre del platillo en esta ventana (se pidió mostrarlo)
+      // ni muestra el caso de varios platillos agotados.
+      destacado: unirEnFrase(agotados.map((platillo) => platillo.nombre)),
+      // TODO: Figma solo muestra la frase con "platos fuertes"
+      mensaje:
+        "Se terminó mientras pedías. No se apartó nada; te mostramos otros " +
+        `${CATEGORIAS[categoria].nombre.toLowerCase()}.`,
+      textoBoton: "Ver otros platillos",
+      alTocar: () => {
+        location.hash = crearRutaDelMenu(categoria);
+      },
+    }),
+  );
+}
+
 /* ---------- Confirmar ---------- */
 
 // El ticket del pedido que se acaba de confirmar abre con "¡Pedido apartado!"
@@ -668,6 +702,11 @@ function confirmarPedido(contenedor, { articulos, horaRecogida, cafeteria }) {
   // Pudieron pasar las 11:00 mientras se revisaba (nota de Figma 1375:9324)
   if (!estaAbiertoApartar()) {
     mostrarHorarioCerrado(contenedor);
+    return;
+  }
+  const agotados = buscarAgotados(articulos);
+  if (agotados.length) {
+    mostrarAgotado(contenedor, articulos, agotados);
     return;
   }
   const pedido = crearPedido({

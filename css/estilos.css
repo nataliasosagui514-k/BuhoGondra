@@ -2399,6 +2399,14 @@ dialog:focus {
   letter-spacing: var(--interletra-titulo-3);
 }
 
+/* El nombre del platillo agotado (Figma no tiene esta línea) */
+.ventana__destacado {
+  margin-top: var(--espacio-8);
+  font-size: var(--letra-etiqueta);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-etiqueta);
+}
+
 .ventana__mensaje {
   margin-top: var(--espacio-8);
   color: var(--color-texto-secundario);
