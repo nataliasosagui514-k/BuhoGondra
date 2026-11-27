@@ -87,9 +87,16 @@ function crearPedido({ articulos, fecha, cafeteria, horaRecogida, anteriores }) 
 
 /* ---------- Horarios ---------- */
 
-// La hora con la que trabaja Apartar.
-function obtenerAhora() {
-  return new Date();
+// La hora con la que trabaja Apartar: la del teléfono o, para las demostraciones, la
+// que diga la dirección (index.html?hora=10:00). Solo cambia la hora, no la fecha.
+function obtenerAhora(consulta = location.search) {
+  const ahora = new Date();
+  const pedida = new URLSearchParams(consulta).get("hora") ?? "";
+  const partes = /^([01]?\d|2[0-3]):([0-5]\d)$/.exec(pedida);
+  if (partes) {
+    ahora.setHours(Number(partes[1]), Number(partes[2]), 0, 0);
+  }
+  return ahora;
 }
 
 function aMinutos(hora) {
