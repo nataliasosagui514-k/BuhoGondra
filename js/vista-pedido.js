@@ -818,6 +818,16 @@ function crearTicket(pedido, articulos) {
       return elemento;
     }),
   );
+  // Lo guardado en el pedido; los anteriores a este descuento no tienen el campo
+  if (pedido.descuento) {
+    lista.append(
+      crearLineaDeDescuento(pedido.descuento, {
+        fila: "ticket__linea",
+        nombre: "ticket__platillo",
+        monto: "ticket__precio",
+      }),
+    );
+  }
   const desglose = crearElemento("div", "ticket__desglose");
   desglose.append(crearElemento("h3", "ticket__subtitulo", "Lo que pediste"), lista);
 
