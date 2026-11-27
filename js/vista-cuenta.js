@@ -1017,7 +1017,7 @@ function dibujarRecuperarNueva(contenedor) {
 
 /* ---------- Invitado (Figma 1003:4839 y sección 1429:10116) ---------- */
 
-// A dónde se regresa al entrar: { hash, tipo }. Solo en memoria
+// A dónde se regresa al entrar: { hash, tipo, platillo }. Solo en memoria
 let regreso = null;
 // Lo que una persona invitada había elegido al tocar "Apartar"
 let lineaDeInvitado = null;
@@ -1051,7 +1051,7 @@ function pedirCuentaParaApartar(platillo, linea) {
     titulo: "Inicia sesión para apartar",
     mensaje:
       "Necesitas tu cuenta UCA para apartar y recibir tu ticket con PIN. Después regresas a este platillo.",
-    destino: { hash: location.hash, tipo: "apartar" },
+    destino: { hash: location.hash, tipo: "apartar", platillo: platillo.nombre },
   });
 }
 
