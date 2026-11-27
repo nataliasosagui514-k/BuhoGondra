@@ -31,11 +31,13 @@ function calcularTotal(articulos) {
 const PRIMER_NUMERO_DE_PEDIDO = 1043;
 const CIFRAS_DEL_PIN = 4;
 
-// Los puntos se dan una vez por pedido, no por cantidad: los de su categoría.
-// TODO: falta decidir cuántos da un pedido que junta categorías de la misma ventana
-// (por ejemplo, plato fuerte y económico). Por ahora cuenta la que más puntos da.
+// Los puntos se dan por pedido, no por cantidad: se suman una vez los de cada
+// categoría que tenga el pedido (plato fuerte 3 + económico 1 = 4).
 function calcularPuntos(platillos) {
-  return Math.max(0, ...platillos.map((platillo) => platillo.puntos ?? 0));
+  const porCategoria = new Map(
+    platillos.map((platillo) => [platillo.categoria, platillo.puntos ?? 0]),
+  );
+  return [...porCategoria.values()].reduce((suma, puntos) => suma + puntos, 0);
 }
 
 // PIN al azar de 4 dígitos que no tenga otro pedido de ese día en esa cafetería.
@@ -142,12 +144,23 @@ function crearLineaPorTipos(id, cantidades) {
   return crearLinea(id, contarUnidades(elegidas), { tipo: elegidas });
 }
 
+// Dos líneas son la misma si son del mismo platillo con las mismas opciones. En los
+// platillos con tipos basta el platillo: las cantidades de cada tipo se suman.
+function sonLaMismaLinea(una, otra) {
+  return (
+    una.id === otra.id &&
+    (Boolean(otra.opciones.tipo) ||
+      JSON.stringify(una.opciones) === JSON.stringify(otra.opciones))
+  );
+}
+
+function quitarLinea(lineas, quitada) {
+  return lineas.filter((linea) => !sonLaMismaLinea(linea, quitada));
+}
+
 // Agrega una línea. Si ya está el mismo platillo con las mismas opciones, suma cantidades.
 function unirLineas(lineas, nueva) {
-  const esIgual = (linea) =>
-    linea.id === nueva.id &&
-    (Boolean(nueva.opciones.tipo) ||
-      JSON.stringify(linea.opciones) === JSON.stringify(nueva.opciones));
+  const esIgual = (linea) => sonLaMismaLinea(linea, nueva);
   if (!lineas.some(esIgual)) {
     return [...lineas, nueva];
   }
@@ -169,6 +182,46 @@ function unirLineas(lineas, nueva) {
 // Un pedido admite una sola ventana de recogida (los pedidos mixtos son de otra fase).
 function esDeLaMismaVentana(platillosDelPedido, platillo) {
   return platillosDelPedido.every((otro) => otro.ventana_recogida === platillo.ventana_recogida);
+}
+
+/* ---------- Presentaciones ---------- */
+
+// Las formas de llevar un platillo, cada una con su precio ("Solo la porción", "En
+// combo"…). Si el platillo ya tiene precio, la otra forma es llevarlo completo.
+function obtenerPresentaciones(platillo) {
+  const grupo = platillo.opciones?.find((uno) => uno.id === "presentacion");
+  if (!grupo) {
+    return [];
+  }
+  return platillo.precio === null
+    ? grupo.valores
+    : [{ nombre: "Plato completo", precio: platillo.precio }, ...grupo.valores];
+}
+
+// Lo que cuesta una unidad de la línea. null: falta elegir la presentación.
+function obtenerPrecio(platillo, linea) {
+  const presentaciones = obtenerPresentaciones(platillo);
+  if (!presentaciones.length) {
+    return platillo.precio;
+  }
+  const elegida = presentaciones.find((una) => una.nombre === linea.opciones.presentacion);
+  return elegida?.precio ?? null;
+}
+
+function elegirPresentacion(linea, presentacion) {
+  return crearLinea(linea.id, linea.cantidad, { ...linea.opciones, presentacion });
+}
+
+// Las unidades de cada platillo, aunque esté en varias líneas.
+function contarPorPlatillo(articulos) {
+  const cuentas = new Map();
+  articulos.forEach(({ platillo, cantidad }) => {
+    cuentas.set(platillo.id, {
+      platillo,
+      cantidad: (cuentas.get(platillo.id)?.cantidad ?? 0) + cantidad,
+    });
+  });
+  return [...cuentas.values()];
 }
 
 // El valor por defecto de cada grupo que lo tiene: { guarnicion: "Arroz", … }

@@ -484,6 +484,11 @@ function crearAccionesDeDetalle(platillo, esDeHoy) {
 
   // Lo que se apartaría ahora; la caja de cantidad la cambia
   let linea = crearLinea(platillo.id, 1, obtenerOpcionesPorDefecto(platillo));
+  // Si ya se eligió una presentación al apartar, se conserva y el botón usa su precio
+  const seleccion = obtenerSeleccion();
+  if (seleccion?.id === platillo.id && seleccion.opciones.presentacion) {
+    linea = crearLinea(platillo.id, 1, seleccion.opciones);
+  }
   const irAApartar = () => apartar(platillo, linea);
   const textoApartar = (precio) => `Apartar · ${formatearPrecio(precio)}`;
 
@@ -505,7 +510,10 @@ function crearAccionesDeDetalle(platillo, esDeHoy) {
     ];
   }
 
-  const boton = crearBotonInferior(textoApartar(obtenerPrecioVisible(platillo)), irAApartar);
+  const boton = crearBotonInferior(
+    textoApartar(obtenerPrecio(platillo, linea) ?? obtenerPrecioVisible(platillo)),
+    irAApartar,
+  );
 
   if (platillo.eligeCantidad) {
     const caja = crearCajaDeCantidad(platillo, (total, elegida) => {
@@ -521,15 +529,10 @@ function crearAccionesDeDetalle(platillo, esDeHoy) {
   if (!grupo) {
     return [boton];
   }
-  const lineas = grupo.valores.map((valor) =>
-    valor.precio === undefined
-      ? `• ${valor.nombre}`
-      : `• ${valor.nombre} · ${formatearPrecio(valor.precio)}`,
-  );
-  // Si el platillo ya tiene precio, la otra opción es llevarlo completo
-  if (platillo.precio !== null && grupo.valores.some((valor) => valor.precio !== undefined)) {
-    lineas.unshift(`• Plato completo · ${formatearPrecio(platillo.precio)}`);
-  }
+  const presentaciones = obtenerPresentaciones(platillo);
+  const lineas = presentaciones.length
+    ? presentaciones.map((una) => `• ${una.nombre} · ${formatearPrecio(una.precio)}`)
+    : grupo.valores.map((valor) => `• ${valor.nombre}`);
   return [crearCajaDeOpciones("Elige tu opción", lineas, "Eliges la opción al apartar."), boton];
 }
 

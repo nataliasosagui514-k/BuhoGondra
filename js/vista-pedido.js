@@ -6,6 +6,26 @@ function empezarEnMinuscula(texto) {
   return `${texto.charAt(0).toLowerCase()}${texto.slice(1)}`;
 }
 
+function empezarEnMayuscula(texto) {
+  return `${texto.charAt(0).toUpperCase()}${texto.slice(1)}`;
+}
+
+// "a", "a y b", "a, b y c"
+function unirEnFrase(partes) {
+  return partes.length > 1
+    ? `${partes.slice(0, -1).join(", ")} y ${partes.at(-1)}`
+    : (partes[0] ?? "");
+}
+
+// ["1 de frijol con queso", "1 revuelta"]. Así lo escribe Figma (1377:9384): los
+// rellenos llevan "de"; "revuelta", que describe a la pupusa, no.
+function listarTipos(linea) {
+  return Object.entries(linea.opciones.tipo).map(([tipo, cantidad]) => {
+    const nombre = empezarEnMinuscula(tipo);
+    return `${cantidad} ${nombre === "revuelta" ? "" : "de "}${nombre}`;
+  });
+}
+
 // Nombres de las opciones elegidas, en el orden de los grupos y en minúscula.
 function listarOpciones(platillo, opciones) {
   return (platillo.opciones ?? [])
@@ -20,9 +40,17 @@ function unirConPuntos(partes) {
 }
 
 // Foto, categoría, nombre y precio (Figma 1346:8846). Reutiliza la fila de Comentarios.
-function crearFilaDePlatillo(platillo, precio) {
+// Con varias unidades el nombre es "2 × Pupusas" (Figma 1377:9381). Sin precio
+// todavía (falta elegir la presentación), la fila no lo muestra.
+function crearFilaDePlatillo(platillo, precio, cantidad = 1) {
   const fila = crearPlatilloResumido(platillo);
-  fila.append(crearElemento("p", "platillo-resumido__precio", formatearPrecio(precio)));
+  if (cantidad > 1) {
+    fila.querySelector(".platillo-resumido__nombre").textContent =
+      `${cantidad} × ${platillo.nombre}`;
+  }
+  if (precio !== null) {
+    fila.append(crearElemento("p", "platillo-resumido__precio", formatearPrecio(precio)));
+  }
   return fila;
 }
 
@@ -54,21 +82,13 @@ function formatearHora(hora24) {
   return `${hora} ${periodo}`;
 }
 
-// Lo elegido en una línea: "Arroz · ensalada fresca · …" o "2 × Revuelta".
-// TODO: Figma solo muestra el texto de un combo; las formas con tipos y con
-// "Cantidad" se arman con los nombres de los datos.
+// Lo elegido en una línea, para la pantalla de hora: "Arroz · ensalada fresca · …" o
+// "1 de frijol con queso · 1 revuelta".
 function describirLinea(platillo, linea) {
   if (linea.opciones.tipo) {
-    return unirConPuntos(
-      Object.entries(linea.opciones.tipo).map(([tipo, cantidad]) => `${cantidad} × ${tipo}`),
-    );
+    return unirConPuntos(listarTipos(linea));
   }
-  const texto = unirConPuntos(listarOpciones(platillo, linea.opciones));
-  const partes = [
-    linea.cantidad > 1 ? `Cantidad: ${linea.cantidad}` : "",
-    texto && `${texto.charAt(0).toUpperCase()}${texto.slice(1)}`,
-  ];
-  return unirConPuntos(partes.filter(Boolean));
+  return empezarEnMayuscula(unirConPuntos(listarOpciones(platillo, linea.opciones)));
 }
 
 // Junta cada línea con su platillo del menú de ese día y con lo que cuesta.
@@ -76,7 +96,7 @@ function detallarLineas(lineas, fecha = obtenerFechaDeHoy()) {
   return lineas.flatMap((linea) => {
     const platillo = obtenerPlatillo(linea.id, fecha);
     return platillo
-      ? [{ linea, platillo, precio: platillo.precio, cantidad: linea.cantidad }]
+      ? [{ linea, platillo, precio: obtenerPrecio(platillo, linea), cantidad: linea.cantidad }]
       : [];
   });
 }
@@ -92,17 +112,37 @@ function nombrarConCantidad(articulo) {
   return `${articulo.cantidad} × ${nombrarEnElPedido(articulo.platillo)}`;
 }
 
-// "Con arroz, ensalada fresca, fresco de tamarindo y 2 tortillas"
+// El título del ticket: "Filete de pollo (combo)" o, con varios platillos,
+// "Filete de pollo y 2 pupusas" (Figma 1377:9703).
+// TODO: Figma no muestra tres platillos o más; se unen con comas y "y".
+function titularTicket(articulos) {
+  const platillos = contarPorPlatillo(articulos);
+  if (platillos.length === 1) {
+    return nombrarEnElPedido(platillos[0].platillo);
+  }
+  return unirEnFrase(
+    platillos.map(({ platillo, cantidad }, posicion) => {
+      if (cantidad > 1) {
+        return `${cantidad} ${empezarEnMinuscula(platillo.nombre)}`;
+      }
+      return posicion ? empezarEnMinuscula(platillo.nombre) : platillo.nombre;
+    }),
+  );
+}
+
+// Para la revisión: "Con arroz, ensalada fresca, fresco de tamarindo y 2 tortillas" o
+// "1 de frijol con queso y 1 revuelta"
 function describirEnFrase(platillo, linea) {
   if (linea.opciones.tipo) {
-    return describirLinea(platillo, linea);
+    return unirEnFrase(listarTipos(linea));
+  }
+  // TODO: Figma no muestra la presentación en la revisión; va solo su nombre
+  if (linea.opciones.presentacion) {
+    return linea.opciones.presentacion;
   }
   const elegidas = listarOpciones(platillo, linea.opciones);
   const incluidas = elegidas.filter((opcion) => !opcion.startsWith("sin "));
-  const ultima = incluidas.pop();
-  const frase = ultima
-    ? `Con ${incluidas.length ? `${incluidas.join(", ")} y ${ultima}` : ultima}`
-    : "";
+  const frase = incluidas.length ? `Con ${unirEnFrase(incluidas)}` : "";
   // TODO: Figma no muestra cómo se escribe un grupo "Sin …"
   const sin = elegidas.filter((opcion) => opcion.startsWith("sin "));
   return unirConPuntos([frase, ...sin].filter(Boolean));
@@ -241,21 +281,38 @@ function crearPregunta(clase, titulo, explicacion, opciones) {
   return pregunta;
 }
 
-function crearPreguntaDeHora(ventana) {
+function crearPreguntaDeHora(ventana, elegida) {
   const rango = formatearRango(obtenerRangoDeRecogida(ventana));
   return crearPregunta(
     "horas",
     "¿A qué hora lo recoges?",
     `Hoy, de ${rango}`,
     crearHorasDeRecogida(ventana).map((hora) =>
-      crearOpcion("chip", "hora", hora, false, [
+      crearOpcion("chip", "hora", hora, hora === elegida, [
         crearElemento("span", "chip__hora", formatearHora(hora)),
       ]),
     ),
   );
 }
 
-function crearPreguntaDeCafeteria() {
+// Caja "Elige tu opción" (Figma 1176:7290 y 1228:7895), aquí con botones de opción.
+// Ninguna llega marcada.
+// TODO: Figma no dibuja esta caja con una opción marcada; el círculo es el de cafetería.
+function crearCajaDePresentacion(platillo, elegida) {
+  const lista = crearElemento("div", "presentaciones__lista");
+  lista.append(
+    ...obtenerPresentaciones(platillo).map(({ nombre, precio }) =>
+      crearOpcion("presentacion", "presentacion", nombre, nombre === elegida, [
+        crearElemento("span", "presentacion__texto", `${nombre} · ${formatearPrecio(precio)}`),
+      ]),
+    ),
+  );
+  const caja = crearElemento("fieldset", "caja presentaciones");
+  caja.append(crearElemento("legend", "caja__titulo presentaciones__titulo", "Elige tu opción"), lista);
+  return caja;
+}
+
+function crearPreguntaDeCafeteria(elegida) {
   return crearPregunta(
     "cafeterias",
     "¿Dónde lo recoges?",
@@ -266,7 +323,7 @@ function crearPreguntaDeCafeteria() {
         crearElemento("span", "cafeteria__nombre", `Cafetería ${cafeteria.nombre}`),
         crearElemento("span", "cafeteria__detalle", "Recoges tu pedido en caja"),
       );
-      return crearOpcion("cafeteria", "cafeteria", cafeteria.id, cafeteria.predeterminada, [
+      return crearOpcion("cafeteria", "cafeteria", cafeteria.id, cafeteria.id === elegida, [
         textos,
       ]);
     }),
@@ -275,9 +332,40 @@ function crearPreguntaDeCafeteria() {
 
 /* ---------- Revisa tu pedido (Figma 1374:9516) ---------- */
 
-// Hoja inferior sobre la pantalla de hora. Tocar el fondo, la X, "Cambiar algo" o
-// la tecla Escape la cierran y se vuelve a lo que se estaba haciendo.
-function crearHojaDeRevision({ articulos, hora, cafeteria, alAgregar, alConfirmar }) {
+// Una línea de la revisión, con su botón para quitarla (oculto hasta "Cambiar algo").
+function crearLineaDeRevision(articulo, editando, alQuitar) {
+  const renglon = crearElemento("p", "hoja__renglon");
+  renglon.append(
+    crearElemento("span", "hoja__platillo", nombrarConCantidad(articulo)),
+    crearElemento("span", "hoja__precio", formatearPrecio(calcularTotal([articulo]))),
+  );
+  const elemento = crearElemento("li", "hoja__linea");
+  elemento.append(renglon);
+  const frase = describirEnFrase(articulo.platillo, articulo.linea);
+  if (frase) {
+    elemento.append(crearElemento("p", "hoja__detalle", frase));
+  }
+  // TODO: Figma no define este botón ni su texto
+  const quitar = crearElemento("button", "boton boton--texto boton--pequeno hoja__quitar", "Quitar");
+  quitar.type = "button";
+  quitar.hidden = !editando;
+  quitar.setAttribute("aria-label", `Quitar ${articulo.platillo.nombre}`);
+  quitar.addEventListener("click", () => alQuitar(articulo));
+  elemento.append(quitar);
+  return elemento;
+}
+
+// Hoja inferior sobre la pantalla de hora. Tocar el fondo, la X o la tecla Escape la
+// cierran. "Cambiar algo" muestra (u oculta) el botón para quitar cada platillo.
+function crearHojaDeRevision({
+  articulos,
+  hora,
+  cafeteria,
+  editando,
+  alQuitar,
+  alAgregar,
+  alConfirmar,
+}) {
   const hoja = crearElemento("dialog", "hoja");
   const cerrar = () => {
     hoja.close();
@@ -299,20 +387,7 @@ function crearHojaDeRevision({ articulos, hora, cafeteria, alAgregar, alConfirma
 
   const lineas = crearElemento("ul", "hoja__lineas");
   lineas.append(
-    ...articulos.map((articulo) => {
-      const renglon = crearElemento("p", "hoja__renglon");
-      renglon.append(
-        crearElemento("span", "hoja__platillo", nombrarConCantidad(articulo)),
-        crearElemento("span", "hoja__precio", formatearPrecio(calcularTotal([articulo]))),
-      );
-      const elemento = crearElemento("li", "hoja__linea");
-      elemento.append(renglon);
-      const frase = describirEnFrase(articulo.platillo, articulo.linea);
-      if (frase) {
-        elemento.append(crearElemento("p", "hoja__detalle", frase));
-      }
-      return elemento;
-    }),
+    ...articulos.map((articulo) => crearLineaDeRevision(articulo, editando, alQuitar)),
   );
 
   const total = crearElemento("p", "hoja__total");
@@ -327,7 +402,14 @@ function crearHojaDeRevision({ articulos, hora, cafeteria, alAgregar, alConfirma
   agregar.type = confirmar.type = cambiar.type = "button";
   agregar.addEventListener("click", alAgregar);
   confirmar.addEventListener("click", () => alConfirmar(confirmar));
-  cambiar.addEventListener("click", cerrar);
+  cambiar.setAttribute("aria-pressed", String(Boolean(editando)));
+  cambiar.addEventListener("click", () => {
+    const activar = cambiar.getAttribute("aria-pressed") !== "true";
+    cambiar.setAttribute("aria-pressed", String(activar));
+    lineas.querySelectorAll(".hoja__quitar").forEach((boton) => {
+      boton.hidden = !activar;
+    });
+  });
 
   hoja.append(
     crearElemento("span", "hoja__asa"),
@@ -365,29 +447,47 @@ function agregarOtroPlatillo(lineas) {
   location.hash = "#/menu";
 }
 
-// Lo que se va a apartar: el pedido en curso más el platillo que se está eligiendo.
-// Devuelve null si falta elegir algo en el detalle.
-function armarLineas(platillo) {
-  const enCurso = obtenerPedidoEnCurso();
+// El platillo que se está eligiendo y todavía no está en el pedido en curso: lo
+// elegido en el detalle o, si se entró directo, el platillo con las opciones por
+// defecto. Devuelve null si no hay ninguno o si falta elegir tipos.
+function obtenerLineaNueva(platillo) {
   const seleccion = obtenerSeleccion();
   if (seleccion?.id === platillo.id) {
-    return unirLineas(enCurso, seleccion);
+    return seleccion;
   }
-  if (enCurso.some((linea) => linea.id === platillo.id)) {
-    return enCurso;
-  }
-  // Se entró directo: sirve el platillo con las opciones por defecto, salvo que
-  // haya que elegir tipos
-  return platillo.opciones?.some((grupo) => grupo.id === "tipo")
+  const yaEsta = obtenerPedidoEnCurso().some((linea) => linea.id === platillo.id);
+  const faltanTipos = platillo.opciones?.some((grupo) => grupo.id === "tipo");
+  return yaEsta || faltanTipos
     ? null
-    : unirLineas(enCurso, crearLinea(platillo.id, 1, obtenerOpcionesPorDefecto(platillo)));
+    : crearLinea(platillo.id, 1, obtenerOpcionesPorDefecto(platillo));
+}
+
+// Filas de los platillos que se van a apartar, con lo elegido en cada uno.
+function crearResumenDeApartar(articulos) {
+  const resumen = crearElemento("ul", "apartar__platillos");
+  resumen.append(
+    ...articulos.map((articulo) => {
+      const elemento = crearElemento("li", "apartar__platillo");
+      const precio = articulo.precio === null ? null : calcularTotal([articulo]);
+      elemento.append(crearFilaDePlatillo(articulo.platillo, precio, articulo.cantidad));
+      const detalle = describirLinea(articulo.platillo, articulo.linea);
+      if (detalle) {
+        elemento.append(crearElemento("p", "apartar__opciones", detalle));
+      }
+      return elemento;
+    }),
+  );
+  return resumen;
 }
 
 function dibujarApartar(contenedor, { id }) {
-  const esCombo = () => obtenerPlatillo(id, obtenerFechaDeHoy())?.categoria === "platos-fuertes";
-  prepararEncabezado(contenedor, "Apartar pedido", () =>
-    volverA(esCombo() ? `#/personalizar/${id}` : `#/platillo/${id}`),
-  );
+  // Cambia si se quita de la revisión el platillo con el que se entró
+  let idActual = id;
+  prepararEncabezado(contenedor, "Apartar pedido", () => {
+    const esCombo =
+      obtenerPlatillo(idActual, obtenerFechaDeHoy())?.categoria === "platos-fuertes";
+    volverA(esCombo ? `#/personalizar/${idActual}` : `#/platillo/${idActual}`);
+  });
   const platillo = obtenerPlatilloDeHoy(contenedor, id);
   if (!platillo) {
     return;
@@ -396,54 +496,100 @@ function dibujarApartar(contenedor, { id }) {
     mostrarHorarioCerrado(contenedor);
     return;
   }
-  // TODO: la Ensalada César no tiene precio hasta elegir su presentación, y esa
-  // elección (nota de Figma 1176:7471) no está diseñada ni pedida en esta fase.
-  if (platillo.precio === null) {
-    contenedor.replaceChildren(
-      crearMensajeConRegreso(crearElemento("h1", "no-encontrado__titulo", "Próximamente")),
-    );
-    return;
-  }
   if (!cabeEnElPedido(platillo)) {
     mostrarAviso("info", AVISO_PEDIDO_MIXTO);
     location.replace("#/menu");
     return;
   }
-  const lineas = armarLineas(platillo);
-  if (!lineas) {
+  let nueva = obtenerLineaNueva(platillo);
+  const armarLineas = () =>
+    nueva ? unirLineas(obtenerPedidoEnCurso(), nueva) : obtenerPedidoEnCurso();
+  if (!nueva && !armarLineas().some((linea) => linea.id === id)) {
     location.replace(`#/platillo/${id}`);
     return;
   }
 
-  const articulos = detallarLineas(lineas);
-  const resumen = crearElemento("ul", "apartar__platillos");
-  resumen.append(
-    ...articulos.map((articulo) => {
-      const elemento = crearElemento("li", "apartar__platillo");
-      elemento.append(
-        crearFilaDePlatillo(articulo.platillo, calcularTotal([articulo])),
-      );
-      const detalle = describirLinea(articulo.platillo, articulo.linea);
-      if (detalle) {
-        elemento.append(crearElemento("p", "apartar__opciones", detalle));
-      }
-      return elemento;
-    }),
-  );
-
+  // Lo ya marcado en la pantalla, para no perderlo al quitar un platillo
+  const elecciones = {
+    hora: null,
+    cafeteria: CAFETERIAS.find((una) => una.predeterminada).id,
+  };
+  const formulario = crearElemento("form", "apartar");
   const continuar = crearElemento("button", "boton boton--primario", "Continuar");
   continuar.type = "submit";
-  continuar.disabled = true;
 
-  const formulario = crearElemento("form", "apartar");
-  formulario.append(
-    resumen,
-    crearPreguntaDeHora(platillo.ventana_recogida),
-    crearPreguntaDeCafeteria(),
-    continuar,
-  );
-  // "Continuar" se activa cuando hay una hora y una cafetería
-  formulario.addEventListener("change", () => {
+  const pintar = () => {
+    const articulos = detallarLineas(armarLineas());
+    const partes = [crearResumenDeApartar(articulos)];
+    if (nueva && obtenerPresentaciones(platillo).length) {
+      partes.push(crearCajaDePresentacion(platillo, nueva.opciones.presentacion));
+    }
+    formulario.replaceChildren(
+      ...partes,
+      crearPreguntaDeHora(articulos[0].platillo.ventana_recogida, elecciones.hora),
+      crearPreguntaDeCafeteria(elecciones.cafeteria),
+      continuar,
+    );
+    // "Continuar" se activa cuando no falta nada por elegir
+    continuar.disabled = !formulario.checkValidity();
+  };
+
+  const quitar = (articulo) => {
+    const enCurso = quitarLinea(obtenerPedidoEnCurso(), articulo.linea);
+    const quedaNueva = nueva && !sonLaMismaLinea(nueva, articulo.linea) ? nueva : null;
+    if (!quedaNueva && !enCurso.length) {
+      borrarPedidoEnCurso();
+      location.hash = "#/menu";
+      return;
+    }
+    if (!guardarPedidoEnCurso(enCurso)) {
+      contenedor.querySelector("dialog.hoja")?.remove(); // el aviso debe verse
+      // TODO: Figma no define este mensaje
+      mostrarAviso("error", "No se pudo guardar tu pedido");
+      return;
+    }
+    nueva = quedaNueva;
+    if (!nueva) {
+      guardarSeleccion(null);
+      idActual = enCurso[0].id;
+      // La dirección pasa a un platillo que sigue en el pedido, para que al recargar
+      // no vuelva el que se quitó. No redibuja la pantalla.
+      history.replaceState(history.state, "", `#/apartar/${idActual}`);
+    }
+    contenedor.querySelector("dialog.hoja").remove();
+    pintar();
+    abrirRevision(true);
+  };
+
+  const abrirRevision = (editando = false) => {
+    const lineas = armarLineas();
+    const articulos = detallarLineas(lineas);
+    abrirDialogo(
+      contenedor,
+      crearHojaDeRevision({
+        articulos,
+        ...elecciones,
+        editando,
+        alQuitar: quitar,
+        alAgregar: () => agregarOtroPlatillo(lineas),
+        alConfirmar: (boton) => {
+          boton.disabled = true; // un segundo toque no debe crear otro pedido
+          confirmarPedido(contenedor, { articulos, ...elecciones });
+        },
+      }),
+    );
+  };
+
+  formulario.addEventListener("change", ({ target }) => {
+    if (target.name === "presentacion") {
+      nueva = elegirPresentacion(nueva, target.value);
+      guardarSeleccion(nueva);
+      formulario
+        .querySelector(".apartar__platillos")
+        .replaceWith(crearResumenDeApartar(detallarLineas(armarLineas())));
+    } else {
+      elecciones[target.name] = target.value;
+    }
     continuar.disabled = !formulario.checkValidity();
   });
   formulario.addEventListener("submit", (evento) => {
@@ -452,26 +598,10 @@ function dibujarApartar(contenedor, { id }) {
       mostrarHorarioCerrado(contenedor);
       return;
     }
-    const datos = new FormData(formulario);
-    abrirDialogo(
-      contenedor,
-      crearHojaDeRevision({
-        articulos,
-        hora: datos.get("hora"),
-        cafeteria: datos.get("cafeteria"),
-        alAgregar: () => agregarOtroPlatillo(lineas),
-        alConfirmar: (boton) => {
-          boton.disabled = true; // un segundo toque no debe crear otro pedido
-          confirmarPedido(contenedor, {
-            articulos,
-            hora: datos.get("hora"),
-            cafeteria: datos.get("cafeteria"),
-          });
-        },
-      }),
-    );
+    abrirRevision();
   });
 
+  pintar();
   contenedor.querySelector(".menu").append(formulario);
 }
 
@@ -545,12 +675,7 @@ function crearTicket(pedido, articulos) {
   const datos = crearElemento("div", "ticket__datos");
   datos.append(
     crearElemento("p", "ticket__numero", `PEDIDO #${pedido.numero}`),
-    // TODO: Figma solo muestra el título de un pedido de un platillo
-    crearElemento(
-      "h2",
-      "ticket__titulo",
-      articulos.map(({ platillo }) => nombrarEnElPedido(platillo)).join(" + "),
-    ),
+    crearElemento("h2", "ticket__titulo", titularTicket(articulos)),
     crearCajaDeRecogida(pedido.horaRecogida, pedido.cafeteria),
     desglose,
     pago,
@@ -592,13 +717,9 @@ function dibujarTicket(contenedor, { id }) {
   );
 
   const acciones = crearElemento("div", "ticket-pantalla__acciones");
-  // TODO: "Más › Historial" todavía no existe
+  // TODO (fase de Más): Figma pone sobre "Listo" la nota "También lo encuentras en
+  // Más › Historial, aunque no tengas internet.". Volver a ponerla cuando exista.
   acciones.append(
-    crearElemento(
-      "p",
-      "ticket-pantalla__nota",
-      "También lo encuentras en Más › Historial, aunque no tengas internet.",
-    ),
     crearBotonInferior("Listo", () => {
       borrarPedidoEnCurso();
       location.hash = "#/menu";

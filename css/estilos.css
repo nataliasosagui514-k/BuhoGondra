@@ -2234,6 +2234,31 @@ main.contenido--completo {
   display: flex;
 }
 
+/* Caja "Elige tu opción" al apartar: la del detalle con botones de opción */
+.presentaciones {
+  min-width: 0;
+  border: 0;
+}
+
+.presentaciones__titulo {
+  float: left;
+  width: 100%;
+  padding: 0;
+}
+
+.presentaciones__lista {
+  display: flex;
+  clear: both;
+  flex-direction: column;
+}
+
+.presentacion {
+  gap: var(--espacio-12);
+  min-height: var(--alto-chip);
+  font-size: var(--letra-texto);
+  line-height: var(--linea-texto);
+}
+
 /* Opción de cafetería (Figma 889:3428). El círculo va a la derecha */
 .cafeteria {
   justify-content: space-between;
@@ -2259,9 +2284,13 @@ main.contenido--completo {
 }
 
 .cafeteria .opcion__marca {
+  order: 1;
+}
+
+.cafeteria .opcion__marca,
+.presentacion .opcion__marca {
   display: flex;
   flex-shrink: 0;
-  order: 1;
   align-items: center;
   justify-content: center;
   width: var(--tamano-circulo);
@@ -2270,7 +2299,8 @@ main.contenido--completo {
   border-radius: var(--radio-pildora);
 }
 
-.cafeteria .opcion__palomita {
+.cafeteria .opcion__palomita,
+.presentacion .opcion__palomita {
   visibility: hidden;
 }
 
@@ -2279,12 +2309,14 @@ main.contenido--completo {
   background: var(--color-fondo-info-suave);
 }
 
-.cafeteria:has(:checked) .opcion__marca {
+.cafeteria:has(:checked) .opcion__marca,
+.presentacion:has(:checked) .opcion__marca {
   border-color: var(--color-accion-secundaria);
   background: var(--color-accion-secundaria);
 }
 
-.cafeteria:has(:checked) .opcion__palomita {
+.cafeteria:has(:checked) .opcion__palomita,
+.presentacion:has(:checked) .opcion__palomita {
   visibility: visible;
 }
 
@@ -2462,6 +2494,16 @@ dialog:focus {
   gap: var(--espacio-16);
 }
 
+/* "Quitar" va bajo su línea, a la derecha. Aparece con "Cambiar algo" */
+.hoja__quitar {
+  align-self: flex-end;
+  margin-top: calc(-1 * var(--espacio-8));
+}
+
+.hoja__quitar[hidden] {
+  display: none;
+}
+
 .hoja__platillo,
 .hoja__detalle,
 .recogida__lugar {
@@ -2570,7 +2612,6 @@ dialog:focus {
   margin-top: 0;
 }
 
-.ticket-pantalla__nota,
 .ticket__instruccion {
   color: var(--color-texto-secundario);
   font-size: var(--letra-texto-pequeno);
