@@ -134,7 +134,8 @@
   --sombra-interior-tarjeta: inset 0 1.5px 0 rgb(255 255 255 / 40%);
   --sombra-nivel-1: 0 4px 12px rgb(9 28 51 / 12%);
   --color-cristal-sobre-foto: rgb(255 255 255 / 40%);
-  /* TODO: Figma no define el gris de una foto que falta; se usa bg/muted */
+  /* Foto mientras carga: variable bg/muted del kit (--color-fondo-atenuado), la que usa
+     el círculo marcador de "Tarjeta de platillo" (Figma 738:2398) */
   --color-foto-carga: var(--color-fondo-atenuado);
 
   /* Desenfoques de cristal */
