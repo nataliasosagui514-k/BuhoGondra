@@ -143,7 +143,11 @@ function mostrarCategoria(contenedor, dia, idCategoria) {
     boton.setAttribute("aria-pressed", String(boton.dataset.categoria === idCategoria));
   });
   contenedor.querySelector(".menu__categoria").textContent = categoria.nombre;
-  contenedor.querySelector(".menu__conteo").textContent = `${platillos.length} platillos`;
+  // Figma cuenta "opciones" en Complementos y "platillos" en las demás categorías
+  const [una, varias] =
+    idCategoria === "complementos" ? ["opción", "opciones"] : ["platillo", "platillos"];
+  contenedor.querySelector(".menu__conteo").textContent =
+    `${platillos.length} ${platillos.length === 1 ? una : varias}`;
 
   const nota = contenedor.querySelector(".menu__nota");
   nota.hidden = idCategoria !== "tipicos";
@@ -375,15 +379,18 @@ function crearDetalle(platillo) {
     encabezado.append(crearElemento("p", "detalle__precio", formatearPrecio(precio)));
   }
 
-  const ventana =
-    platillo.ventana_recogida === "tipicos" ? HORARIOS.recogerTipicos : HORARIOS.recogerAlmuerzos;
-  const recoger = crearElemento(
-    "p",
-    "detalle__recoger",
-    `Hora de recoger: ${formatearRango(ventana, "–")}`,
-  );
-
-  contenido.append(estado, encabezado, recoger, ...crearAccionesDeDetalle(platillo));
+  contenido.append(estado, encabezado);
+  // En Figma solo los típicos llevan la línea de recogida (1294:8255 a 1294:8283)
+  if (platillo.recogida) {
+    contenido.append(
+      crearElemento(
+        "p",
+        "detalle__recoger",
+        `${platillo.recogida} de ${formatearRango(HORARIOS.recogerTipicos)}`,
+      ),
+    );
+  }
+  contenido.append(...crearAccionesDeDetalle(platillo));
   detalle.append(portada, contenido);
   return detalle;
 }

@@ -46,8 +46,13 @@ function crearPlatillo(id, nombre, categoria, precio, extras = {}) {
 
 const economico = (id, nombre, precio, extras) =>
   crearPlatillo(id, nombre, "economicos", precio, extras);
+/* "recogida" es la forma que concuerda con el nombre en la línea "Recógelo de 2:00 a
+   5:30 p. m.". Figma solo confirma "Recógelas" (empanadas y pupusas) y "Recógelo" (arroz
+   en leche, pastelito de pollo y tamales de pollo y de chipilín).
+   TODO: confirmar en Figma la forma de los demás típicos (canoas, tamales, yuca, poleada,
+   enchilada, nuégados y los que usan "Recógelo" por defecto). */
 const tipico = (id, nombre, precio, extras) =>
-  crearPlatillo(id, nombre, "tipicos", precio, extras);
+  crearPlatillo(id, nombre, "tipicos", precio, { recogida: "Recógelo", ...extras });
 const complemento = (id, nombre, precio, extras) =>
   crearPlatillo(id, nombre, "complementos", precio, extras);
 const otroComplemento = (id, nombre) =>
@@ -106,18 +111,21 @@ const croissant = economico("croissant-de-jamon-y-queso", "Croissant de jamón y
 const filetePollo = platoFuerte("filete-de-pollo", "Filete de pollo", 4.0);
 const empanadaLeche = tipico("empanada-de-leche", "Empanada de leche", 0.75, {
   eligeCantidad: true,
+  recogida: "Recógelas",
 });
 const empanadaFrijol = tipico("empanada-de-frijol", "Empanada de frijol", 0.75, {
   eligeCantidad: true,
+  recogida: "Recógelas",
 });
 const pastelitoPollo = tipico("pastelito-de-pollo", "Pastelito de pollo", 0.65);
 const pastelitoRes = tipico("pastelito-de-res", "Pastelito de res", 0.65);
 const tamalPollo = tipico("tamal-de-pollo", "Tamal de pollo", 0.95);
 const tamalChipilin = tipico("tamal-de-chipilin", "Tamal de chipilín", 0.95);
-const tamales = tipico("tamales", "Tamales", 0.95);
+const tamales = tipico("tamales", "Tamales", 0.95, { recogida: "Recógelos" });
 // Los dos tipos cuestan lo mismo: el precio es el del platillo, por unidad
 const pupusas = tipico("pupusas", "Pupusas", 0.8, {
   eligeCantidad: true,
+  recogida: "Recógelas",
   opciones: [
     {
       id: "tipo",
@@ -213,8 +221,14 @@ const MENU_SEMANA = {
       platoFuerte("lasana-de-pollo", "Lasaña de pollo", 4.0),
     ],
     tipicos: [
-      tipico("canoa-de-leche", "Canoa de leche", 1.35, { eligeCantidad: true }),
-      tipico("canoa-de-frijol", "Canoa de frijol", 1.35, { eligeCantidad: true }),
+      tipico("canoa-de-leche", "Canoa de leche", 1.35, {
+        eligeCantidad: true,
+        recogida: "Recógelas",
+      }),
+      tipico("canoa-de-frijol", "Canoa de frijol", 1.35, {
+        eligeCantidad: true,
+        recogida: "Recógelas",
+      }),
       tipico("atol-de-maiz-tostado", "Atol de maíz tostado", 1.0),
       pastelitoRes,
       tamalPollo,
@@ -239,6 +253,7 @@ const MENU_SEMANA = {
     tipicos: [
       tipico("platano-en-miel", "Plátano en miel", 1.75),
       tipico("yuca-frita-o-sancochada", "Yuca frita o sancochada", 1.35, {
+        recogida: "Recógela",
         opciones: [
           {
             id: "preparacion",
@@ -248,8 +263,8 @@ const MENU_SEMANA = {
           },
         ],
       }),
-      tipico("poleada", "Poleada", 1.0),
-      tipico("enchilada", "Enchilada", 1.25),
+      tipico("poleada", "Poleada", 1.0, { recogida: "Recógela" }),
+      tipico("enchilada", "Enchilada", 1.25, { recogida: "Recógela" }),
       tamales,
       pupusas,
     ],
@@ -271,7 +286,7 @@ const MENU_SEMANA = {
       empanadaLeche,
       empanadaFrijol,
       tipico("pancito-con-pollo", "Pancito con pollo", 1.3),
-      tipico("nuegados", "Nuégados", 1.0),
+      tipico("nuegados", "Nuégados", 1.0, { recogida: "Recógelos" }),
       tamales,
       pupusas,
     ],
