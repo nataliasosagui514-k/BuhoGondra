@@ -28,11 +28,11 @@ Un guion (—) en el id significa que no se encontró un componente para esa var
 | Encabezado | Interno: volver y título | Normal | `1010:4871`, `1051:5423` | Hecho |
 | Encabezado | Pestaña: título (Puntos) | Normal | `1003:4399` | Hecho |
 | Encabezado | Pestaña: enlace «¿Cómo funciona?» | Normal | `1003:4401` | Pendiente |
-| Encabezado | Menú: fecha, subtítulo y calendario | Normal | `1526:11316` | Pendiente |
+| Encabezado | Menú: fecha, subtítulo y calendario | Normal | `1526:11316` | Parcial: sin subtítulo |
 | Botón de volver | En encabezado (relleno gris) | Normal | `1027:6547` | Hecho |
 | Botón de volver | En encabezado | Presionado | `905:4403` | Hecho |
 | Botón de volver | Flotante (relleno blanco) | Normal | `905:4400` | Pendiente |
-| Botón de icono | Flotante | Normal | `1173:4653` | Pendiente |
+| Botón de icono | Flotante | Normal | `1173:4653` | Hecho (calendario del Menú) |
 | Botón de icono | Flotante | Presionado | `1173:4655` | Pendiente |
 | Panel «Más» | Panel lateral | Abierto | `1050:4983` | Pendiente |
 

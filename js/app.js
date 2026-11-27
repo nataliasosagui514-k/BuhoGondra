@@ -12,6 +12,15 @@ const pantallas = {
   },
   "#/puntos": { titulo: "Puntos", enBarra: true },
   "#/mas": { titulo: "Más", enBarra: true },
+  // Se abre con el calendario del menú; también dibuja su propio encabezado
+  "#/semana": {
+    titulo: "Menú de la semana",
+    enBarra: false,
+    sinEncabezado: true,
+    pestana: "#/menu",
+    plantilla: "plantilla-semana",
+    preparar: dibujarSemana,
+  },
   // Ruta oculta: no tiene enlace en la app
   "#/componentes": {
     titulo: "Componentes",
@@ -53,6 +62,12 @@ function recordarOrigen() {
   if (history.state === null) {
     history.replaceState({ desde: hashAnterior }, "");
   }
+  hashAnterior = location.hash;
+}
+
+// Cambia la dirección de la pantalla actual sin crear otra entrada en el historial.
+function cambiarDireccion(ruta) {
+  history.replaceState(history.state, "", ruta);
   hashAnterior = location.hash;
 }
 

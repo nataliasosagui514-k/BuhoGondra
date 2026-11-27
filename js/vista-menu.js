@@ -2,10 +2,29 @@
 // Solo muestran información: aquí no se aparta ni se guarda nada.
 
 const CATEGORIA_INICIAL = "economicos";
+// Categorías que tienen botón
+const CATEGORIAS_CON_BOTON = ["economicos", "platos-fuertes", "complementos", "tipicos"];
 
 // La dirección del menú guarda la categoría: #/menu?categoria=tipicos
 function crearRutaDelMenu(idCategoria) {
   return `#/menu?categoria=${idCategoria}`;
+}
+
+// La del menú de la semana guarda el día y la categoría
+function crearRutaDeLaSemana(idCategoria, fecha) {
+  const dia = fecha ? `dia=${fecha}&` : "";
+  return `#/semana?${dia}categoria=${idCategoria}`;
+}
+
+// Sin categoría en la dirección (o con una que no existe) se usa la inicial.
+function leerCategoria(parametros) {
+  const pedida = parametros.get("categoria");
+  return CATEGORIAS_CON_BOTON.includes(pedida) ? pedida : CATEGORIA_INICIAL;
+}
+
+// "2026-11-24" -> fecha del teléfono a medianoche, sin cambiar de día por la zona horaria
+function convertirAFecha(fecha) {
+  return new Date(`${fecha}T00:00`);
 }
 
 /* ---------- Formatos de texto ---------- */
@@ -86,13 +105,13 @@ function obtenerCategoriaVisual(idCategoria) {
 
 /* ---------- Menú de hoy ---------- */
 
-// Única función que crea las tarjetas.
-function crearTarjeta(platillo) {
+// Única función que crea las tarjetas. Con "fecha", el detalle se abre en ese día.
+function crearTarjeta(platillo, fecha) {
   const enlace = crearElemento(
     "a",
     `tarjeta categoria--${obtenerCategoriaVisual(platillo.categoria)}`,
   );
-  enlace.href = `#/platillo/${platillo.id}`;
+  enlace.href = `#/platillo/${platillo.id}${fecha ? `?dia=${fecha}` : ""}`;
 
   const textos = crearElemento("span", "tarjeta__textos");
   const precio = obtenerPrecioVisible(platillo);
@@ -124,7 +143,7 @@ function crearFoto(platillo, clase) {
 }
 
 // Muestra la lista de una categoría sin cambiar de pantalla.
-function mostrarCategoria(contenedor, dia, idCategoria) {
+function mostrarCategoria(contenedor, dia, idCategoria, fecha) {
   const categoria = dia.categorias.find((una) => una.id === idCategoria);
   const platillos = [...categoria.platillos];
   if (idCategoria === "complementos") {
@@ -146,7 +165,22 @@ function mostrarCategoria(contenedor, dia, idCategoria) {
   nota.hidden = idCategoria !== "tipicos";
   nota.textContent = `Apártalos de ${formatearRango(HORARIOS.apartar, " a ", true)} y recógelos de ${formatearRango(HORARIOS.recogerTipicos)}`;
 
-  contenedor.querySelector(".menu__rejilla").replaceChildren(...platillos.map(crearTarjeta));
+  contenedor
+    .querySelector(".menu__rejilla")
+    .replaceChildren(...platillos.map((platillo) => crearTarjeta(platillo, fecha)));
+}
+
+// Copia en "lugar" los botones de categoría y la cuadrícula, y los pone a funcionar.
+// La usan el Menú de hoy y el Menú de la semana.
+function dibujarCategorias(lugar, { dia, idCategoria, fecha, alElegir }) {
+  lugar.replaceChildren(document.getElementById("plantilla-categorias").content.cloneNode(true));
+  lugar.querySelectorAll(".categoria").forEach((boton) => {
+    boton.addEventListener("click", () => {
+      mostrarCategoria(lugar, dia, boton.dataset.categoria, fecha);
+      alElegir(boton.dataset.categoria);
+    });
+  });
+  mostrarCategoria(lugar, dia, idCategoria, fecha);
 }
 
 // Aviso para un día sin menú.
@@ -176,20 +210,120 @@ function dibujarMenu(contenedor, { parametros }) {
   contenedor.querySelector(".anuncio__texto").textContent =
     `Recoge tu comida de ${formatearRango(HORARIOS.recogerAlmuerzos)} en tu cafetería UCA.`;
 
-  contenedor.querySelectorAll(".categoria").forEach((boton) => {
-    boton.addEventListener("click", () => {
-      const idCategoria = boton.dataset.categoria;
-      // Cambia la dirección sin crear otra entrada en el historial
-      history.replaceState(history.state, "", crearRutaDelMenu(idCategoria));
-      mostrarCategoria(contenedor, dia, idCategoria);
-    });
+  // El calendario abre la semana en la categoría que esté seleccionada
+  const calendario = contenedor.querySelector(".menu__calendario");
+  const idCategoria = leerCategoria(parametros);
+  calendario.href = crearRutaDeLaSemana(idCategoria);
+
+  dibujarCategorias(contenedor.querySelector(".menu__lista"), {
+    dia,
+    idCategoria,
+    alElegir: (elegida) => {
+      cambiarDireccion(crearRutaDelMenu(elegida));
+      calendario.href = crearRutaDeLaSemana(elegida);
+    },
   });
-  // Sin categoría en la dirección (o con una que no existe) se usa la inicial
-  const pedida = parametros.get("categoria");
-  const hayBoton = [...contenedor.querySelectorAll(".categoria")].some(
-    (boton) => boton.dataset.categoria === pedida,
+}
+
+/* ---------- Menú de la semana ---------- */
+
+// Única función que crea las pestañas de día (Figma 1175:4669).
+function crearPestanaDeDia(dia, alElegir) {
+  const esDeHoy = dia.fecha === obtenerFechaDeHoy();
+  const numero = convertirAFecha(dia.fecha).getDate();
+  const pestana = crearElemento("button", "dia");
+  pestana.type = "button";
+  pestana.dataset.fecha = dia.fecha;
+  pestana.setAttribute("aria-label", `${esDeHoy ? "Hoy, " : ""}${dia.nombre} ${numero}`);
+  pestana.append(
+    crearElemento("span", "dia__nombre", esDeHoy ? "Hoy" : dia.nombre.slice(0, 3)),
+    crearElemento("span", "dia__numero", String(numero)),
   );
-  mostrarCategoria(contenedor, dia, hayBoton ? pedida : CATEGORIA_INICIAL);
+  pestana.addEventListener("click", () => alElegir(dia.fecha));
+  return pestana;
+}
+
+// Día con el que abre la semana: el de la dirección; si no, hoy; si no, el primero.
+// TODO: en fin de semana Figma pide el lunes siguiente, pero MENU_SEMANA no lo tiene.
+function leerFecha(parametros) {
+  const pedida = parametros.get("dia") ?? "";
+  if (/^\d{4}-\d{2}-\d{2}$/.test(pedida) && !Number.isNaN(convertirAFecha(pedida).getTime())) {
+    return pedida;
+  }
+  const hoy = obtenerFechaDeHoy();
+  return obtenerMenuDelDia(hoy) ? hoy : Object.values(MENU_SEMANA)[0].fecha;
+}
+
+// Regresa al Menú de hoy con la categoría que está seleccionada en la semana.
+function volverAlMenuDesdeSemana(idCategoria) {
+  const [ruta, consulta = ""] = (history.state?.desde ?? "").split("?");
+  if (ruta === "#/menu" && leerCategoria(new URLSearchParams(consulta)) === idCategoria) {
+    history.back();
+  } else {
+    location.replace(crearRutaDelMenu(idCategoria));
+  }
+}
+
+function dibujarSemana(contenedor, { parametros }) {
+  let fecha = leerFecha(parametros);
+  let idCategoria = leerCategoria(parametros);
+
+  contenedor
+    .querySelector(".semana__encabezado")
+    .prepend(crearBotonVolver(() => volverAlMenuDesdeSemana(idCategoria)));
+
+  const aviso = contenedor.querySelector(".semana__aviso");
+  aviso.append(
+    crearAviso(
+      "info",
+      "Solo para ver",
+      `Puedes apartar únicamente el menú de hoy, de ${formatearRango(HORARIOS.apartar, " a ", true)}, desde la pantalla Menú.`,
+    ),
+  );
+  const dias = contenedor.querySelector(".dias");
+
+  // Cambia la fecha, la pestaña y la lista sin salir de la pantalla
+  const mostrarDia = () => {
+    dias.querySelectorAll(".dia").forEach((pestana) => {
+      pestana.setAttribute("aria-pressed", String(pestana.dataset.fecha === fecha));
+    });
+    contenedor.querySelector(".semana__fecha").textContent = formatearFechaLarga(
+      convertirAFecha(fecha),
+    );
+
+    const dia = obtenerMenuDelDia(fecha);
+    const tieneMenu = Boolean(dia?.categorias.length);
+    const lista = contenedor.querySelector(".menu__lista");
+    aviso.hidden = !tieneMenu;
+    if (!tieneMenu) {
+      lista.replaceChildren(crearAvisoSinMenu());
+      return;
+    }
+    dibujarCategorias(lista, {
+      dia,
+      idCategoria,
+      fecha,
+      alElegir: (elegida) => {
+        idCategoria = elegida;
+        cambiarDireccion(crearRutaDeLaSemana(idCategoria, fecha));
+      },
+    });
+  };
+
+  const elegirDia = (elegida) => {
+    if (elegida === fecha) {
+      return;
+    }
+    fecha = elegida;
+    idCategoria = CATEGORIA_INICIAL; // en Figma, cada día entra en Económicos
+    cambiarDireccion(crearRutaDeLaSemana(idCategoria, fecha));
+    mostrarDia();
+  };
+
+  dias.append(
+    ...Object.values(MENU_SEMANA).map((dia) => crearPestanaDeDia(dia, elegirDia)),
+  );
+  mostrarDia();
 }
 
 /* ---------- Detalle de platillo ---------- */
@@ -383,14 +517,23 @@ function crearAccionesDeDetalle(platillo, esDeHoy) {
   return [crearCajaDeOpciones("Elige tu opción", lineas, "Eliges la opción al apartar."), boton];
 }
 
-// Regresa al menú en la categoría correcta. Si se llegó desde el menú, retrocede en el
-// historial; si el detalle se abrió directo, usa la categoría del platillo.
+// Regresa a donde se estaba. Si se llegó desde el menú (de hoy o de la semana), retrocede
+// en el historial; si el detalle se abrió directo, va al menú en la categoría del platillo.
 function volverAlMenu(idCategoria) {
-  if (history.state?.desde?.startsWith("#/menu")) {
+  if (/^#\/(menu|semana)/.test(history.state?.desde ?? "")) {
     history.back();
   } else {
     location.replace(crearRutaDelMenu(idCategoria));
   }
+}
+
+// Copia el botón de volver del encabezado, para las pantallas que dibujan el suyo.
+function crearBotonVolver(alTocar) {
+  const volver = document.getElementById("boton-volver").cloneNode(true);
+  volver.removeAttribute("id");
+  volver.hidden = false;
+  volver.addEventListener("click", alTocar);
+  return volver;
 }
 
 // Única función que crea el detalle. "dia" es el menú al que pertenece el platillo.
@@ -401,11 +544,8 @@ function crearDetalle(platillo, dia) {
   const detalle = crearElemento("article", `detalle categoria--${idCategoria}`);
 
   const portada = crearElemento("div", "detalle__portada");
-  const volver = document.getElementById("boton-volver").cloneNode(true);
-  volver.removeAttribute("id");
-  volver.hidden = false;
+  const volver = crearBotonVolver(() => volverAlMenu(idCategoria));
   volver.classList.add("boton-volver--sobre-foto");
-  volver.addEventListener("click", () => volverAlMenu(idCategoria));
   portada.append(volver, crearFoto(platillo, "detalle__foto"));
 
   const contenido = crearElemento("div", "detalle__contenido");
@@ -438,8 +578,8 @@ function crearDetalle(platillo, dia) {
   if (esDeHoy) {
     contenido.append(...acciones);
   } else {
-    // En otro día quedan las cajas, sin ningún botón, y el aviso
-    const cajas = acciones.filter((accion) => !accion.classList.contains("detalle__boton"));
+    // En otro día no hay pedido: sin botones ni selector de cantidad, y con el aviso
+    const cajas = acciones.filter((accion) => !accion.matches(".detalle__boton, .caja--cantidad"));
     contenido.append(...cajas, crearAvisoDeOtroDia(dia));
   }
   detalle.append(portada, contenido);

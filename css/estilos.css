@@ -138,6 +138,9 @@
      el círculo marcador de "Tarjeta de platillo" (Figma 738:2398) */
   --color-foto-carga: var(--color-fondo-atenuado);
 
+  /* Botón de icono (Figma 1173:4652) */
+  --brillo-boton-icono: linear-gradient(180deg, rgb(255 255 255 / 50%) 0%, rgb(255 255 255 / 0%) 40%, rgb(255 255 255 / 10%) 100%);
+
   /* Desenfoques de cristal */
   --desenfoque-suave: blur(8px);
   --desenfoque-medio: blur(10px);
@@ -260,6 +263,11 @@
   --relleno-inferior-detalle: 118px;
   --tamano-boton-cantidad: 36px;
   --ancho-numero-cantidad: 24px;
+
+  /* Menú de la semana */
+  --ancho-pestana-dia: 62px;
+  --alto-pestana-dia: 60px;
+  --separacion-pestana-dia: 2px;
 }
 
 /* Reset básico */
@@ -784,7 +792,8 @@ main.contenido--completo {
     calc(var(--alto-navegacion) + var(--distancia-navegacion) + var(--espacio-24));
 }
 
-.menu__del-dia {
+.menu__del-dia,
+.menu__lista {
   display: flex;
   flex-direction: column;
   gap: var(--espacio-24);
@@ -792,8 +801,31 @@ main.contenido--completo {
 
 .menu__encabezado {
   display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--espacio-12);
+}
+
+.menu__titulos {
+  display: flex;
   flex-direction: column;
   gap: var(--espacio-4);
+}
+
+/* Botón de icono: círculo de cristal de 44 px (Figma 1175:7568) */
+.boton-icono {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--tamano-boton-volver);
+  height: var(--tamano-boton-volver);
+  border: var(--borde-fino) solid var(--color-brillo-70);
+  border-radius: var(--radio-pildora);
+  background: var(--brillo-boton-icono), var(--color-superficie);
+  box-shadow: var(--sombra-interior-barra);
+  backdrop-filter: var(--desenfoque-suave);
+  color: var(--color-texto-principal);
 }
 
 .menu__fecha,
@@ -942,6 +974,89 @@ main.contenido--completo {
   margin-top: var(--espacio-16);
   padding: 0;
   list-style: none;
+}
+
+/* ---------- Menú de la semana (Figma 1176:7342) ---------- */
+.semana__encabezado {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-12);
+  padding-block: var(--espacio-4);
+}
+
+.semana__seleccion {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-20);
+}
+
+.semana__dia {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-12);
+}
+
+.semana__aviso[hidden] {
+  display: none;
+}
+
+.semana__fecha {
+  font-family: var(--fuente-titulos);
+  font-size: var(--letra-titulo-2);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-titulo-2);
+  letter-spacing: var(--interletra-titulo-2);
+}
+
+/* Cinco pestañas en fila; en teléfonos angostos se encogen */
+.dias {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, var(--ancho-pestana-dia)));
+  justify-content: space-between;
+  gap: var(--espacio-8);
+}
+
+/* Pestaña de día (Figma 1175:4669) */
+.dia {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--separacion-pestana-dia);
+  height: var(--alto-pestana-dia);
+  padding: 0;
+  border: var(--borde-fino) solid var(--color-borde-suave);
+  border-radius: var(--radio-imagen);
+  background: var(--color-superficie);
+  color: var(--color-texto-principal);
+  cursor: pointer;
+}
+
+.dia__nombre {
+  color: var(--color-texto-secundario);
+  font-family: var(--fuente-texto);
+  font-size: var(--letra-etiqueta-pequena);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-etiqueta-pequena);
+  letter-spacing: var(--interletra-etiqueta-pequena);
+}
+
+.dia__numero {
+  font-family: var(--fuente-titulos);
+  font-size: var(--letra-titulo-3);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-titulo-3);
+  letter-spacing: var(--interletra-titulo-3);
+}
+
+.dia[aria-pressed="true"] {
+  border-color: var(--color-accion-secundaria);
+  background: var(--color-accion-secundaria);
+  color: var(--color-texto-sobre-secundario);
+}
+
+.dia[aria-pressed="true"] .dia__nombre {
+  color: inherit;
 }
 
 /* Tarjeta de platillo (Figma 738:2445) */

@@ -46,11 +46,9 @@ function crearPlatillo(id, nombre, categoria, precio, extras = {}) {
 
 const economico = (id, nombre, precio, extras) =>
   crearPlatillo(id, nombre, "economicos", precio, extras);
-/* "recogida" es la forma que concuerda con el nombre en la línea "Recógelo de 2:00 a
-   5:30 p. m.". Figma solo confirma "Recógelas" (empanadas y pupusas) y "Recógelo" (arroz
-   en leche, pastelito de pollo y tamales de pollo y de chipilín).
-   TODO: confirmar en Figma la forma de los demás típicos (canoas, tamales, yuca, poleada,
-   enchilada, nuégados y los que usan "Recógelo" por defecto). */
+/* "recogida" es la forma de la línea "Recógelo de 2:00 a 5:30 p. m.": concuerda en género
+   y número con el nombre de cada platillo. Donde Figma muestra otra forma, manda Figma
+   ("Recógelas" en las empanadas, cuyo nombre está en singular). */
 const tipico = (id, nombre, precio, extras) =>
   crearPlatillo(id, nombre, "tipicos", precio, { recogida: "Recógelo", ...extras });
 const complemento = (id, nombre, precio, extras) =>
@@ -237,11 +235,11 @@ const MENU_SEMANA = {
     tipicos: [
       tipico("canoa-de-leche", "Canoa de leche", 1.35, {
         eligeCantidad: true,
-        recogida: "Recógelas",
+        recogida: "Recógela",
       }),
       tipico("canoa-de-frijol", "Canoa de frijol", 1.35, {
         eligeCantidad: true,
-        recogida: "Recógelas",
+        recogida: "Recógela",
       }),
       tipico("atol-de-maiz-tostado", "Atol de maíz tostado", 1.0),
       pastelitoRes,
