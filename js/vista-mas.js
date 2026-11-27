@@ -76,6 +76,11 @@ const ICONOS_DE_MAS = {
     CIRCULO_DE_ICONO,
     [7.34, 7.5, "M4.66 0L5.84 3.28L9.32 3.39L6.56 5.52L7.54 8.86L4.66 6.9L1.78 8.86L2.76 5.52L0 3.39L3.48 3.28L4.66 0Z"],
   ],
+  terminos: [
+    CIRCULO_DE_ICONO,
+    [12, 11, "M0 0L0 5.5"],
+    [12, 7.7, "M0 0L0.01 0"],
+  ],
   telefono: [
     [3, 4, "M2 0L5 0L7 5L4.5 6.5C5.57 8.67 7.33 10.43 9.5 11.5L11 9L16 11L16 14C16 14.53 15.79 15.04 15.41 15.41C15.04 15.79 14.53 16 14 16C10.43 15.58 7.11 13.96 4.57 11.43C2.04 8.89 0.42 5.57 0 2C0 1.47 0.21 0.96 0.59 0.59C0.96 0.21 1.47 0 2 0Z"],
   ],
@@ -1417,4 +1422,318 @@ function dibujarArea(contenedor, area) {
   const pantalla = contenedor.querySelector(".cuenta");
   pantalla.classList.add("area-pantalla", `area-pantalla--${area.id}`);
   pantalla.replaceChildren(franja, hoja);
+}
+
+/* ---------- Centro de ayuda (Figma 90) ---------- */
+
+function dibujarCentroDeAyuda(contenedor) {
+  const filas = crearElemento("nav", "mas__filas ayuda-menu__filas");
+  // TODO: Figma no define el nombre del menú para lectores de pantalla
+  filas.setAttribute("aria-label", "Temas de ayuda");
+  filas.append(
+    ...[
+      {
+        icono: "ayuda",
+        titulo: "Preguntas frecuentes",
+        detalle: "Pedidos, cancelaciones y puntos",
+        href: "#/mas/ayuda/preguntas",
+      },
+      {
+        icono: "terminos",
+        titulo: "Términos y condiciones",
+        detalle: "Reglas de uso, horarios y Búhopremios",
+        href: "#/mas/ayuda/terminos",
+      },
+      {
+        icono: "perfil",
+        titulo: "Problemas con mi cuenta",
+        detalle: "Mi correo ya tiene cuenta y yo no la hice",
+        href: "#/mas/ayuda/problemas",
+      },
+    ].map((fila) => crearFila({ ...fila, flecha: true })),
+  );
+  const presentacion = crearElemento("div", "ayuda-menu");
+  presentacion.append(
+    crearImagen("vacio__imagen vacio__imagen--ayuda", "img/buhi-ayuda.png"),
+    crearElemento("h1", "vacio__titulo", "¿En qué te ayudamos?"),
+    crearElemento("p", "vacio__texto", "Encuentra respuestas rápidas o revisa las reglas de la app."),
+  );
+  montarPantallaDeMas(
+    contenedor,
+    { titulo: "Centro de ayuda", anterior: "#/mas" },
+    presentacion,
+    filas,
+  );
+}
+
+/* ---------- Preguntas frecuentes y Términos (Figma 91 y 92) ---------- */
+
+// TODO: varias respuestas hablan del chat de Búhi, que todavía no existe
+// En 91d la pregunta abierta es más larga; se usa el texto de la lista cerrada
+const PREGUNTAS_FRECUENTES = [
+  {
+    pregunta: "¿Cómo aparto un pedido?",
+    respuesta:
+      "De lunes a viernes, de 8:00 a 11:00 a. m. Elige un platillo del menú, personalízalo y escoge la hora (de 12:00 a 2:00 p. m.) y la cafetería donde lo recogerás. Al confirmar recibes un ticket con un PIN.",
+  },
+  {
+    pregunta: "¿Cómo recojo mi pedido?",
+    respuesta:
+      "Ve a la cafetería que elegiste a la hora que escogiste. Muestra el PIN de tu ticket en caja, paga ahí y recibe tu comida.",
+  },
+  {
+    pregunta: "¿Cómo cancelo mi pedido?",
+    respuesta:
+      "Puedes cancelarlo hasta las 11:00 a. m. Toca la burbuja de Búhi en el inicio y elige «Cancelar mi pedido». Después de esa hora la cafetería ya está preparando tu comida.",
+  },
+  {
+    pregunta: "¿Puedo cambiar la hora o la cafetería?",
+    respuesta:
+      "Sí, puedes cambiarlo desde el chat de Búhi. La cafetería se puede cambiar hasta las 11:00 a. m. La hora de recogida puedes cambiarla entre 12:00 a 2:00 p. m., después de esa hora ya no se puede.",
+  },
+  {
+    pregunta: "¿Qué pasa si no recojo mi pedido?",
+    respuesta:
+      "Si no llegas antes de las 2:00 p. m., la cafetería puede vender el platillo. No se te cobra nada, pero ese pedido no suma puntos.",
+  },
+  {
+    pregunta: "¿Cómo funcionan los Búhopremios?",
+    respuesta:
+      "Cada pedido que recoges suma puntos. Al llegar a 50, 100 y 150 puntos desbloqueas un premio: postre, típico y plato fuerte. Tus puntos no se gastan. Cada premio se canjea una vez y vence a los 7 días: elígelo en Puntos y muestra el PIN en caja.",
+  },
+];
+
+// El mismo texto que se acepta al crear la cuenta (07)
+const TEMAS_DE_LOS_TERMINOS = [
+  {
+    pregunta: "Naturaleza del servicio",
+    respuesta: [
+      "• La aplicación es solo una herramienta para apartar platillos en las cafeterías autorizadas del campus.",
+      "• Cubre únicamente el menú del día: económicos, platos fuertes, complementos y típicos.",
+      "• La app no cobra ni procesa pagos. Pagas el total en la caja de la cafetería al recoger tu comida.",
+    ].join("\n"),
+  },
+  {
+    pregunta: "Horarios de operación y entregas",
+    respuesta: [
+      "• Puedes apartar de lunes a viernes, de 8:00 a 11:00 a. m.",
+      "• Los platillos se entregan en la cafetería de 12:00 m. a 2:00 p. m.",
+      "• Si no recoges tu pedido antes de las 2:00 p. m., la cafetería puede disponer del platillo y venderlo a otra persona.",
+    ].join("\n"),
+  },
+  {
+    pregunta: "Cancelaciones y cambios",
+    respuesta: [
+      "• Puedes cancelar tu pedido o cambiar la cafetería hasta las 11:00 a. m. del mismo día, desde el chat de Búhi.",
+      "• La hora de recogida se puede cambiar a otra entre 12:00 y 2:00 p. m. que todavía no haya pasado.",
+      "• Si la cafetería no puede preparar tu pedido (por ejemplo, se agotó), lo cancelará y te avisará. No se te cobra nada.",
+    ].join("\n"),
+  },
+  {
+    pregunta: "Búhopremios",
+    respuesta: [
+      "• Los puntos se suman solo por pedidos apartados en la app y entregados.",
+      "• Los puntos no son dinero y no se cambian por efectivo.",
+      "• Los puntos no se gastan: cada nivel (50, 100 y 150 puntos) desbloquea su premio una sola vez.",
+      "• Cada premio vence 7 días después de desbloquearse.",
+      "• Los pedidos cancelados o no recogidos no suman puntos.",
+    ].join("\n"),
+  },
+  {
+    pregunta: "Tu cuenta",
+    respuesta: [
+      "• Cada correo institucional puede tener una sola cuenta.",
+      "• Tu tipo de cuenta (estudiante o docente y empleado) se define por tu correo.",
+      "• El PIN de cada ticket es personal: no lo compartas.",
+      "• Puedes eliminar tu cuenta cuando quieras desde Perfil.",
+    ].join("\n"),
+  },
+  {
+    pregunta: "Modificaciones",
+    respuesta:
+      "Nos reservamos el derecho de actualizar estos términos para adaptarlos a cambios de la cafetería o de la Universidad. Te avisaremos de cualquier cambio importante a través de la app.",
+  },
+];
+
+// Todas empiezan cerradas y solo queda una abierta a la vez
+function crearAcordeon(elementos) {
+  const acordeon = crearElemento("div", "acordeon");
+  const bloques = elementos.map((uno) => crearPreguntaFrecuente(uno));
+  bloques.forEach((bloque) => {
+    bloque.addEventListener("toggle", () => {
+      if (bloque.open) {
+        bloques.filter((otro) => otro !== bloque).forEach((otro) => (otro.open = false));
+      }
+    });
+  });
+  acordeon.append(...bloques);
+  return acordeon;
+}
+
+// A los Términos y a "Problemas con mi cuenta" también se llega desde el registro;
+// en ese caso, "volver" regresa a él.
+function montarPantallaDeAyuda(contenedor, titulo, ...partes) {
+  montarPantallaDeCuenta(
+    contenedor,
+    crearEncabezadoDeCuenta(() => {
+      if (history.state?.desde?.startsWith("#/registro")) {
+        history.back();
+        return;
+      }
+      volverA("#/mas/ayuda");
+    }, titulo),
+    ...partes,
+  );
+}
+
+function dibujarListaDeAyuda(contenedor, titulo, introduccion, elementos) {
+  montarPantallaDeAyuda(
+    contenedor,
+    titulo,
+    crearElemento("h1", "solo-lectores", titulo),
+    crearElemento("p", "acordeon__introduccion", introduccion),
+    crearAcordeon(elementos),
+  );
+}
+
+function dibujarPreguntasFrecuentes(contenedor) {
+  dibujarListaDeAyuda(
+    contenedor,
+    "Preguntas frecuentes",
+    "Toca una pregunta para ver la respuesta.",
+    PREGUNTAS_FRECUENTES,
+  );
+}
+
+function dibujarTerminos(contenedor) {
+  dibujarListaDeAyuda(
+    contenedor,
+    "Términos y condiciones",
+    "Al usar BúhoGondra aceptas estas reglas. Toca cada tema para leerlo.",
+    TEMAS_DE_LOS_TERMINOS,
+  );
+}
+
+/* ---------- Problemas con mi cuenta (Figma 93, 93b y 93c) ---------- */
+
+// El correo que ya tenía cuenta, cuando se llega desde el registro (02d)
+let correoDelReporte = "";
+
+function crearPaso(titulo, descripcion, ...partes) {
+  const paso = crearElemento("section", "paso");
+  paso.append(
+    crearElemento("h2", "paso__titulo", titulo),
+    crearElemento("p", "paso__descripcion", descripcion),
+    ...partes,
+  );
+  return paso;
+}
+
+// 93c
+function mostrarReporteRecibido(contenedor, correo) {
+  montarPantallaDeAyuda(
+    contenedor,
+    "Problemas con mi cuenta",
+    crearEstadoVacio({
+      imagen: "img/buhi-ayuda.png",
+      clase: "vacio__imagen--ayuda",
+      titulo: "Recibimos tu reporte",
+      texto: `Funda Gondra revisará tu caso y te responderá a ${correo} en los próximos días hábiles.`,
+    }),
+    crearBotonAlMenu(),
+  );
+}
+
+function dibujarProblemas(contenedor) {
+  const [nombre, correo, suceso] = [
+    { id: "reporte-nombre", etiqueta: "Nombre y apellido", autocompletar: "name" },
+    {
+      id: "reporte-correo",
+      etiqueta: "Correo institucional",
+      tipo: "email",
+      ejemplo: "tucorreo@uca.edu.sv",
+      autocompletar: "email",
+      valor: correoDelReporte,
+    },
+    { id: "reporte-suceso", etiqueta: "¿Qué pasó?", ejemplo: "Mi correo ya tiene una cuenta" },
+  ].map(crearCampo);
+  correoDelReporte = "";
+
+  const recuperar = crearBotonInferior(
+    "Recuperar mi cuenta",
+    () => irARecuperar(normalizarCorreo(correo.entrada.value)),
+    "secundario",
+  );
+  recuperar.classList.add("paso__boton");
+
+  const enviar = crearBotonDeEnvio("Enviar reporte");
+  let fallo = null;
+  const formulario = crearFormularioDeCuenta(
+    () => {
+      const reporte = {
+        nombre: nombre.entrada.value.trim(),
+        correo: normalizarCorreo(correo.entrada.value),
+        mensaje: suceso.entrada.value.trim(),
+      };
+      // Los tres son obligatorios. TODO: Figma no define estos mensajes
+      const errores = [
+        [nombre, !reporte.nombre && "Escribe tu nombre y apellido"],
+        [
+          correo,
+          detectarTipoCorreo(reporte.correo) === "no-uca" &&
+            (reporte.correo
+              ? "Usa tu correo de la UCA (termina en @uca.edu.sv)"
+              : "Escribe tu correo institucional"),
+        ],
+        [suceso, !reporte.mensaje && "Cuéntanos qué pasó"],
+      ].filter(([, mensaje]) => mensaje);
+      errores.forEach(([campo, mensaje]) => campo.marcarError(mensaje));
+      if (errores.length) {
+        errores[0][0].entrada.focus();
+        return;
+      }
+      fallo?.remove();
+      // TODO: el reporte solo se guarda en este navegador; no se envía a Funda Gondra.
+      // Falta definir el canal de envío y el plazo de respuesta (nota de Figma 93)
+      const enviado =
+        navigator.onLine !== false &&
+        guardarReporte({ ...reporte, fecha: new Date().toISOString() });
+      if (enviado) {
+        mostrarReporteRecibido(contenedor, reporte.correo);
+        return;
+      }
+      // 93b
+      fallo = crearAviso("error", "No se pudo enviar tu reporte", "Revisa tu conexión e inténtalo de nuevo.");
+      fallo.setAttribute("role", "alert");
+      enviar.textContent = "Reintentar";
+      enviar.before(fallo);
+    },
+    [
+      crearPaso(
+        "1. ¿Quizá la creaste antes?",
+        "Puede que ya tuvieras cuenta y no lo recuerdes. Intenta recuperar tu contraseña.",
+        recuperar,
+      ),
+      crearPaso(
+        "2. Si no fuiste tú, avísanos",
+        "Revisaremos tu caso y te responderemos a tu correo institucional.",
+        nombre.elemento,
+        correo.elemento,
+        suceso.elemento,
+      ),
+      crearAviso(
+        "info",
+        "Funda Gondra nunca te pedirá tu contraseña",
+        "Si no creaste esta cuenta, cambia también la contraseña de tu correo UCA.",
+      ),
+    ],
+    [enviar],
+  );
+
+  montarPantallaDeAyuda(
+    contenedor,
+    "Problemas con mi cuenta",
+    crearTitulosDeMas("Mi correo ya tiene cuenta y yo no la hice", "Sigue estos pasos para resolverlo."),
+    formulario,
+  );
 }

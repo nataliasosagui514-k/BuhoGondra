@@ -7,6 +7,7 @@ const CLAVE_SESION = "buhogondra.sesion";
 const CLAVE_PREMIOS = "buhogondra.premios";
 const CLAVE_OPINIONES = "buhogondra.opiniones";
 const CLAVE_LEIDAS = "buhogondra.notificacionesLeidas";
+const CLAVE_REPORTES = "buhogondra.reportes";
 
 // Lee un valor guardado; devuelve null si no existe o no se puede leer.
 function leerDato(clave) {
@@ -95,6 +96,15 @@ function borrarDatosDeAutor(autor) {
   const datos = reescribirDatosDeAutor((lista) => lista.filter((uno) => uno?.autor !== autor));
   const { [autor]: leidas, ...otras } = obtenerLeidasPorCuenta();
   return datos && (!leidas || escribirDato(CLAVE_LEIDAS, otras));
+}
+
+/* ---------- Reportes ---------- */
+
+// Los reportes de "Problemas con mi cuenta": { nombre, correo, mensaje, fecha }.
+// Devuelve true si se guardó.
+function guardarReporte(reporte) {
+  const reportes = leerDato(CLAVE_REPORTES);
+  return escribirDato(CLAVE_REPORTES, [...(Array.isArray(reportes) ? reportes : []), reporte]);
 }
 
 /* ---------- Pedido en curso y selección ---------- */

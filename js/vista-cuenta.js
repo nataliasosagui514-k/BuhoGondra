@@ -275,7 +275,7 @@ function crearRegistroVacio() {
   return { correo: "", contraseña: "", verificado: false, nombre: "", apellido: "", buho: null };
 }
 
-// TODO: Figma abre otras pantallas (Centro de ayuda) que todavía no existen
+// TODO: lo usa lo que todavía no existe: el chat de Búhi
 function avisarPantallaPendiente() {
   mostrarAviso("info", "Próximamente");
 }
@@ -336,7 +336,10 @@ function dibujarRegistroCorreo(contenedor) {
   const continuar = crearBotonDeEnvio("Continuar");
   const pie = crearPieDeCuenta("¿Ya tienes cuenta?", "Inicia sesión", () => irAIniciarSesion());
   // 02d: el correo ya tiene cuenta
-  const noLaCreaste = crearBotonDeTexto("¿No creaste esta cuenta?", avisarPantallaPendiente);
+  const noLaCreaste = crearBotonDeTexto("¿No creaste esta cuenta?", () => {
+    correoDelReporte = normalizarCorreo(correo.entrada.value);
+    location.hash = "#/mas/ayuda/problemas";
+  });
   noLaCreaste.classList.add("cuenta__enlace-izquierda");
   const entrarConEste = crearBotonDeEnvio("Iniciar sesión con este correo");
   const usarOtro = crearBotonDeTexto("Usar otro correo", () => {
@@ -622,7 +625,9 @@ function dibujarRegistroTerminar(contenedor) {
   }
   const enlace = crearElemento("button", "bienvenida__enlace", "Términos y Condiciones");
   enlace.type = "button";
-  enlace.addEventListener("click", avisarPantallaPendiente);
+  enlace.addEventListener("click", () => {
+    location.hash = "#/mas/ayuda/terminos";
+  });
   const texto = crearElemento(
     "p",
     "bienvenida__texto",

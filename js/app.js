@@ -75,6 +75,17 @@ const pantallas = {
   }),
   "#/mas/cotizar": crearPantallaDeMas("Cotizar eventos", (c) => dibujarCotizar(c)),
   "#/mas/sobre": crearPantallaDeMas("Sobre Funda Gondra", (c) => dibujarSobre(c)),
+  "#/mas/ayuda": crearPantallaDeMas("Centro de ayuda", (c) => dibujarCentroDeAyuda(c)),
+  "#/mas/ayuda/preguntas": crearPantallaDeMas("Preguntas frecuentes", (c) => dibujarPreguntasFrecuentes(c)),
+  // A estas dos también se llega desde el registro: no se pierde lo ya escrito
+  "#/mas/ayuda/terminos": {
+    ...crearPantallaDeMas("Términos y condiciones", (c) => dibujarTerminos(c)),
+    conservaCuenta: true,
+  },
+  "#/mas/ayuda/problemas": {
+    ...crearPantallaDeMas("Problemas con mi cuenta", (c) => dibujarProblemas(c)),
+    conservaCuenta: true,
+  },
   ...Object.fromEntries(
     AREAS.map((area) => [
       `#/mas/sobre/${area.id}`,
@@ -233,7 +244,7 @@ function mostrarPantalla() {
   }
   recordarOrigen();
   const pantalla = buscarPantalla(location.hash);
-  if (!pantalla.deCuenta) {
+  if (!pantalla.deCuenta && !pantalla.conservaCuenta) {
     salirDeCuenta();
   }
 

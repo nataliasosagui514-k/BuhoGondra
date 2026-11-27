@@ -5075,3 +5075,72 @@ dialog:focus {
 .hoja--acciones .boton--texto {
   align-self: center;
 }
+
+/* ---------- Centro de ayuda (Figma 1145:6600) ---------- */
+.ayuda-menu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--espacio-8);
+  margin-block: var(--espacio-32);
+  text-align: center;
+}
+
+.ayuda-menu__filas {
+  gap: var(--espacio-8);
+}
+
+/* Preguntas frecuentes y Términos (Figma 1145:6652 y 1146:6818) */
+.acordeon__introduccion {
+  margin-top: var(--espacio-16);
+  color: var(--color-texto-secundario);
+  font-size: var(--letra-texto);
+  line-height: var(--linea-texto);
+}
+
+.acordeon {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-12);
+  margin-top: var(--espacio-16);
+}
+
+/* Los temas con viñetas van un punto por renglón */
+.acordeon .pregunta-frecuente__respuesta {
+  white-space: pre-line;
+}
+
+/* Problemas con mi cuenta (Figma 1147:7006) */
+.paso {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-12);
+  padding: var(--espacio-16);
+  border: var(--borde-fino) solid var(--color-borde-suave);
+  border-radius: var(--radio-icono);
+  background: var(--color-superficie);
+}
+
+.paso__titulo {
+  font-size: var(--letra-texto);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-texto);
+}
+
+.paso__descripcion {
+  color: var(--color-texto-secundario);
+  font-size: var(--letra-texto);
+  line-height: var(--linea-texto);
+}
+
+.paso .paso__boton {
+  align-self: flex-start;
+  width: auto;
+  height: var(--alto-boton-compacto);
+  margin: 0;
+  font-size: var(--letra-boton-pequeno);
+}
+
+.cuenta__acciones .aviso {
+  margin-bottom: var(--espacio-12);
+}
