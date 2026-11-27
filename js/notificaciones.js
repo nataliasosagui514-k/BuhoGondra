@@ -67,7 +67,7 @@ function obtenerNotificaciones(hoy = obtenerFechaDeHoy()) {
   }
   const primerDia = sumarDias(hoy, -DIAS_DE_ESTA_SEMANA);
   return [
-    ...crearAvisosDePedidos(obtenerPedidosDeLaSesion().reverse(), hoy),
+    ...crearAvisosDePedidos(listarPedidosConRecogida().reverse(), hoy),
     ...crearAvisosDePremios(obtenerPremiosDeLaSesion(hoy), hoy),
   ]
     .filter((aviso) => aviso.fecha >= primerDia)

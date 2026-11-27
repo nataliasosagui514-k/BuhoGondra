@@ -14,6 +14,12 @@ function obtenerPedidosDeLaSesion() {
   return sesion ? obtenerPedidos().filter((pedido) => pedido.autor === sesion.correo) : [];
 }
 
+// Los que se pueden mostrar en Historial y en los avisos. Un pedido de prueba (ver
+// README) solo trae puntos: suma, pero no tiene recogida que mostrar.
+function listarPedidosConRecogida() {
+  return obtenerPedidosDeLaSesion().filter((pedido) => pedido.horaRecogida);
+}
+
 function sumarPuntos(pedidos) {
   return pedidos.reduce((suma, pedido) => suma + (pedido.puntos ?? 0), 0);
 }

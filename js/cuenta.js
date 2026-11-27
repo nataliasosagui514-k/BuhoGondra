@@ -258,7 +258,7 @@ function cambiarCorreo(nuevo) {
 }
 
 function listarPedidosEnCurso() {
-  return obtenerPedidosDeLaSesion().filter((pedido) => estaEnCurso(pedido));
+  return listarPedidosConRecogida().filter((pedido) => estaEnCurso(pedido));
 }
 
 // Borra para siempre la cuenta y todo lo suyo, y cierra la sesión. No se puede con

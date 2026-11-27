@@ -868,7 +868,7 @@ function crearGrupoDePedidos(titulo, pedidos) {
 function dibujarHistorial(contenedor) {
   const encabezado = { titulo: "Historial", anterior: "#/mas" };
   // Del más reciente al más antiguo (se guardan en el orden en que se hicieron)
-  const pedidos = obtenerPedidosDeLaSesion()
+  const pedidos = listarPedidosConRecogida()
     .reverse()
     .sort((uno, otro) => otro.fecha.localeCompare(uno.fecha));
   if (!pedidos.length) {
@@ -982,7 +982,7 @@ function crearAccionesDePedido(pedido, articulos) {
 
 // El id es el del pedido. Cada quien ve solo los suyos.
 function dibujarDetalleDePedido(contenedor, { id }) {
-  const pedido = obtenerPedidosDeLaSesion().find((uno) => uno.id === id);
+  const pedido = listarPedidosConRecogida().find((uno) => uno.id === id);
   if (!pedido) {
     location.replace(obtenerSesion() ? "#/mas/historial" : "#/mas");
     return;
