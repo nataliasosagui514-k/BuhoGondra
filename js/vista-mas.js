@@ -1111,3 +1111,95 @@ function dibujarNotificaciones(contenedor) {
     grupos,
   );
 }
+
+/* ---------- Copiar y enlaces ---------- */
+
+// Copia un texto y devuelve true si lo logró. Si el navegador no deja usar el
+// portapapeles moderno, prueba con la forma antigua.
+async function copiarTexto(texto) {
+  try {
+    await navigator.clipboard.writeText(texto);
+    return true;
+  } catch {
+    const caja = document.createElement("textarea");
+    caja.value = texto;
+    caja.setAttribute("readonly", "");
+    // Dentro de una ventana abierta, el texto solo se puede elegir si va en ella
+    (document.querySelector("dialog[open]") ?? document.body).append(caja);
+    caja.select();
+    const copiado = document.execCommand("copy");
+    caja.remove();
+    return copiado;
+  }
+}
+
+async function copiarYAvisar(texto, titulo, mensaje) {
+  if (await copiarTexto(texto)) {
+    mostrarAviso("exito", titulo, mensaje);
+  } else {
+    // TODO: Figma no define este aviso
+    mostrarAviso("error", "No se pudo copiar");
+  }
+}
+
+// Un enlace que se ve como botón inferior
+function crearBotonDeEnlace(texto, destino) {
+  const enlace = crearElemento("a", "boton boton--primario detalle__boton boton--enlace", texto);
+  enlace.href = destino;
+  return enlace;
+}
+
+/* ---------- Cotizar eventos (Figma 70 y 70b) ---------- */
+
+const NUMERO_DE_COTIZACIONES = "+503 7140 0499";
+const MENSAJE_DE_COTIZACION = "Hola, quiero cotizar un evento.";
+
+// "https://wa.me/50371400499?text=…"
+function crearEnlaceDeWhatsApp(numero, mensaje) {
+  return `https://wa.me/${numero.replace(/\D/g, "")}?text=${encodeURIComponent(mensaje)}`;
+}
+
+function dibujarCotizar(contenedor) {
+  const presentacion = crearElemento("div", "cotizar");
+  const tarjeta = crearElemento("div", "cotizar__tarjeta");
+  tarjeta.append(
+    crearElemento("p", "cotizar__etiqueta", "WhatsApp de cotizaciones"),
+    crearElemento("p", "cotizar__numero", NUMERO_DE_COTIZACIONES),
+    crearElemento("p", "cotizar__detalle", "Para un servicio personalizado"),
+  );
+  presentacion.append(
+    crearImagen("cotizar__imagen", "img/buho-taza.png"),
+    crearElemento("h1", "vacio__titulo", "¿Tienes un evento?"),
+    crearElemento(
+      "p",
+      "vacio__texto",
+      "Escríbenos por WhatsApp y armamos contigo el menú para tu reunión o celebración.",
+    ),
+    tarjeta,
+  );
+
+  const escribir = crearBotonDeEnlace(
+    "Escribir por WhatsApp",
+    crearEnlaceDeWhatsApp(NUMERO_DE_COTIZACIONES, MENSAJE_DE_COTIZACION),
+  );
+  escribir.target = "_blank";
+  escribir.rel = "noopener noreferrer";
+  const acciones = crearElemento("div", "cuenta__acciones");
+  acciones.append(
+    escribir,
+    crearBotonDeTexto("Copiar número", () =>
+      copiarYAvisar(
+        NUMERO_DE_COTIZACIONES,
+        "Número copiado",
+        "Pégalo en WhatsApp o guárdalo en tus contactos.",
+      ),
+    ),
+  );
+
+  montarPantallaDeMas(
+    contenedor,
+    { titulo: "Cotizar eventos", anterior: "#/mas" },
+    presentacion,
+    acciones,
+  );
+}

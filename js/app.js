@@ -73,6 +73,7 @@ const pantallas = {
   "#/mas/notificaciones": crearPantallaDeMas("Notificaciones", (c) => dibujarNotificaciones(c), {
     conSesion: true,
   }),
+  "#/mas/cotizar": crearPantallaDeMas("Cotizar eventos", (c) => dibujarCotizar(c)),
   // Se abre con el calendario del menú; también dibuja su propio encabezado
   "#/semana": {
     titulo: "Menú de la semana",
