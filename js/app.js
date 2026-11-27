@@ -7,7 +7,7 @@ const pantallas = {
   "#/mas": { titulo: "Más", enBarra: true },
 };
 const pantallaInicial = "#/menu";
-const duracionAviso = 4000; // milisegundos
+const duracionAviso = 4000; // milisegundos. TODO: Figma no define la duración
 
 // Muestra la pantalla que indica el hash de la dirección.
 function mostrarPantalla() {
@@ -38,16 +38,29 @@ function marcarPestanaActiva() {
   });
 }
 
-// Crea un aviso ("exito" o "error"), lo muestra y lo quita después de unos segundos.
-function mostrarAviso(tipo, titulo) {
-  const aviso = document.createElement("div");
-  aviso.className = `aviso aviso--${tipo}`;
+// Crea un elemento con una clase y, si se indica, un texto.
+function crearElemento(etiqueta, clase, texto = "") {
+  const elemento = document.createElement(etiqueta);
+  elemento.className = clase;
+  elemento.textContent = texto;
+  return elemento;
+}
 
-  const texto = document.createElement("p");
-  texto.className = "aviso__titulo";
-  texto.textContent = titulo;
+// Crea un aviso ("exito" o "error") con título y texto explicativo opcional.
+function crearAviso(tipo, titulo, texto) {
+  const aviso = crearElemento("div", `aviso aviso--${tipo}`);
+  const contenido = crearElemento("div", "aviso__contenido");
+  contenido.append(crearElemento("p", "aviso__titulo", titulo));
+  if (texto) {
+    contenido.append(crearElemento("p", "aviso__texto", texto));
+  }
+  aviso.append(contenido);
+  return aviso;
+}
 
-  aviso.append(texto);
+// Muestra un aviso y lo quita después de unos segundos.
+function mostrarAviso(tipo, titulo, texto) {
+  const aviso = crearAviso(tipo, titulo, texto);
   document.getElementById("zona-avisos").append(aviso);
   setTimeout(() => aviso.remove(), duracionAviso);
 }

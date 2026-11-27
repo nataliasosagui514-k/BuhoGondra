@@ -125,6 +125,9 @@
   --sombra-interior-pestana: inset 0 1.5px 0 rgb(255 255 255 / 50%);
   --sombra-interior-primario: inset 0 -2px 4px rgb(153 64 0 / 18%), inset 0 1.5px 0 rgb(255 255 255 / 60%);
   --sombra-interior-contorno: inset 0 1.5px 0 rgb(255 255 255 / 70%);
+  --color-cristal-deshabilitado: color-mix(in srgb, var(--color-accion-deshabilitada) 60%, transparent);
+  --brillo-deshabilitado: linear-gradient(180deg, rgb(255 255 255 / 45%) 0%, rgb(255 255 255 / 4%) 50%, rgb(255 255 255 / 0%) 100%);
+  --sombra-interior-deshabilitado: inset 0 -2px 4px rgb(89 107 130 / 12%), inset 0 1.5px 0 rgb(255 255 255 / 60%);
 
   /* Desenfoques de cristal */
   --desenfoque-suave: blur(8px);
@@ -215,7 +218,9 @@
   --alto-navegacion: 64px;
   --distancia-navegacion: 34px; /* separación del borde inferior */
   --alto-pestana: 48px;
-  --alto-boton: 52px; /* tamaño Grande */
+  --alto-boton-grande: 52px;
+  --alto-boton-compacto: 44px; /* Mediano y Pequeño */
+  --separacion-foco: 4px;
   --alto-etiqueta: 28px;
   --alto-encabezado: 52px;
   --tamano-boton-volver: 44px;
@@ -386,31 +391,50 @@ h1 {
   text-align: center;
 }
 
-/* Botones (tamaño Grande) */
+/* Botones (Figma 610:2516). Por defecto, tamaño Grande */
 .boton {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: var(--alto-boton);
-  padding-inline: var(--espacio-24);
-  border: var(--borde-fino) solid transparent;
+  height: var(--alto-boton-grande);
+  padding: 0 var(--espacio-24);
+  border: 0; /* solo llevan borde Primario, Contorno y Deshabilitado */
   border-radius: var(--radio-pildora);
+  background: transparent;
   font-family: var(--fuente-titulos);
   font-size: var(--letra-boton-grande);
   font-weight: var(--peso-seminegrita);
   line-height: var(--linea-boton-grande);
+  white-space: nowrap;
   cursor: pointer;
 }
 
+/* Tamaños Mediano y Pequeño: mismo alto y letra; cambia el relleno lateral */
+.boton--mediano,
+.boton--pequeno {
+  height: var(--alto-boton-compacto);
+  font-size: var(--letra-boton-pequeno);
+  line-height: var(--linea-boton-pequeno);
+}
+
+.boton--mediano {
+  padding-inline: var(--espacio-20);
+}
+
+.boton--pequeno {
+  padding-inline: var(--espacio-16);
+}
+
+/* Variantes. La clase .es-presionado muestra el estado fijo en #/componentes */
 .boton--primario {
-  border-color: var(--color-brillo-55);
+  border: var(--borde-fino) solid var(--color-brillo-55);
   background: var(--brillo-primario), var(--color-cristal-primario);
   box-shadow: var(--sombra-interior-primario);
   backdrop-filter: var(--desenfoque-suave);
   color: var(--color-texto-sobre-primario);
 }
 
-.boton--primario:active {
+.boton--primario:is(:active, .es-presionado) {
   background: var(--brillo-primario), var(--color-cristal-primario-presionado);
 }
 
@@ -419,7 +443,7 @@ h1 {
   color: var(--color-texto-sobre-secundario);
 }
 
-.boton--secundario:active {
+.boton--secundario:is(:active, .es-presionado) {
   background: var(--color-accion-secundaria-presionada);
 }
 
@@ -431,9 +455,54 @@ h1 {
   color: var(--color-texto-enlace);
 }
 
-.boton--contorno:active {
+.boton--contorno:is(:active, .es-presionado) {
   background: var(--brillo-contorno), var(--color-cristal-contorno-presionado);
 }
+
+.boton--texto {
+  color: var(--color-texto-enlace);
+}
+
+.boton--texto:is(:active, .es-presionado) {
+  background: var(--color-fondo-info-suave);
+}
+
+.boton--peligro {
+  background: var(--color-accion-peligro);
+  color: var(--color-texto-sobre-peligro);
+}
+
+.boton--peligro:is(:active, .es-presionado) {
+  background: var(--color-accion-peligro-presionada);
+}
+
+/* Deshabilitado: igual en todas las variantes, con dos excepciones debajo */
+.boton:disabled {
+  border: var(--borde-fino) solid var(--color-brillo-55);
+  background: var(--brillo-deshabilitado), var(--color-cristal-deshabilitado);
+  box-shadow: var(--sombra-interior-deshabilitado);
+  backdrop-filter: var(--desenfoque-suave);
+  color: var(--color-texto-deshabilitado);
+  cursor: default;
+}
+
+.boton--contorno:disabled {
+  background: var(--brillo-deshabilitado), var(--color-accion-deshabilitada);
+}
+
+.boton--texto:disabled {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+/* Foco: anillo azul separado del botón */
+.boton:is(:focus-visible, .es-foco) {
+  outline: var(--borde-campo) solid var(--color-anillo-foco);
+  outline-offset: var(--separacion-foco);
+}
+
 
 /* Etiquetas */
 .etiqueta {
@@ -449,11 +518,12 @@ h1 {
   letter-spacing: var(--interletra-etiqueta-pequena);
 }
 
-/* Figma no tiene componente para estas tres: usan sus colores de acento */
+/* Figma (820:2456) no tiene componente para Nuevo, Combo ni Casero: solo define
+   sus colores de acento. La forma es la general de Etiqueta. */
 .etiqueta--nuevo,
 .etiqueta--combo,
 .etiqueta--casero {
-  color: var(--color-texto-principal); /* TODO: confirmar valor en Figma */
+  color: var(--color-texto-principal); /* TODO: color de texto no definido en Figma */
 }
 
 .etiqueta--nuevo {
@@ -494,7 +564,8 @@ h1 {
   background: var(--color-texto-deshabilitado);
 }
 
-/* Avisos: zona flotante donde aparecen (la posición no viene de Figma) */
+/* Zona flotante de avisos.
+   TODO: Figma no define posición, animación ni el cristal del aviso flotante */
 .zona-avisos {
   position: fixed;
   /* Encima de la barra, para no tapar el título ni el botón de volver */
@@ -526,6 +597,13 @@ h1 {
   width: var(--tamano-icono);
   height: var(--tamano-icono);
   border-radius: var(--radio-pildora);
+}
+
+/* Título (Label/Large) y texto explicativo (Body/Medium) */
+.aviso__contenido {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-4);
 }
 
 .aviso__titulo {
