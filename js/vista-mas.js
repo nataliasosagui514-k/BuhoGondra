@@ -72,6 +72,10 @@ const ICONOS_DE_MAS = {
     [5, 11, "M2 0L12 0C13.1 0 14 0.9 14 2L14 8C14 9.1 13.1 10 12 10L2 10C0.9 10 0 9.1 0 8L0 2C0 0.9 0.9 0 2 0Z"],
     [8, 3, "M0 8L0 4C0 1.8 1.8 0 4 0C6.2 0 8 1.8 8 4L8 8"],
   ],
+  premio: [
+    CIRCULO_DE_ICONO,
+    [7.34, 7.5, "M4.66 0L5.84 3.28L9.32 3.39L6.56 5.52L7.54 8.86L4.66 6.9L1.78 8.86L2.76 5.52L0 3.39L3.48 3.28L4.66 0Z"],
+  ],
 };
 
 /* ---------- Filas ---------- */
@@ -196,6 +200,7 @@ function cerrarPanel() {
 }
 
 function crearPanel() {
+  const avisosSinVer = hayAvisosSinVer();
   const sesion = obtenerSesion();
   const filas = crearElemento("nav", "panel__filas");
   // TODO: Figma no define el nombre del menú para lectores de pantalla
@@ -203,12 +208,12 @@ function crearPanel() {
   filas.append(
     ...FILAS_DEL_PANEL.map(({ icono, titulo, ruta, invitado }) => {
       if (sesion || !invitado) {
-        return crearFila({ icono, titulo, href: ruta, clase: "fila--panel" });
+        const conAviso = icono === "notificaciones" && avisosSinVer;
+        return crearFila({ icono, titulo, href: ruta, clase: conAviso ? "fila--con-aviso" : "" });
       }
       return crearFila({
         icono,
         titulo,
-        clase: "fila--panel",
         alTocar: () =>
           pedirCuenta(panel, { ...invitado, destino: { hash: ruta, tipo: "mas" } }),
       });
@@ -1007,4 +1012,102 @@ function dibujarDetalleDePedido(contenedor, { id }) {
   const pantalla = contenedor.querySelector(".cuenta");
   pantalla.classList.add("detalle-pedido");
   pantalla.replaceChildren(portada, hoja);
+}
+
+/* ---------- Notificaciones (Figma 60 y 60b) ---------- */
+
+// TODO: 60c (notificaciones del iPhone apagadas, "Abrir Ajustes del iPhone") no se
+// puede hacer en una página web
+
+// El punto azul del botón Más de la barra
+function actualizarPuntoDeAvisos() {
+  const boton = document.querySelector('.pestana[href="#/mas"]');
+  const hay = hayAvisosSinVer();
+  boton.classList.toggle("pestana--con-aviso", hay);
+  // TODO: Figma no define cómo lo anuncia un lector de pantalla
+  boton.querySelector("span").textContent = hay ? "Más, con avisos nuevos" : "Más";
+}
+
+// "Sáb 21 nov"
+function formatearFechaDeAviso(fecha) {
+  const dia = convertirAFecha(fecha).toLocaleDateString("es", { weekday: "short" }).replace(".", "");
+  return `${dia.charAt(0).toUpperCase()}${dia.slice(1)} ${formatearFechaCorta(fecha)}`;
+}
+
+const ICONOS_DE_AVISO = { pedido: "historial", premio: "premio" };
+
+function crearNotificacion(aviso, leida, hoy) {
+  const marco = crearElemento("span", "notificacion__marco");
+  marco.append(crearIconoSvg("fila__icono", 24, ICONOS_DE_MAS[ICONOS_DE_AVISO[aviso.tipo]]));
+  const textos = crearElemento("span", "notificacion__textos");
+  textos.append(
+    crearElemento("span", "notificacion__titulo", aviso.titulo),
+    crearElemento("span", "notificacion__mensaje", aviso.mensaje),
+  );
+  // Las de hoy ya están bajo "Hoy" y no se sabe su hora
+  if (aviso.fecha !== hoy) {
+    textos.append(crearElemento("span", "notificacion__fecha", formatearFechaDeAviso(aviso.fecha)));
+  }
+  const enlace = crearElemento("a", `notificacion${leida ? "" : " notificacion--nueva"}`);
+  enlace.href = aviso.destino;
+  enlace.append(marco, textos);
+  if (!leida) {
+    const punto = crearElemento("span", "notificacion__punto");
+    punto.setAttribute("role", "img");
+    // TODO: Figma no define este texto para lectores de pantalla
+    punto.setAttribute("aria-label", "Sin leer");
+    enlace.append(punto);
+  }
+  enlace.addEventListener("click", () => marcarAvisos("leidas", [aviso.id]));
+  const elemento = crearElemento("li", "");
+  elemento.append(enlace);
+  return elemento;
+}
+
+function dibujarNotificaciones(contenedor) {
+  const encabezado = { titulo: "Notificaciones", anterior: "#/mas" };
+  const hoy = obtenerFechaDeHoy();
+  const avisos = obtenerNotificaciones(hoy);
+  if (!avisos.length) {
+    montarPantallaDeMas(
+      contenedor,
+      encabezado,
+      crearEstadoVacio({
+        imagen: "img/buhi-ayuda.png",
+        clase: "vacio__imagen--avisos",
+        titulo: "No tienes notificaciones",
+        texto:
+          "Aquí te avisaremos cuando tu pedido esté listo, si tienes un cupón o si hay platos de temporada.",
+      }),
+      crearBotonAlMenu(),
+    );
+    return;
+  }
+  const { leidas } = obtenerEstadoDeAvisos();
+  // Al entrar se quitan los puntos azules de Más
+  marcarAvisos("vistas", avisos.map((aviso) => aviso.id));
+
+  const grupos = crearElemento("div", "pedidos");
+  grupos.append(
+    ...[
+      ["Hoy", avisos.filter((aviso) => aviso.fecha === hoy)],
+      ["Esta semana", avisos.filter((aviso) => aviso.fecha !== hoy)],
+    ]
+      .filter(([, lista]) => lista.length)
+      .map(([titulo, lista]) => {
+        const elementos = crearElemento("ul", "pedidos__lista");
+        elementos.append(
+          ...lista.map((aviso) => crearNotificacion(aviso, leidas.includes(aviso.id), hoy)),
+        );
+        const grupo = crearElemento("section", "pedidos__grupo notificaciones__grupo");
+        grupo.append(crearSubtitulo(titulo), elementos);
+        return grupo;
+      }),
+  );
+  montarPantallaDeMas(
+    contenedor,
+    encabezado,
+    crearElemento("h1", "solo-lectores", "Notificaciones"),
+    grupos,
+  );
 }

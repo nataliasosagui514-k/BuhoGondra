@@ -58,11 +58,15 @@ function guardarPremioCanjeado(premio) {
 
 /* ---------- Notificaciones leídas ---------- */
 
-// Solo se guarda qué avisos ya se leyeron: { correo: [ids] }. Los avisos no se guardan,
-// salen de los pedidos (js/notificaciones.js).
+// Solo se guarda qué avisos se vieron y cuáles se abrieron: { correo: { vistas, leidas } }.
+// Los avisos no se guardan, salen de los pedidos y premios (js/notificaciones.js).
 function obtenerLeidasPorCuenta() {
   const leidas = leerDato(CLAVE_LEIDAS);
   return leidas && typeof leidas === "object" && !Array.isArray(leidas) ? leidas : {};
+}
+
+function guardarLeidasPorCuenta(leidas) {
+  return escribirDato(CLAVE_LEIDAS, leidas);
 }
 
 /* ---------- Datos de una cuenta ---------- */

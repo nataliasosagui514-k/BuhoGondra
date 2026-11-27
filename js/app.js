@@ -70,6 +70,9 @@ const pantallas = {
   "#/mas/perfil/buho": crearPantallaDePerfil("Cambiar mi búho", (c) => dibujarCambiarBuho(c)),
   "#/mas/perfil/eliminar": crearPantallaDePerfil("Eliminar cuenta", (c) => dibujarEliminarCuenta(c)),
   "#/mas/historial": crearPantallaDeMas("Historial", (c) => dibujarHistorial(c), { conSesion: true }),
+  "#/mas/notificaciones": crearPantallaDeMas("Notificaciones", (c) => dibujarNotificaciones(c), {
+    conSesion: true,
+  }),
   // Se abre con el calendario del menú; también dibuja su propio encabezado
   "#/semana": {
     titulo: "Menú de la semana",
@@ -251,6 +254,7 @@ function abrirPanel({ titulo, ruta }) {
   document.title = `${titulo} · BúhoGondra`;
   marcarPestanaActiva(ruta);
   abrirDialogo(contenido, crearPanel());
+  actualizarPuntoDeAvisos();
 }
 
 function dibujarPantalla(pantalla, hash) {
@@ -283,6 +287,7 @@ function dibujarPantalla(pantalla, hash) {
   preparar?.(contenido, { id, parametros }); // contenido extra que necesite la pantalla
   window.scrollTo(0, 0);
 
+  actualizarPuntoDeAvisos();
   marcarPestanaActiva(pestana);
 }
 

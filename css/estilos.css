@@ -332,8 +332,14 @@
   --alto-portada-pedido: 320px;
   --ancho-buho-historial: 149px;
   --alto-buho-historial: 160px;
+  --ancho-buho-avisos: 160px;
+  --alto-buho-avisos: 124px;
   --ancho-buho-ayuda: 150px;
   --alto-buho-ayuda: 116px;
+
+  /* Notificaciones */
+  --tamano-circulo-aviso: 40px;
+  --separacion-punto-aviso: 3px;
 
   /* Avatar grande de Mi perfil (Figma 1051:5422) */
   --tamano-avatar-perfil: 96px;
@@ -4498,6 +4504,11 @@ dialog:focus {
   height: var(--alto-buho-historial);
 }
 
+.vacio__imagen--avisos {
+  width: var(--ancho-buho-avisos);
+  height: var(--alto-buho-avisos);
+}
+
 .vacio__imagen--ayuda {
   width: var(--ancho-buho-ayuda);
   height: var(--alto-buho-ayuda);
@@ -4742,4 +4753,101 @@ dialog:focus {
 
 .detalle-pedido__acciones .boton--texto {
   align-self: center;
+}
+
+/* ---------- Notificaciones (Figma 1084:6168) ---------- */
+.notificaciones__grupo {
+  gap: var(--espacio-12);
+}
+
+.notificacion {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--espacio-12);
+  padding: var(--espacio-16);
+  border: var(--borde-fino) solid var(--color-borde-suave);
+  border-radius: var(--radio-icono);
+  background: var(--color-superficie);
+  color: var(--color-texto-principal);
+  text-decoration: none;
+}
+
+.notificacion--nueva {
+  border-color: transparent;
+  background: var(--color-fondo-info-suave);
+}
+
+.notificacion__marco {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--tamano-circulo-aviso);
+  height: var(--tamano-circulo-aviso);
+  border-radius: var(--radio-pildora);
+  background: var(--color-fondo-marca-suave);
+  color: var(--color-accion-primaria);
+}
+
+.notificacion--nueva .notificacion__marco {
+  background: var(--color-superficie);
+}
+
+.notificacion__textos {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--espacio-4);
+  min-width: 0;
+  font-size: var(--letra-texto);
+  line-height: var(--linea-texto);
+}
+
+.notificacion__titulo {
+  font-weight: var(--peso-seminegrita);
+}
+
+.notificacion__mensaje {
+  color: var(--color-texto-secundario);
+}
+
+.notificacion__fecha {
+  color: var(--color-texto-secundario);
+  font-size: var(--letra-nota);
+  font-weight: var(--peso-media);
+  line-height: var(--linea-nota);
+}
+
+.notificacion__punto {
+  flex-shrink: 0;
+  width: var(--tamano-punto);
+  height: var(--tamano-punto);
+  border-radius: var(--radio-pildora);
+  background: var(--color-accion-secundaria);
+}
+
+/* Punto azul de avisos sin ver: en la fila del panel y en el botón Más */
+.fila--con-aviso .fila__marco::after,
+.pestana--con-aviso::after {
+  content: "";
+  position: absolute;
+  width: var(--tamano-punto-aviso);
+  height: var(--tamano-punto-aviso);
+  border: var(--borde-campo) solid var(--color-superficie);
+  border-radius: var(--radio-pildora);
+  background: var(--color-accion-secundaria);
+}
+
+.fila--con-aviso .fila__marco::after {
+  top: calc(-1 * var(--separacion-punto-aviso));
+  right: calc(-1 * var(--separacion-punto-aviso));
+}
+
+.pestana--con-aviso {
+  position: relative;
+}
+
+.pestana--con-aviso::after {
+  top: var(--espacio-8);
+  right: var(--espacio-8);
 }

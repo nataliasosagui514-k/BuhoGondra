@@ -893,11 +893,12 @@ function dibujarTicket(contenedor, { id }) {
   );
 
   const acciones = crearElemento("div", "ticket-pantalla__acciones");
-  // Abierto desde el Historial, "Listo" regresa allí y no toca el pedido que se arma
+  // Abierto desde Más (Historial o Notificaciones), "Listo" regresa allí y no toca el
+  // pedido que se arma
   const desde = history.state?.desde ?? "";
   acciones.append(
     crearBotonInferior("Listo", () => {
-      if (desde.startsWith("#/mas/historial")) {
+      if (desde.startsWith("#/mas/")) {
         history.back();
         return;
       }
