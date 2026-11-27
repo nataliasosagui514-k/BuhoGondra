@@ -571,7 +571,17 @@ function crearDetalle(platillo, dia) {
     encabezado.append(crearElemento("p", "detalle__precio", formatearPrecio(precio)));
   }
 
-  contenido.append(estado, encabezado);
+  // "Más complementos" es un resumen: no se califica (M16 no lleva fila)
+  const opiniones = platillo.elementos ? [] : obtenerOpiniones(platillo.id);
+  const promedio = calcularPromedio(opiniones);
+  const titulo = crearElemento("div", "detalle__titulo");
+  titulo.append(encabezado);
+  if (promedio !== null) {
+    const texto = promedio.toFixed(1);
+    titulo.append(crearEtiquetaDeCalificacion(texto, `Calificación: ${texto} de 5 estrellas`));
+  }
+
+  contenido.append(estado, titulo);
   // En Figma solo los típicos llevan la línea de recogida (1294:8255 a 1294:8283)
   if (platillo.recogida) {
     contenido.append(
@@ -582,14 +592,17 @@ function crearDetalle(platillo, dia) {
       ),
     );
   }
-  const acciones = crearAccionesDeDetalle(platillo, esDeHoy);
-  if (esDeHoy) {
-    contenido.append(...acciones);
-  } else {
+  let acciones = crearAccionesDeDetalle(platillo, esDeHoy);
+  if (!esDeHoy) {
     // En otro día no hay pedido: sin botones ni selector de cantidad, y con el aviso
     const cajas = acciones.filter((accion) => !accion.matches(".detalle__boton, .caja--cantidad"));
-    contenido.append(...cajas, crearAvisoDeOtroDia(dia));
+    acciones = [...cajas, crearAvisoDeOtroDia(dia)];
   }
+  // La fila va justo antes de lo último: el botón o el aviso
+  if (!platillo.elementos) {
+    acciones.splice(-1, 0, crearFilaDeComentarios(platillo.id, opiniones));
+  }
+  contenido.append(...acciones);
   detalle.append(portada, contenido);
   return detalle;
 }

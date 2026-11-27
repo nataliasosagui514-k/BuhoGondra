@@ -351,3 +351,41 @@ const NIVELES_PUNTOS = [
   { nombre: "Búhi Mega Pro", puntos: 100, premio: "Típico" },
   { nombre: "Búhi Supremo", puntos: 150, premio: "Plato fuerte" },
 ];
+
+/* Opiniones de ejemplo, marcadas con "ejemplo": true. Cubren SOLO algunos platillos
+   (croissant, croquetas y pupusas); los demás muestran "Todavía no hay opiniones" (M5c).
+   Promedio y número de cada uno coinciden con Figma (M2, M3 y M24). Los nombres y textos
+   del croissant son los de M5; el resto es relleno sin texto. "buho" es el avatar. */
+function crearOpinionDeEjemplo(platilloId, autor, calificacion, dia, texto, buho) {
+  return { platilloId, autor, calificacion, texto, fecha: `${dia}T12:00:00`, buho, ejemplo: true };
+}
+
+// Una opinión sin texto por cada calificación, una por día hacia atrás desde "desde".
+function crearOpinionesDeRelleno(platilloId, calificaciones, desde) {
+  return calificaciones.map((calificacion, posicion) => {
+    const fecha = new Date(`${desde}T12:00:00`);
+    fecha.setDate(fecha.getDate() - posicion);
+    const dia = fecha.toLocaleDateString("sv"); // "AAAA-MM-DD"
+    const autor = `Persona de ejemplo ${posicion + 1}`;
+    return crearOpinionDeEjemplo(platilloId, autor, calificacion, dia, "", (posicion % 6) + 1);
+  });
+}
+
+const OPINIONES_DE_EJEMPLO = [
+  crearOpinionDeEjemplo(croissant.id, "María López", 5, "2026-11-25",
+    "Crujiente y bien relleno. El refresco venía frío. Lo vuelvo a pedir.", 3),
+  crearOpinionDeEjemplo(croissant.id, "Carlos Ramírez", 4, "2026-11-23",
+    "Buen tamaño para el precio. Me gustaría que trajera un poco más de queso.", 1),
+  crearOpinionDeEjemplo(croissant.id, "Ana Martínez", 5, "2026-11-20",
+    "Perfecto para un almuerzo rápido entre clases.", 5),
+  crearOpinionDeEjemplo(croissant.id, "José Hernández", 5, "2026-11-13", "", 6),
+  // Con las cuatro de arriba: 8 de cinco, 3 de cuatro y 1 de tres estrellas
+  ...crearOpinionesDeRelleno(croissant.id, [5, 4, 5, 3, 5, 4, 5, 5], "2026-11-06"),
+  ...crearOpinionesDeRelleno("croquetas-de-pollo", [5, 4, 4, 5, 4, 4, 4, 4], "2026-11-19"),
+  // 21 opiniones: 17 de cinco y 4 de cuatro estrellas
+  ...crearOpinionesDeRelleno(
+    pupusas.id,
+    Array.from({ length: 21 }, (_, posicion) => (posicion % 5 === 4 ? 4 : 5)),
+    "2026-11-24",
+  ),
+];

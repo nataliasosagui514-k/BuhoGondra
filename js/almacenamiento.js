@@ -51,3 +51,10 @@ function guardarPuntos(cantidad) {
   }
   return escribirDato(CLAVE_PUNTOS, cantidad) ? cantidad : null;
 }
+
+// Opiniones de un platillo, de la más reciente a la más antigua.
+function obtenerOpiniones(platilloId) {
+  return OPINIONES_DE_EJEMPLO.filter((opinion) => opinion.platilloId === platilloId).sort(
+    (una, otra) => new Date(otra.fecha) - new Date(una.fecha),
+  );
+}
