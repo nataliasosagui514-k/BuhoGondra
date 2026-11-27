@@ -84,6 +84,17 @@ La posición, la entrada y la duración del aviso flotante vienen de Figma. Solo
 | Calificación (selector) | Valor 0 a 5 | Normal | `827:2507` | Hecho |
 | Campo de texto | Vacío, Foco y Lleno | — | `725:2427` | Hecho en «Tu comentario»; Error y Deshabilitado pendientes |
 
+## Apartar pedido
+
+| Componente | Variante | Estado | Nodo en Figma | Implementación |
+|---|---|---|---|---|
+| Tarjeta de acompañamiento | Normal y Seleccionado | — | `1345:4696` | Hecho |
+| Chip de horario | Normal y Seleccionado | — | `889:3410` | Hecho; Deshabilitado pendiente |
+| Opción de cafetería | Normal y Seleccionada | — | `889:3428` | Hecho; «Cerrada por hoy» pendiente |
+| Hoja inferior | Revisa tu pedido | Abierta | `1374:9609` | Hecho |
+| Ventana de confirmación | Éxito e Informativa | Abierta | `834:2458` | Hecho; Confirmar y Peligro pendientes |
+| Ticket con PIN | Pedido | — | `874:3386` | Hecho; Premio pendiente |
+
 ## Botones
 
 Componente completo en Figma: `610:2516`.

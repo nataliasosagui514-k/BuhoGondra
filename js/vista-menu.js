@@ -554,7 +554,7 @@ function crearBotonVolver(alTocar) {
 
 // Única función que crea el detalle. "dia" es el menú al que pertenece el platillo.
 function crearDetalle(platillo, dia) {
-  // Esta fase solo revisa la fecha; la hora se revisa en la fase de Apartar
+  // El detalle solo revisa la fecha; la hora se revisa al apartar (js/vista-pedido.js)
   const esDeHoy = dia.fecha === obtenerFechaDeHoy();
   const idCategoria = obtenerCategoriaVisual(platillo.categoria);
   const detalle = crearElemento("article", `detalle categoria--${idCategoria}`);
