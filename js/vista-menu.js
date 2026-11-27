@@ -2,8 +2,11 @@
 // Solo muestran información: aquí no se aparta ni se guarda nada.
 
 const CATEGORIA_INICIAL = "economicos";
-// Categoría que debe abrirse la próxima vez que se dibuje el menú
-let categoriaPendiente = null;
+
+// La dirección del menú guarda la categoría: #/menu?categoria=tipicos
+function crearRutaDelMenu(idCategoria) {
+  return `#/menu?categoria=${idCategoria}`;
+}
 
 /* ---------- Formatos de texto ---------- */
 
@@ -161,13 +164,12 @@ function crearAvisoSinMenu() {
   );
 }
 
-function dibujarMenu(contenedor) {
+function dibujarMenu(contenedor, { parametros }) {
   const ahora = new Date();
   contenedor.querySelector(".menu__fecha").textContent = formatearFechaLarga(ahora);
 
   const dia = obtenerMenuDelDia(obtenerFechaDeHoy(ahora));
   if (!dia) {
-    categoriaPendiente = null;
     contenedor.querySelector(".menu__del-dia").replaceWith(crearAvisoSinMenu());
     return;
   }
@@ -179,11 +181,18 @@ function dibujarMenu(contenedor) {
 
   contenedor.querySelectorAll(".categoria").forEach((boton) => {
     boton.addEventListener("click", () => {
-      mostrarCategoria(contenedor, dia, boton.dataset.categoria);
+      const idCategoria = boton.dataset.categoria;
+      // Cambia la dirección sin crear otra entrada en el historial
+      history.replaceState(history.state, "", crearRutaDelMenu(idCategoria));
+      mostrarCategoria(contenedor, dia, idCategoria);
     });
   });
-  mostrarCategoria(contenedor, dia, categoriaPendiente ?? CATEGORIA_INICIAL);
-  categoriaPendiente = null;
+  // Sin categoría en la dirección (o con una que no existe) se usa la inicial
+  const pedida = parametros.get("categoria");
+  const hayBoton = [...contenedor.querySelectorAll(".categoria")].some(
+    (boton) => boton.dataset.categoria === pedida,
+  );
+  mostrarCategoria(contenedor, dia, hayBoton ? pedida : CATEGORIA_INICIAL);
 }
 
 /* ---------- Detalle de platillo ---------- */
@@ -280,8 +289,7 @@ function crearAccionesDeDetalle(platillo) {
     const verPlatosFuertes = crearBotonInferior(
       "Ver platos fuertes",
       () => {
-        categoriaPendiente = "platos-fuertes";
-        location.hash = "#/menu";
+        location.hash = crearRutaDelMenu("platos-fuertes");
       },
       "secundario",
     );
@@ -330,6 +338,16 @@ function crearAccionesDeDetalle(platillo) {
   return [crearCajaDeOpciones("Elige tu opción", lineas, "Eliges la opción al apartar."), boton];
 }
 
+// Regresa al menú en la categoría correcta. Si se llegó desde el menú, retrocede en el
+// historial; si el detalle se abrió directo, usa la categoría del platillo.
+function volverAlMenu(idCategoria) {
+  if (history.state?.desde?.startsWith("#/menu")) {
+    history.back();
+  } else {
+    location.replace(crearRutaDelMenu(idCategoria));
+  }
+}
+
 // Única función que crea el detalle.
 function crearDetalle(platillo) {
   const idCategoria = obtenerCategoriaVisual(platillo.categoria);
@@ -340,7 +358,7 @@ function crearDetalle(platillo) {
   volver.removeAttribute("id");
   volver.hidden = false;
   volver.classList.add("boton-volver--sobre-foto");
-  volver.addEventListener("click", () => history.back());
+  volver.addEventListener("click", () => volverAlMenu(idCategoria));
   portada.append(volver, crearFoto(platillo, "detalle__foto"));
 
   const contenido = crearElemento("div", "detalle__contenido");
@@ -382,7 +400,7 @@ function crearPlatilloNoEncontrado() {
   return bloque;
 }
 
-function dibujarDetalle(contenedor, id) {
+function dibujarDetalle(contenedor, { id }) {
   const platillo = buscarPlatilloParaVista(id);
   if (platillo) {
     document.title = `${platillo.nombre} · BúhoGondra`;

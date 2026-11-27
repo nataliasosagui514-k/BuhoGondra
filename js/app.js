@@ -35,29 +35,44 @@ const pantallasConId = {
 const pantallaInicial = "#/menu";
 const duracionAviso = 4000; // milisegundos. TODO: Figma no define la duración
 
-// Devuelve la pantalla de un hash (con su id, si lo lleva), o null si no existe.
+// Devuelve la pantalla de un hash (con su ruta, su id y los datos que van después
+// del "?"), o null si no existe.
 function buscarPantalla(hash) {
-  if (Object.hasOwn(pantallas, hash)) {
-    return pantallas[hash];
+  const [ruta, consulta = ""] = hash.split("?");
+  const parametros = new URLSearchParams(consulta);
+  if (Object.hasOwn(pantallas, ruta)) {
+    return { ...pantallas[ruta], ruta, parametros };
   }
-  const partes = hash.match(/^#\/(platillo|apartar)\/([^/]+)$/);
-  return partes ? { ...pantallasConId[partes[1]], id: partes[2] } : null;
+  const partes = ruta.match(/^#\/(platillo|apartar)\/([^/]+)$/);
+  return partes ? { ...pantallasConId[partes[1]], ruta, parametros, id: partes[2] } : null;
+}
+
+// Cada entrada del historial recuerda desde qué pantalla se llegó a ella.
+let hashAnterior = null;
+function recordarOrigen() {
+  if (history.state === null) {
+    history.replaceState({ desde: hashAnterior }, "");
+  }
+  hashAnterior = location.hash;
 }
 
 // Muestra la pantalla que indica el hash de la dirección.
 function mostrarPantalla() {
   // Si el hash está vacío o no existe, se corrige sin crear otra entrada en el historial.
   if (!buscarPantalla(location.hash)) {
-    history.replaceState(null, "", pantallaInicial);
+    history.replaceState(history.state, "", pantallaInicial);
   }
+  recordarOrigen();
   const {
     titulo,
     enBarra,
     plantilla = "plantilla-pantalla",
     preparar,
     sinEncabezado = false,
-    pestana = location.hash,
+    ruta,
+    pestana = ruta,
     id,
+    parametros,
   } = buscarPantalla(location.hash);
 
   document.title = `${titulo} · BúhoGondra`;
@@ -68,7 +83,7 @@ function mostrarPantalla() {
   const contenido = document.getElementById("contenido");
   contenido.classList.toggle("contenido--completo", sinEncabezado);
   contenido.replaceChildren(document.getElementById(plantilla).content.cloneNode(true));
-  preparar?.(contenido, id); // contenido extra que necesite la pantalla
+  preparar?.(contenido, { id, parametros }); // contenido extra que necesite la pantalla
   window.scrollTo(0, 0);
 
   marcarPestanaActiva(pestana);
