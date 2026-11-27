@@ -327,10 +327,13 @@ h1 {
   transform: translateX(-50%);
   width: max-content;
   height: var(--alto-navegacion);
-  padding: calc(var(--espacio-8) - var(--borde-fino));
+  /* Como en Figma: 8 px a los lados además del borde; las pestañas se centran en el alto */
+  display: flex;
+  align-items: center;
+  padding-inline: var(--espacio-8);
   border: var(--borde-fino) solid var(--color-brillo-70);
   border-radius: var(--radio-pildora);
-  background: var(--brillo-barra), var(--color-superficie);
+  background: var(--brillo-barra), var(--color-superficie); /* sin sombra exterior */
   box-shadow: var(--sombra-interior-barra);
   backdrop-filter: var(--desenfoque-barra);
 }
