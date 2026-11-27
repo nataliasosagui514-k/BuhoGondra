@@ -62,7 +62,7 @@ Un guion (—) en el id significa que no se encontró un componente para esa var
 | Aviso | Éxito | Normal | `820:2437` | Hecho |
 | Aviso | Error | Normal | `820:2430` | Hecho |
 | Aviso | Información | Normal | `820:2444` | Pendiente |
-| Aviso | Menú sin actualizar | Normal | `905:4113` | Pendiente |
+| Aviso | Menú sin actualizar | Normal | `905:4113` | Hecho en el Menú (aún no aparece en #/componentes) |
 | Aviso | Flotante (posición, animación y cristal) | Visible | — | Pendiente |
 
 El aviso flotante actual usa una posición y una duración provisionales, marcadas con TODO en el código.

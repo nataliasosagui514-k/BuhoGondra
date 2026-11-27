@@ -2,7 +2,14 @@
 
 // Pantallas disponibles. Las que no están en la barra muestran el botón de volver.
 const pantallas = {
-  "#/menu": { titulo: "Menú", enBarra: true },
+  // El menú dibuja su propio encabezado
+  "#/menu": {
+    titulo: "Menú",
+    enBarra: true,
+    sinEncabezado: true,
+    plantilla: "plantilla-menu",
+    preparar: dibujarMenu,
+  },
   "#/puntos": { titulo: "Puntos", enBarra: true },
   "#/mas": { titulo: "Más", enBarra: true },
   // Ruta oculta: no tiene enlace en la app
@@ -13,13 +20,34 @@ const pantallas = {
     preparar: dibujarCatalogo,
   },
 };
+
+// Rutas que terminan en el id de un platillo: #/platillo/ID y #/apartar/ID
+const pantallasConId = {
+  platillo: {
+    titulo: "Platillo",
+    enBarra: false,
+    sinEncabezado: true,
+    pestana: "#/menu",
+    preparar: dibujarDetalle,
+  },
+  apartar: { titulo: "Apartar", enBarra: false, pestana: "#/menu", preparar: dibujarProximamente },
+};
 const pantallaInicial = "#/menu";
 const duracionAviso = 4000; // milisegundos. TODO: Figma no define la duración
+
+// Devuelve la pantalla de un hash (con su id, si lo lleva), o null si no existe.
+function buscarPantalla(hash) {
+  if (Object.hasOwn(pantallas, hash)) {
+    return pantallas[hash];
+  }
+  const partes = hash.match(/^#\/(platillo|apartar)\/([^/]+)$/);
+  return partes ? { ...pantallasConId[partes[1]], id: partes[2] } : null;
+}
 
 // Muestra la pantalla que indica el hash de la dirección.
 function mostrarPantalla() {
   // Si el hash está vacío o no existe, se corrige sin crear otra entrada en el historial.
-  if (!Object.hasOwn(pantallas, location.hash)) {
+  if (!buscarPantalla(location.hash)) {
     history.replaceState(null, "", pantallaInicial);
   }
   const {
@@ -27,24 +55,29 @@ function mostrarPantalla() {
     enBarra,
     plantilla = "plantilla-pantalla",
     preparar,
-  } = pantallas[location.hash];
+    sinEncabezado = false,
+    pestana = location.hash,
+    id,
+  } = buscarPantalla(location.hash);
 
   document.title = `${titulo} · BúhoGondra`;
   document.getElementById("titulo-pantalla").textContent = titulo;
   document.getElementById("boton-volver").hidden = enBarra;
+  document.querySelector("body > header").hidden = sinEncabezado;
 
   const contenido = document.getElementById("contenido");
+  contenido.classList.toggle("contenido--completo", sinEncabezado);
   contenido.replaceChildren(document.getElementById(plantilla).content.cloneNode(true));
-  preparar?.(contenido); // contenido extra que necesite la pantalla
+  preparar?.(contenido, id); // contenido extra que necesite la pantalla
   window.scrollTo(0, 0);
 
-  marcarPestanaActiva();
+  marcarPestanaActiva(pestana);
 }
 
 // Marca en la barra la opción que corresponde a la pantalla actual.
-function marcarPestanaActiva() {
+function marcarPestanaActiva(ruta) {
   document.querySelectorAll(".pestana").forEach((pestana) => {
-    if (pestana.getAttribute("href") === location.hash) {
+    if (pestana.getAttribute("href") === ruta) {
       pestana.setAttribute("aria-current", "page");
     } else {
       pestana.removeAttribute("aria-current");

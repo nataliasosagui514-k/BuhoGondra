@@ -129,6 +129,14 @@
   --brillo-deshabilitado: linear-gradient(180deg, rgb(255 255 255 / 45%) 0%, rgb(255 255 255 / 4%) 50%, rgb(255 255 255 / 0%) 100%);
   --sombra-interior-deshabilitado: inset 0 -2px 4px rgb(89 107 130 / 12%), inset 0 1.5px 0 rgb(255 255 255 / 60%);
 
+  /* Menú de hoy y detalle */
+  --color-tarjeta-contorno: rgb(255 255 255 / 35%);
+  --sombra-interior-tarjeta: inset 0 1.5px 0 rgb(255 255 255 / 40%);
+  --sombra-nivel-1: 0 4px 12px rgb(9 28 51 / 12%);
+  --color-cristal-sobre-foto: rgb(255 255 255 / 40%);
+  /* TODO: Figma no define el gris de una foto que falta; se usa bg/muted */
+  --color-foto-carga: var(--color-fondo-atenuado);
+
   /* Desenfoques de cristal */
   --desenfoque-suave: blur(8px);
   --desenfoque-medio: blur(10px);
@@ -163,6 +171,7 @@
   --linea-titulo-1: 36px;
   --linea-titulo-2: 28px;
   --linea-titulo-3: 24px;
+  --linea-titulo-tarjeta: 20px;
   --linea-precio-grande: 32px;
   --linea-precio: 24px;
   --linea-texto-grande: 24px;
@@ -227,6 +236,29 @@
   --tamano-icono: 24px;
   --tamano-punto: 8px;
   --ancho-maximo-aviso: 350px;
+
+  /* Menú de hoy y detalle */
+  --margen-superior-menu: 54px;
+  --ancho-categoria: 80px;
+  --ancho-cuadro-categoria: 56px;
+  --alto-cuadro-categoria: 48px;
+  --tamano-icono-categoria: 20px;
+  --ancho-tarjeta: 155px;
+  --alto-tarjeta: 218px;
+  --alto-fondo-tarjeta: 166px;
+  --relleno-tarjeta: 14px;
+  --separacion-texto-tarjeta: 2px;
+  --tamano-foto-tarjeta: 112px;
+  --posicion-foto-tarjeta: 92px;
+  --borde-foto: 3px;
+  --tamano-imagen-anuncio: 112px;
+  --alto-portada: 252px;
+  --tamano-foto-detalle: 180px;
+  --posicion-foto-detalle: 20px; /* centrada en la parte visible de la portada */
+  --posicion-volver-detalle: 54px;
+  --relleno-inferior-detalle: 118px;
+  --tamano-boton-cantidad: 36px;
+  --ancho-numero-cantidad: 24px;
 }
 
 /* Reset básico */
@@ -265,7 +297,11 @@ main {
 }
 
 /* Encabezado sin fondo ni borde: botón de volver y, a su lado, el título */
-header {
+body > header[hidden] {
+  display: none;
+}
+
+body > header {
   display: flex;
   align-items: center;
   gap: var(--espacio-12);
@@ -685,4 +721,491 @@ h1 {
 
 .aviso--error .aviso__titulo {
   color: var(--color-texto-sobre-error-suave);
+}
+
+/* Aviso "Menú sin actualizar" (Figma 1399:9826) */
+.aviso--desactualizado {
+  background: var(--color-fondo-marca-suave);
+  color: var(--color-texto-marca);
+}
+
+.aviso--desactualizado::before {
+  background: url("../img/icono-aviso-reloj.svg");
+}
+
+/* ---------- Pantallas que dibujan su propio encabezado ---------- */
+main.contenido--completo {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+/* Colores de cada categoría. --color-sobre-categoria es el texto encima de ese color */
+.categoria--economicos {
+  --color-categoria: var(--color-categoria-economicos);
+  --color-sobre-categoria: var(--color-texto-sobre-primario);
+}
+
+.categoria--platos-fuertes {
+  --color-categoria: var(--color-categoria-platos-fuertes);
+  --color-sobre-categoria: var(--color-texto-sobre-primario);
+}
+
+.categoria--complementos {
+  --color-categoria: var(--color-categoria-complementos);
+  --color-sobre-categoria: var(--color-texto-principal);
+}
+
+.categoria--tipicos {
+  --color-categoria: var(--color-categoria-tipicos);
+  --color-sobre-categoria: var(--color-texto-sobre-primario);
+}
+
+/* ---------- Menú de hoy (Figma 1175:7562) ---------- */
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-24);
+  padding: var(--margen-superior-menu) var(--margen-lateral-pantalla)
+    calc(var(--alto-navegacion) + var(--distancia-navegacion) + var(--espacio-24));
+}
+
+.menu__del-dia {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-24);
+}
+
+.menu__encabezado {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-4);
+}
+
+.menu__fecha,
+.anuncio__antetitulo {
+  color: var(--color-texto-marca);
+  font-size: var(--letra-etiqueta-pequena);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-etiqueta-pequena);
+  letter-spacing: var(--interletra-etiqueta-pequena);
+}
+
+.menu__fecha {
+  text-transform: uppercase;
+}
+
+.menu__titulo,
+.detalle__nombre {
+  font-size: var(--letra-titulo-1);
+  line-height: var(--linea-titulo-1);
+  letter-spacing: var(--interletra-titulo-1);
+}
+
+.anuncio {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-8);
+  padding: var(--espacio-16) var(--espacio-8) var(--espacio-16) var(--espacio-20);
+  border-radius: var(--radio-tarjeta);
+  background: var(--color-superficie);
+}
+
+.anuncio__textos {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--espacio-4);
+  min-width: 0;
+}
+
+.anuncio__titulo {
+  font-family: var(--fuente-titulos);
+  font-size: var(--letra-titulo-3);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-titulo-3);
+  letter-spacing: var(--interletra-titulo-3);
+}
+
+.anuncio__texto,
+.menu__conteo,
+.menu__nota {
+  color: var(--color-texto-secundario);
+  font-size: var(--letra-texto-pequeno);
+  line-height: var(--linea-texto-pequeno);
+  letter-spacing: var(--interletra-texto-pequeno);
+}
+
+.anuncio__imagen {
+  flex-shrink: 0;
+  width: var(--tamano-imagen-anuncio);
+  height: var(--tamano-imagen-anuncio);
+  object-fit: contain;
+}
+
+/* Botones de categoría (Figma 1173:4729) */
+.categorias {
+  display: flex;
+  justify-content: space-between;
+}
+
+.categoria {
+  display: flex;
+  flex: 0 1 var(--ancho-categoria);
+  flex-direction: column;
+  align-items: center;
+  gap: var(--espacio-8);
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-texto-secundario);
+  font-family: var(--fuente-texto);
+  font-size: var(--letra-nota);
+  font-weight: var(--peso-media);
+  line-height: var(--linea-nota);
+  letter-spacing: var(--interletra-nota);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.categoria__cuadro {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--ancho-cuadro-categoria);
+  height: var(--alto-cuadro-categoria);
+  border: var(--borde-fino) solid var(--color-borde-suave);
+  border-radius: var(--radio-icono);
+  background: var(--color-superficie);
+}
+
+.categoria__icono {
+  width: var(--tamano-icono-categoria);
+  height: var(--tamano-icono-categoria);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.categoria[aria-pressed="true"] {
+  color: var(--color-texto-principal);
+}
+
+.categoria[aria-pressed="true"] .categoria__cuadro {
+  border-color: var(--color-categoria);
+  background: var(--color-categoria);
+  color: var(--color-sobre-categoria);
+}
+
+.menu__titulo-categoria {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--espacio-12);
+}
+
+.menu__categoria {
+  font-family: var(--fuente-titulos);
+  font-size: var(--letra-titulo-2);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-titulo-2);
+  letter-spacing: var(--interletra-titulo-2);
+}
+
+.menu__nota {
+  margin-top: var(--espacio-4);
+}
+
+/* Cuadrícula de 2 columnas; en teléfonos angostos las tarjetas se encogen */
+.menu__rejilla {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, var(--ancho-tarjeta)));
+  justify-content: center;
+  gap: var(--espacio-24) var(--espacio-32);
+  margin-top: var(--espacio-16);
+  padding: 0;
+  list-style: none;
+}
+
+/* Tarjeta de platillo (Figma 738:2445) */
+.tarjeta {
+  position: relative;
+  display: block;
+  height: var(--alto-tarjeta);
+  color: var(--color-sobre-categoria);
+  text-decoration: none;
+}
+
+.tarjeta::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: var(--alto-fondo-tarjeta);
+  border: var(--borde-fino) solid var(--color-tarjeta-contorno);
+  border-radius: var(--radio-tarjeta);
+  background: var(--color-categoria);
+  box-shadow: var(--sombra-interior-tarjeta);
+}
+
+.tarjeta__textos {
+  position: absolute;
+  inset: var(--relleno-tarjeta) var(--relleno-tarjeta) auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--separacion-texto-tarjeta);
+  font-family: var(--fuente-titulos);
+}
+
+/* Heading/Card title */
+.tarjeta__nombre {
+  font-size: var(--letra-titulo-3);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-titulo-tarjeta);
+  letter-spacing: var(--interletra-titulo-3);
+  overflow-wrap: break-word;
+}
+
+.tarjeta__precio {
+  font-size: var(--letra-precio);
+  font-weight: var(--peso-negrita);
+  line-height: var(--linea-precio);
+}
+
+.foto {
+  display: block;
+  overflow: hidden;
+  border-radius: var(--radio-pildora);
+  background: var(--color-foto-carga);
+}
+
+.foto img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tarjeta__foto {
+  position: absolute;
+  top: var(--posicion-foto-tarjeta);
+  left: 50%;
+  transform: translateX(-50%);
+  width: var(--tamano-foto-tarjeta);
+  height: var(--tamano-foto-tarjeta);
+  border: var(--borde-foto) solid var(--color-superficie);
+  box-shadow: var(--sombra-nivel-1);
+}
+
+/* ---------- Detalle de platillo (Figma 1176:7241) ---------- */
+.detalle {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  background: var(--color-superficie);
+}
+
+.detalle__portada {
+  position: relative;
+  height: var(--alto-portada);
+  background: var(--color-fondo-app);
+}
+
+.detalle__foto {
+  position: absolute;
+  top: var(--posicion-foto-detalle);
+  left: 50%;
+  transform: translateX(-50%);
+  width: var(--tamano-foto-detalle);
+  height: var(--tamano-foto-detalle);
+}
+
+.boton-volver--sobre-foto {
+  position: absolute;
+  z-index: 1;
+  top: var(--posicion-volver-detalle);
+  left: var(--margen-lateral-pantalla);
+  background: var(--color-cristal-sobre-foto);
+}
+
+.detalle__contenido {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--espacio-12);
+  margin-top: calc(-1 * var(--radio-hoja));
+  padding: var(--espacio-24) var(--margen-lateral-pantalla) var(--relleno-inferior-detalle);
+  border-radius: var(--radio-hoja) var(--radio-hoja) 0 0;
+  background: var(--color-superficie);
+}
+
+.detalle__estado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espacio-12);
+  min-height: var(--alto-etiqueta);
+}
+
+.detalle__categoria {
+  color: var(--color-categoria);
+  font-size: var(--letra-etiqueta-pequena);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-etiqueta-pequena);
+  letter-spacing: var(--interletra-etiqueta-pequena);
+  text-transform: uppercase;
+}
+
+/* El amarillo no se lee sobre blanco: Figma usa el texto oscuro */
+.categoria--complementos .detalle__categoria {
+  color: var(--color-texto-principal);
+}
+
+.detalle__encabezado {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-4);
+}
+
+.detalle__precio {
+  color: var(--color-texto-marca);
+  font-family: var(--fuente-titulos);
+  font-size: var(--letra-precio-grande);
+  font-weight: var(--peso-negrita);
+  line-height: var(--linea-precio-grande);
+}
+
+.detalle__recoger {
+  font-size: var(--letra-texto-pequeno);
+  line-height: var(--linea-texto-pequeno);
+  letter-spacing: var(--interletra-texto-pequeno);
+}
+
+/* Empuja el botón al final de la pantalla */
+.detalle__boton {
+  flex-shrink: 0;
+  width: 100%;
+  margin-top: auto;
+}
+
+/* Caja de opciones */
+.caja {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-4);
+  padding: var(--espacio-12) var(--espacio-16);
+  border-radius: var(--radio-imagen);
+  background: var(--color-fondo-atenuado);
+}
+
+.caja__titulo {
+  font-size: var(--letra-etiqueta);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-etiqueta);
+}
+
+.caja__lista {
+  padding: 0;
+  color: var(--color-texto-secundario);
+  font-size: var(--letra-texto);
+  line-height: var(--linea-texto);
+  list-style: none;
+}
+
+.caja__nota,
+.selector__detalle {
+  color: var(--color-texto-secundario);
+  font-size: var(--letra-nota);
+  font-weight: var(--peso-media);
+  line-height: var(--linea-nota);
+  letter-spacing: var(--interletra-nota);
+}
+
+.caja--cantidad {
+  gap: var(--espacio-8);
+}
+
+/* Selector de cantidad (Figma 1293:4703) */
+.selector {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espacio-12);
+  min-height: var(--tamano-boton-cantidad);
+}
+
+.selector__etiqueta,
+.selector__numero,
+.selector__boton {
+  font-size: var(--letra-etiqueta);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-etiqueta);
+}
+
+.selector__contador {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--espacio-12);
+}
+
+.selector__numero {
+  min-width: var(--ancho-numero-cantidad);
+  text-align: center;
+}
+
+.selector__boton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tamano-boton-cantidad);
+  height: var(--tamano-boton-cantidad);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radio-pildora);
+  font-family: var(--fuente-texto);
+  touch-action: manipulation; /* tocar rápido no amplía la página */
+  cursor: pointer;
+}
+
+.selector__boton--restar {
+  border: var(--borde-fino) solid var(--color-borde-normal);
+  background: var(--color-superficie);
+  color: var(--color-texto-principal);
+}
+
+.selector__boton--restar:disabled {
+  border-color: var(--color-borde-deshabilitado);
+  background: var(--color-fondo-atenuado);
+  color: var(--color-texto-deshabilitado);
+  cursor: default;
+}
+
+.selector__boton--sumar {
+  background: var(--color-accion-primaria);
+  color: var(--color-texto-sobre-primario);
+}
+
+/* Platillo no encontrado */
+.no-encontrado {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--espacio-24);
+  padding: var(--espacio-24) var(--margen-lateral-pantalla)
+    calc(var(--alto-navegacion) + var(--distancia-navegacion) + var(--espacio-24));
+  text-align: center;
+}
+
+.no-encontrado__titulo {
+  font-size: var(--letra-titulo-2);
+  line-height: var(--linea-titulo-2);
+}
+
+.no-encontrado .detalle__boton {
+  margin-top: 0;
 }
