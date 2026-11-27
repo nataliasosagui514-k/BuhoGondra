@@ -17,6 +17,15 @@ const pantallas = {
     plantilla: "plantilla-puntos",
     preparar: dibujarPuntos,
   },
+  "#/puntos/ayuda": {
+    titulo: "Puntos y premios",
+    enBarra: false,
+    sinEncabezado: true,
+    sinNavegacion: true,
+    pestana: "#/puntos",
+    plantilla: "plantilla-ayuda-puntos",
+    preparar: dibujarAyudaDePuntos,
+  },
   "#/mas": { titulo: "Más", enBarra: true },
   // Se abre con el calendario del menú; también dibuja su propio encabezado
   "#/semana": {

@@ -3268,6 +3268,89 @@ dialog:focus {
   stroke-linecap: round;
 }
 
+/* ---------- Ayuda de puntos (Figma 1003:4524) ---------- */
+.ayuda-pantalla {
+  gap: var(--espacio-16);
+  padding-bottom: var(--margen-inferior-ticket); /* no lleva barra de navegación */
+}
+
+.ayuda {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-24);
+}
+
+.ayuda__titulos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-8);
+}
+
+.ayuda__titulos h1 {
+  font-size: var(--letra-titulo-1);
+  line-height: var(--linea-titulo-1);
+  letter-spacing: var(--interletra-titulo-1);
+}
+
+.ayuda__titulos p {
+  color: var(--color-texto-secundario);
+}
+
+.ayuda__preguntas {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-12);
+}
+
+/* Componente "Pregunta frecuente" (Figma 1002:4593) */
+.pregunta-frecuente {
+  padding: var(--espacio-8) var(--espacio-16);
+  border: var(--borde-fino) solid var(--color-borde-suave);
+  border-radius: var(--radio-imagen);
+  background: var(--color-superficie);
+}
+
+.pregunta-frecuente[open] {
+  padding-bottom: var(--espacio-16);
+}
+
+/* Toda la cabecera se puede tocar */
+.pregunta-frecuente__cabecera {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-12);
+  min-height: var(--alto-boton-compacto);
+  list-style: none;
+  cursor: pointer;
+}
+
+.pregunta-frecuente__cabecera::-webkit-details-marker {
+  display: none;
+}
+
+.pregunta-frecuente__cabecera:focus-visible {
+  outline: var(--borde-campo) solid var(--color-anillo-foco);
+  outline-offset: var(--separacion-foco);
+}
+
+.pregunta-frecuente__pregunta {
+  flex: 1;
+  font-size: var(--letra-etiqueta);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-etiqueta);
+}
+
+.pregunta-frecuente[open] .pregunta-frecuente__flecha {
+  rotate: 180deg;
+}
+
+.pregunta-frecuente__respuesta {
+  margin-top: var(--espacio-4);
+  color: var(--color-texto-secundario);
+  font-size: var(--letra-texto);
+  line-height: var(--linea-texto);
+}
+
 /* ---------- Premio canjeado (Figma 1003:4490) ---------- */
 /* Usa la pantalla del ticket; empieza más arriba porque lleva la foto */
 .premio-pantalla {

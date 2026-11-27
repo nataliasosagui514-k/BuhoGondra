@@ -235,6 +235,85 @@ function dibujarPuntos(contenedor) {
   pintar();
 }
 
+/* ---------- Ayuda de puntos (Figma 1003:4524 y 1006:5301) ---------- */
+
+const PREGUNTAS_DE_PUNTOS = [
+  {
+    pregunta: "¿Cómo acumulo puntos?",
+    // TODO: en esta fase los puntos se suman al confirmar el pedido; la app todavía no
+    // sabe si se recogió o se canceló
+    respuesta:
+      "Cada pedido que apartas en la app y recoges en la cafetería suma puntos. Si lo " +
+      "cancelas o no lo recoges, no suma.",
+  },
+  {
+    pregunta: "¿Cómo gano premios?",
+    respuesta:
+      "Al llegar a cada nivel desbloqueas un premio: Búhi Pro (50 pts) → Postre, Búhi " +
+      "Mega Pro (100 pts) → Típico y Búhi Supremo (150 pts) → Plato fuerte.",
+  },
+  {
+    pregunta: "¿Cómo canjeo mi premio?",
+    respuesta:
+      "Toca “Canjear” en el premio desbloqueado. Te damos un ticket con un PIN de 4 " +
+      "dígitos: muéstralo en caja en cualquier cafetería UCA.",
+  },
+  {
+    pregunta: "¿Se gastan mis puntos al canjear?",
+    respuesta: "No. Tus puntos se mantienen; solo sirven para subir de nivel.",
+  },
+  {
+    pregunta: "¿Cuánto tiempo tengo para recoger mi premio?",
+    respuesta:
+      "7 días desde que lo desbloqueas. Si no lo recoges a tiempo, ese premio se pierde, " +
+      "pero tus puntos se mantienen.",
+  },
+  {
+    pregunta: "¿Dónde veo mis puntos?",
+    respuesta:
+      "En la pestaña Puntos: ahí ves cuántos llevas y cuánto te falta para el " +
+      "siguiente nivel.",
+  },
+];
+
+// Componente "Pregunta frecuente" (Figma 1002:4593): se abre y se cierra al tocar la
+// pregunta. Es la única función que crea cada una.
+function crearPreguntaFrecuente({ pregunta, respuesta }, abierta = false) {
+  const cabecera = crearElemento("summary", "pregunta-frecuente__cabecera");
+  cabecera.append(
+    crearElemento("span", "pregunta-frecuente__pregunta", pregunta),
+    crearIconoSvg("icono pregunta-frecuente__flecha", 24, ["M6 9L12 15L18 9"]),
+  );
+  const bloque = crearElemento("details", "pregunta-frecuente");
+  bloque.open = abierta;
+  bloque.append(cabecera, crearElemento("p", "pregunta-frecuente__respuesta", respuesta));
+  return bloque;
+}
+
+function dibujarAyudaDePuntos(contenedor) {
+  contenedor
+    .querySelector(".encabezado-interno")
+    .prepend(crearBotonVolver(() => volverA("#/puntos")));
+  // Como en la pantalla 22, llega con la primera abierta; pueden quedar varias abiertas
+  contenedor
+    .querySelector(".ayuda__preguntas")
+    .append(
+      ...PREGUNTAS_DE_PUNTOS.map((una, posicion) =>
+        crearPreguntaFrecuente(una, posicion === 0),
+      ),
+    );
+  contenedor
+    .querySelector(".ayuda")
+    .append(
+      crearAviso(
+        "info",
+        "Importante",
+        "Los puntos no son dinero y no se cambian por efectivo. Solo cuentan los pedidos " +
+          "apartados en la app y recogidos.",
+      ),
+    );
+}
+
 /* ---------- Premio canjeado (Figma 1003:4490) ---------- */
 
 // La foto grande de arriba. Los premios sin foto grande usan la del talón.

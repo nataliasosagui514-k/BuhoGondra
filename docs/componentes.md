@@ -101,6 +101,8 @@ La posición, la entrada y la duración del aviso flotante vienen de Figma. Solo
 |---|---|---|
 | Progreso de puntos (0 a 3 premios alcanzados) | `874:3463` | `crearProgresoDePuntos` en `js/vista-puntos.js` |
 | Tarjeta de premio (Disponible, Por recoger, Vencido, Bloqueado; "Canjeado" no se usa en el MVP) | `1002:4641` | `crearTarjetaDePremio` en `js/vista-puntos.js` |
+| Pregunta frecuente (Cerrada y Abierta) | `1002:4593` | `crearPreguntaFrecuente` en `js/vista-puntos.js` |
+| Ticket con PIN, tipo Premio | `874:3386` | `crearTicketConPin` en `js/vista-pedido.js` y `crearTicketDePremio` en `js/vista-puntos.js` |
 
 ## Botones
 
