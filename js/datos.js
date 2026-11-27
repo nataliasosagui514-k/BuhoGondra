@@ -347,7 +347,8 @@ const CAFETERIAS = [
 const HORARIOS = {
   apartar: { desde: "08:00", hasta: "11:00" },
   recogerAlmuerzos: { desde: "12:00", hasta: "14:00", cadaMinutos: 15 },
-  recogerTipicos: { desde: "14:00", hasta: "17:30", cadaMinutos: null }, // intervalo sin definir
+  // Cada 15 minutos, como los almuerzos (nota de Figma 1375:9318)
+  recogerTipicos: { desde: "14:00", hasta: "17:30", cadaMinutos: 15 },
 };
 
 const LIMITE_UNIDADES_POR_PEDIDO = null; // null: no hay límite

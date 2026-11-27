@@ -1,5 +1,5 @@
 // Vistas del Menú de hoy y del detalle de platillo.
-// Solo muestran información: aquí no se aparta ni se guarda nada.
+// El botón "Apartar" pasa lo elegido a js/vista-pedido.js, que hace el resto.
 
 const CATEGORIA_INICIAL = "economicos";
 // Categorías que tienen botón
@@ -389,35 +389,40 @@ function crearSelectorDeCantidad({ etiqueta, detalle, minimo, alCambiar }) {
   return fila;
 }
 
-// Un selector por platillo, o uno por cada tipo (pupusas).
-// El total solo cambia lo que se ve en pantalla; no se guarda.
-function crearCajaDeCantidad(platillo, alCambiarTotal) {
+// Un selector por platillo, o uno por cada tipo (pupusas). En cada cambio avisa el
+// total y la línea que se apartaría.
+function crearCajaDeCantidad(platillo, alCambiar) {
   const tipos = platillo.opciones?.find((grupo) => grupo.id === "tipo")?.valores;
   const filas = tipos ? tipos.map((tipo) => tipo.nombre) : ["Cantidad"];
   // Con tipos, cada uno empieza en 0 y se necesita al menos 1 en total
   const minimo = tipos ? 0 : 1;
-  const cantidades = filas.map(() => minimo);
-  const sumarCantidades = () => cantidades.reduce((suma, cantidad) => suma + cantidad, 0);
+  const cantidades = Object.fromEntries(filas.map((fila) => [fila, minimo]));
+  const avisar = () => {
+    const linea = tipos
+      ? crearLineaPorTipos(platillo.id, cantidades)
+      : crearLinea(platillo.id, contarUnidades(cantidades), {});
+    alCambiar(linea.cantidad, linea);
+  };
 
   const caja = crearElemento("section", "caja caja--cantidad");
   if (tipos) {
     // Texto de Figma para pupusas, el único platillo con tipos
     caja.append(crearElemento("h2", "caja__titulo", "Elige tus pupusas"));
   }
-  filas.forEach((etiqueta, posicion) => {
+  filas.forEach((etiqueta) => {
     caja.append(
       crearSelectorDeCantidad({
         etiqueta,
         detalle: `${formatearPrecio(platillo.precio)} c/u`,
         minimo,
         alCambiar: (cantidad) => {
-          cantidades[posicion] = cantidad;
-          alCambiarTotal(sumarCantidades());
+          cantidades[etiqueta] = cantidad;
+          avisar();
         },
       }),
     );
   });
-  alCambiarTotal(sumarCantidades());
+  avisar();
   return caja;
 }
 
@@ -477,9 +482,9 @@ function crearAccionesDeDetalle(platillo, esDeHoy) {
       : [verPlatosFuertes];
   }
 
-  const irAApartar = () => {
-    location.hash = `#/apartar/${platillo.id}`;
-  };
+  // Lo que se apartaría ahora; la caja de cantidad la cambia
+  let linea = crearLinea(platillo.id, 1, obtenerOpcionesPorDefecto(platillo));
+  const irAApartar = () => apartar(platillo, linea);
   const textoApartar = (precio) => `Apartar · ${formatearPrecio(precio)}`;
 
   if (platillo.categoria === "platos-fuertes") {
@@ -503,7 +508,8 @@ function crearAccionesDeDetalle(platillo, esDeHoy) {
   const boton = crearBotonInferior(textoApartar(obtenerPrecioVisible(platillo)), irAApartar);
 
   if (platillo.eligeCantidad) {
-    const caja = crearCajaDeCantidad(platillo, (total) => {
+    const caja = crearCajaDeCantidad(platillo, (total, elegida) => {
+      linea = elegida;
       boton.disabled = total === 0;
       const precio = formatearPrecio(calcularSubtotal(platillo.precio, total));
       boton.textContent = total > 1 ? `Apartar ${total} · ${precio}` : `Apartar · ${precio}`;
@@ -644,9 +650,4 @@ function dibujarDetalle(contenedor, { id, parametros }) {
     document.title = `${platillo.nombre} · BúhoGondra`;
   }
   contenedor.replaceChildren(crearVistaDeDetalle(platillo, dia));
-}
-
-// Ruta provisional: apartar se construye en la siguiente fase.
-function dibujarProximamente(contenedor) {
-  contenedor.querySelector(".mensaje-construccion").textContent = "Próximamente";
 }

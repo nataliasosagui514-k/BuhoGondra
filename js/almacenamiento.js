@@ -53,6 +53,50 @@ function guardarPuntos(cantidad) {
   return escribirDato(CLAVE_PUNTOS, cantidad) ? cantidad : null;
 }
 
+/* ---------- Pedido en curso y selección ---------- */
+
+const CLAVE_PEDIDO_EN_CURSO = "buhogondra.pedidoEnCurso";
+const CLAVE_SELECCION = "buhogondra.seleccion";
+
+// Los platillos que ya se agregaron al pedido que se está armando. Solo vale hoy.
+function obtenerPedidoEnCurso() {
+  const enCurso = leerDato(CLAVE_PEDIDO_EN_CURSO);
+  return enCurso?.fecha === obtenerFechaDeHoy() && Array.isArray(enCurso.platillos)
+    ? enCurso.platillos
+    : [];
+}
+
+function guardarPedidoEnCurso(platillos) {
+  return escribirDato(CLAVE_PEDIDO_EN_CURSO, { fecha: obtenerFechaDeHoy(), platillos });
+}
+
+// El platillo que se está apartando y todavía no se agregó ni se confirmó. Se guarda
+// solo mientras la pestaña esté abierta, para que no se pierda al recargar.
+function obtenerSeleccion() {
+  try {
+    return JSON.parse(sessionStorage.getItem(CLAVE_SELECCION));
+  } catch {
+    return null;
+  }
+}
+
+function guardarSeleccion(linea) {
+  try {
+    sessionStorage.setItem(CLAVE_SELECCION, JSON.stringify(linea));
+  } catch {
+    // Sin almacenamiento, la pantalla usa las opciones por defecto
+  }
+}
+
+function borrarPedidoEnCurso() {
+  try {
+    localStorage.removeItem(CLAVE_PEDIDO_EN_CURSO);
+    sessionStorage.removeItem(CLAVE_SELECCION);
+  } catch {
+    // Sin almacenamiento no hay nada que borrar
+  }
+}
+
 /* ---------- Opiniones ---------- */
 
 // TODO: sin sesión, el autor es "Tú". La revisión de sesión y de persona invitada

@@ -1,6 +1,8 @@
 /* BúhoGondra: variables de diseño (Figma, "UI Kit") y estructura base. */
 
-:root {
+/* ::backdrop (el fondo de ventanas y hojas) también necesita las variables */
+:root,
+::backdrop {
   /* Paleta: único lugar donde se escriben los valores de color */
   --paleta-blanco: #ffffff;
   --paleta-blanco-apagado: #fafaf8;
@@ -302,6 +304,23 @@
   --relleno-pie-acompanamiento: 10px;
   /* Separación entre el botón fijo y la barra de navegación */
   --separacion-boton-fijo: 12px;
+
+  /* Hora y cafetería (Figma 1374:9387) */
+  --separacion-apartar: 28px;
+  --alto-chip: 44px;
+  --borde-chip: 1.5px;
+  --separacion-chip: 6px;
+  --alto-cafeteria: 72px;
+  --tamano-circulo: 24px;
+  --tamano-palomita: 14px;
+  --separacion-texto-cafeteria: 2px;
+
+  /* Ventanas y hojas sobre fondo oscuro al 40 % (Figma 834:2458) */
+  --color-velo: color-mix(in srgb, var(--paleta-gris-900) 40%, transparent);
+  --ancho-ventana: 326px;
+  --margen-ventana: 32px;
+  --tamano-circulo-ventana: 56px;
+  --tamano-icono-ventana: 28px;
 
   /* Menú de la semana */
   --ancho-pestana-dia: 62px;
@@ -2057,4 +2076,282 @@ main.contenido--completo {
   z-index: 1;
   bottom: calc(var(--alto-navegacion) + var(--distancia-navegacion) + var(--separacion-boton-fijo));
   margin-top: calc(var(--espacio-16) - var(--espacio-24));
+}
+
+/* ---------- Apartar: hora y cafetería (Figma 1374:9387) ---------- */
+.apartar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--separacion-apartar);
+}
+
+.apartar__platillos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-16);
+  padding: 0;
+  list-style: none;
+}
+
+.apartar__platillo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-8);
+}
+
+.apartar__opciones {
+  color: var(--color-texto-secundario);
+  font-size: var(--letra-texto-pequeno);
+  line-height: var(--linea-texto-pequeno);
+  letter-spacing: var(--interletra-texto-pequeno);
+}
+
+.pregunta {
+  min-width: 0;
+  padding: 0;
+  border: 0;
+}
+
+.pregunta__encabezado {
+  display: flex;
+  float: left;
+  flex-direction: column;
+  gap: var(--espacio-4);
+  width: 100%;
+  margin-bottom: var(--espacio-12);
+  padding: 0;
+}
+
+.pregunta__titulo,
+.cafeteria__nombre {
+  font-family: var(--fuente-titulos);
+  font-size: var(--letra-titulo-3);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-titulo-3);
+  letter-spacing: var(--interletra-titulo-3);
+}
+
+.pregunta__explicacion {
+  color: var(--color-texto-secundario);
+  font-size: var(--letra-nota);
+  font-weight: var(--peso-media);
+  line-height: var(--linea-nota);
+  letter-spacing: var(--interletra-nota);
+}
+
+.horas {
+  display: grid;
+  clear: both;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--espacio-8);
+}
+
+.cafeterias {
+  display: flex;
+  clear: both;
+  flex-direction: column;
+  gap: var(--espacio-12);
+}
+
+/* Opción que se toca: el botón de opción la ocupa entera, pero no se ve */
+.opcion {
+  position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.opcion__entrada {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.opcion:has(:focus-visible) {
+  outline: var(--borde-campo) solid var(--color-anillo-foco);
+  outline-offset: var(--separacion-foco);
+}
+
+.opcion__palomita {
+  width: var(--tamano-palomita);
+  height: var(--tamano-palomita);
+  fill: none;
+  stroke: var(--color-texto-sobre-secundario);
+  stroke-width: 2.04;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Chip de horario (Figma 889:3410) */
+.chip {
+  justify-content: center;
+  gap: var(--separacion-chip);
+  height: var(--alto-chip);
+  border: var(--borde-chip) solid var(--color-borde-normal);
+  border-radius: var(--radio-pildora);
+  background: var(--color-superficie);
+  font-size: var(--letra-etiqueta);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-etiqueta);
+  white-space: nowrap;
+}
+
+.chip .opcion__marca {
+  display: none;
+}
+
+.chip:has(:checked) {
+  border-color: var(--color-accion-secundaria);
+  background: var(--color-accion-secundaria);
+  color: var(--color-texto-sobre-secundario);
+}
+
+.chip:has(:checked) .opcion__marca {
+  display: flex;
+}
+
+/* Opción de cafetería (Figma 889:3428). El círculo va a la derecha */
+.cafeteria {
+  justify-content: space-between;
+  gap: var(--espacio-12);
+  height: var(--alto-cafeteria);
+  padding-inline: var(--espacio-16);
+  border: var(--borde-fino) solid var(--color-borde-suave);
+  border-radius: var(--radio-icono);
+  background: var(--color-superficie);
+}
+
+.cafeteria__textos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--separacion-texto-cafeteria);
+}
+
+.cafeteria__detalle {
+  color: var(--color-texto-secundario);
+  font-size: var(--letra-texto-pequeno);
+  line-height: var(--linea-texto-pequeno);
+  letter-spacing: var(--interletra-texto-pequeno);
+}
+
+.cafeteria .opcion__marca {
+  display: flex;
+  flex-shrink: 0;
+  order: 1;
+  align-items: center;
+  justify-content: center;
+  width: var(--tamano-circulo);
+  height: var(--tamano-circulo);
+  border: var(--borde-campo) solid var(--color-borde-normal);
+  border-radius: var(--radio-pildora);
+}
+
+.cafeteria .opcion__palomita {
+  visibility: hidden;
+}
+
+.cafeteria:has(:checked) {
+  border: var(--borde-campo) solid var(--color-accion-secundaria);
+  background: var(--color-fondo-info-suave);
+}
+
+.cafeteria:has(:checked) .opcion__marca {
+  border-color: var(--color-accion-secundaria);
+  background: var(--color-accion-secundaria);
+}
+
+.cafeteria:has(:checked) .opcion__palomita {
+  visibility: visible;
+}
+
+/* ---------- Ventana (Figma 834:2458) ---------- */
+dialog::backdrop {
+  background: var(--color-velo);
+}
+
+dialog:focus {
+  outline: 0;
+}
+
+.ventana {
+  width: calc(100% - 2 * var(--margen-ventana));
+  max-width: var(--ancho-ventana);
+  margin: auto;
+  padding: var(--espacio-24);
+  border: var(--borde-fino) solid var(--color-brillo-70);
+  border-radius: var(--radio-tarjeta);
+  background: var(--color-superficie);
+  box-shadow: var(--sombra-interior-barra);
+  color: var(--color-texto-principal);
+  text-align: center;
+}
+
+.ventana[open] {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ventana__circulo {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--tamano-circulo-ventana);
+  height: var(--tamano-circulo-ventana);
+  border-radius: var(--radio-pildora);
+}
+
+.ventana__icono {
+  width: var(--tamano-icono-ventana);
+  height: var(--tamano-icono-ventana);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ventana--informacion .ventana__circulo {
+  background: var(--color-fondo-marca-suave);
+  color: var(--color-texto-marca);
+}
+
+/* El icono se balancea y descansa, como en el prototipo */
+@media (prefers-reduced-motion: no-preference) {
+  .ventana--informacion .ventana__circulo {
+    animation: balanceo 2s ease-in-out infinite;
+  }
+}
+
+@keyframes balanceo {
+  0% { rotate: 0deg; }
+  3% { rotate: 12deg; }
+  7% { rotate: -10deg; }
+  11% { rotate: 7deg; }
+  15% { rotate: -4deg; }
+  19% { rotate: 2deg; }
+  23%, 100% { rotate: 0deg; }
+}
+
+.ventana__titulo {
+  margin-top: var(--espacio-16);
+  font-family: var(--fuente-titulos);
+  font-size: var(--letra-titulo-3);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-titulo-3);
+  letter-spacing: var(--interletra-titulo-3);
+}
+
+.ventana__mensaje {
+  margin-top: var(--espacio-8);
+  color: var(--color-texto-secundario);
+  font-size: var(--letra-texto);
+  line-height: var(--linea-texto);
+}
+
+.ventana .detalle__boton {
+  margin-top: var(--espacio-24);
 }

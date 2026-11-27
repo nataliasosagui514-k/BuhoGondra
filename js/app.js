@@ -48,7 +48,14 @@ const pantallasConId = {
     pestana: "#/menu",
     preparar: dibujarDetalle,
   },
-  apartar: { titulo: "Apartar", enBarra: false, pestana: "#/menu", preparar: dibujarProximamente },
+  apartar: {
+    titulo: "Apartar pedido",
+    enBarra: false,
+    sinEncabezado: true,
+    pestana: "#/menu",
+    plantilla: "plantilla-apartar",
+    preparar: dibujarApartar,
+  },
   comentarios: {
     titulo: "Comentarios y calificaciones",
     enBarra: false,
