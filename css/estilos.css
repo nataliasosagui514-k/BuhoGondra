@@ -408,6 +408,7 @@
   --separacion-marca: 11px;
   --tamano-buho-marca: 128px;
   --alto-espacio-inicio: 51px;
+  --alto-espacio-bajo-aviso: 90px;
   --alto-espacio-con-errores: 27px;
   --alto-espacio-con-aviso: 11px;
   --separacion-aviso-inicio: 22px;
@@ -3668,6 +3669,10 @@ dialog:focus {
 /* Deja aire arriba; se encoge en pantallas bajas */
 .inicio__espacio {
   flex: 0 1 var(--alto-espacio-inicio);
+}
+
+.inicio__espacio--bajo-aviso {
+  flex-basis: var(--alto-espacio-bajo-aviso);
 }
 
 .marca {

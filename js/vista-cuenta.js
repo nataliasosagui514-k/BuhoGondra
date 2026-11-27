@@ -1,5 +1,5 @@
-// Pantallas de cuenta: Splash, registro e inicio de sesión. Las reglas están en
-// js/cuenta.js.
+// Pantallas de cuenta: Splash, registro, inicio de sesión y recuperar contraseña. Las
+// reglas están en js/cuenta.js.
 
 /* ---------- Piezas comunes ---------- */
 
@@ -700,14 +700,6 @@ function irAIniciarSesion(correo = "") {
   location.hash = "#/login";
 }
 
-// Correo que llega ya escrito a "Recuperar contraseña"
-let correoParaRecuperar = "";
-
-function irARecuperar(correo) {
-  correoParaRecuperar = correo;
-  location.hash = "#/recuperar";
-}
-
 // El aviso que va arriba del formulario según lo que falló.
 function redactarErrorDeInicio({ motivo, intentos }) {
   if (motivo !== "credenciales") {
@@ -744,6 +736,13 @@ function dibujarLogin(contenedor) {
     autocompletar: "current-password",
   });
   correoParaIniciar = "";
+  const espacio = crearElemento("div", "inicio__espacio");
+  if (contraseñaRecienCambiada) {
+    contraseñaRecienCambiada = false;
+    // El logo baja para que el aviso de arriba no lo tape (11)
+    espacio.classList.add("inicio__espacio--bajo-aviso");
+    anunciarContraseñaActualizada(contraseña.entrada);
+  }
 
   const olvidaste = crearBotonDeTexto("¿Olvidaste tu contraseña?", () =>
     irARecuperar(correo.entrada.value.trim()),
@@ -823,7 +822,162 @@ function dibujarLogin(contenedor) {
     olvidaste.textContent = "Crear una nueva contraseña";
   }
 
-  montarPantallaDeCuenta(contenedor, crearElemento("div", "inicio__espacio"), marca, formulario);
+  montarPantallaDeCuenta(contenedor, espacio, marca, formulario);
+  // Con el correo ya escrito tras cambiar la contraseña, el cursor queda en ella (11)
+  if (enfocarContraseña) {
+    enfocarContraseña = false;
+    contraseña.entrada.focus();
+  }
+}
+
+/* ---------- Recuperar contraseña (Figma, sección 1156:7059) ---------- */
+
+const DURACION_DE_CONTRASEÑA_ACTUALIZADA = 5000;
+// El correo que se está recuperando y si su código ya se verificó. Solo en memoria
+let recuperacion = { correo: "", verificado: false };
+let contraseñaRecienCambiada = false;
+let enfocarContraseña = false;
+
+function irARecuperar(correo) {
+  recuperacion = { correo, verificado: false };
+  location.hash = "#/recuperar";
+}
+
+// 11: aviso arriba de "Inicia sesión"; se va a los 5 s o al empezar a escribir.
+function anunciarContraseñaActualizada(entrada) {
+  const aviso = mostrarAviso(
+    "exito",
+    "Contraseña actualizada",
+    "Entra con tu nueva contraseña.",
+    DURACION_DE_CONTRASEÑA_ACTUALIZADA,
+  );
+  entrada.addEventListener("input", () => aviso.remove(), { once: true });
+  enfocarContraseña = true;
+}
+
+function crearPantallaDeRecuperar(contenedor, alVolver, titulo, descripcion, formulario) {
+  montarPantallaDeCuenta(
+    contenedor,
+    crearEncabezadoDeCuenta(alVolver, "Recuperar contraseña"),
+    crearTitulosDeCuenta({ titulo, descripcion }),
+    formulario,
+  );
+}
+
+// 08 y 08b
+function dibujarRecuperar(contenedor) {
+  const correo = crearCampo({
+    id: "recuperar-correo",
+    etiqueta: "Correo institucional",
+    tipo: "email",
+    ejemplo: "tucorreo@uca.edu.sv",
+    autocompletar: "email",
+    valor: recuperacion.correo,
+  });
+  crearPantallaDeRecuperar(
+    contenedor,
+    () => volverA("#/login"),
+    "¿Olvidaste tu contraseña?",
+    "Escribe tu correo de la UCA y te enviaremos un código para crear una nueva.",
+    crearFormularioDeCuenta(
+      () => {
+        const escrito = normalizarCorreo(correo.entrada.value);
+        // Solo se revisa el formato: no se dice si el correo tiene cuenta
+        if (detectarTipoCorreo(escrito) === "no-uca") {
+          correo.marcarError("Revisa el correo: debe terminar en @uca.edu.sv");
+          return;
+        }
+        recuperacion = { correo: escrito, verificado: false };
+        enviarCodigoDeRecuperacion(escrito);
+        codigoEnviadoEn = Date.now();
+        location.hash = "#/recuperar/codigo";
+      },
+      [correo.elemento],
+      [crearBotonDeEnvio("Enviar código")],
+    ),
+  );
+}
+
+// 09 y 09b
+function dibujarRecuperarCodigo(contenedor) {
+  if (!recuperacion.correo) {
+    location.replace("#/recuperar");
+    return;
+  }
+  const cambiarCorreo = () => volverA("#/recuperar");
+  crearPantallaDeRecuperar(
+    contenedor,
+    cambiarCorreo,
+    "Escribe el código",
+    `Si ${recuperacion.correo} tiene una cuenta, te enviamos un código de 6 dígitos. Vence en 10 minutos.`,
+    crearFormularioDeCodigo({
+      textoBoton: "Continuar",
+      alReenviar: () => enviarCodigoDeRecuperacion(recuperacion.correo),
+      alCambiarCorreo: cambiarCorreo,
+      alVerificar: (codigo) => {
+        if (!verificarCodigo(codigo)) {
+          return false;
+        }
+        recuperacion.verificado = true;
+        location.hash = "#/recuperar/nueva";
+        return true;
+      },
+    }),
+  );
+}
+
+// 10 y 10b
+function dibujarRecuperarNueva(contenedor) {
+  if (!recuperacion.verificado) {
+    location.replace("#/recuperar");
+    return;
+  }
+  const nueva = crearCampo({
+    id: "recuperar-nueva",
+    etiqueta: "Nueva contraseña",
+    tipo: "password",
+    ayuda: "Mínimo 8 caracteres",
+    autocompletar: "new-password",
+  });
+  const repetida = crearCampo({
+    id: "recuperar-repetida",
+    etiqueta: "Repite la nueva contraseña",
+    tipo: "password",
+    autocompletar: "new-password",
+  });
+  const guardar = crearBotonDeEnvio("Guardar contraseña");
+  crearPantallaDeRecuperar(
+    contenedor,
+    () => location.replace("#/recuperar"),
+    "Crea tu nueva contraseña",
+    "Usa al menos 8 caracteres. Escríbela dos veces para confirmarla.",
+    crearFormularioDeCuenta(
+      async () => {
+        if (nueva.entrada.value.length < MINIMO_CONTRASENA) {
+          nueva.marcarError("Mínimo 8 caracteres");
+          return;
+        }
+        if (repetida.entrada.value !== nueva.entrada.value) {
+          repetida.marcarError("Las contraseñas no coinciden");
+          return;
+        }
+        guardar.disabled = true;
+        const { correo } = recuperacion;
+        if (!(await restablecerContrasena(correo, nueva.entrada.value))) {
+          guardar.disabled = false;
+          // TODO: Figma no define este aviso
+          mostrarAviso("error", "No se pudo guardar tu contraseña");
+          return;
+        }
+        recuperacion = { correo: "", verificado: false };
+        correoParaIniciar = correo;
+        contraseñaRecienCambiada = true;
+        location.replace("#/login");
+      },
+      [nueva.elemento, repetida.elemento],
+      [guardar],
+    ),
+  );
 }
 
 /* ---------- Entrar a la app ---------- */

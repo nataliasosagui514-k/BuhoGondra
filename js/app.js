@@ -51,6 +51,9 @@ const pantallas = {
   // Cuenta: sin barra (se dibujan en js/vista-cuenta.js)
   "#/splash": crearPantallaDeCuenta("BúhoGondra", (c) => dibujarSplash(c)),
   "#/login": crearPantallaDeCuenta("Inicia sesión", (c) => dibujarLogin(c)),
+  "#/recuperar": crearPantallaDeCuenta("Recuperar contraseña", (c) => dibujarRecuperar(c)),
+  "#/recuperar/codigo": crearPantallaDeCuenta("Recuperar contraseña", (c) => dibujarRecuperarCodigo(c)),
+  "#/recuperar/nueva": crearPantallaDeCuenta("Recuperar contraseña", (c) => dibujarRecuperarNueva(c)),
   "#/registro/correo": crearPantallaDeCuenta("Crea tu cuenta", (c) => dibujarRegistroCorreo(c)),
   "#/registro/codigo": crearPantallaDeCuenta("Verifica tu correo", (c) => dibujarRegistroCodigo(c)),
   "#/registro/datos": crearPantallaDeCuenta("Crea tu cuenta", (c) => dibujarRegistroDatos(c)),
@@ -131,7 +134,7 @@ const pantallasConId = {
 };
 const pantallaInicial = "#/menu";
 // Milisegundos. Notas de Figma 1440:11261 y 1429:10299: el aviso se va solo a los 3 s
-// (la de la pantalla 01, que aún no existe, pide 5 s).
+// ("Contraseña actualizada" dura 5 s: ver js/vista-cuenta.js).
 const duracionAviso = 3000;
 
 // Devuelve la pantalla de un hash (con su ruta, su id y los datos que van después
@@ -232,8 +235,9 @@ function crearAviso(tipo, titulo, texto) {
   return aviso;
 }
 
-// Muestra un aviso y lo quita después de unos segundos.
-function mostrarAviso(tipo, titulo, texto) {
+// Muestra un aviso y lo quita después de unos segundos. Lo devuelve, por si hay que
+// quitarlo antes.
+function mostrarAviso(tipo, titulo, texto, duracion = duracionAviso) {
   const aviso = crearAviso(tipo, titulo, texto);
   const zona = document.getElementById("zona-avisos");
   zona.append(aviso);
@@ -249,7 +253,8 @@ function mostrarAviso(tipo, titulo, texto) {
     if (!zona.children.length) {
       zona.removeAttribute("popover");
     }
-  }, duracionAviso);
+  }, duracion);
+  return aviso;
 }
 
 // Eventos
