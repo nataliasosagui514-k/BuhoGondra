@@ -91,14 +91,16 @@ function describirLinea(platillo, linea) {
   return empezarEnMayuscula(unirConPuntos(listarOpciones(platillo, linea.opciones)));
 }
 
-// Junta cada línea con su platillo del menú de ese día y con lo que cuesta.
+// Junta cada línea con su platillo del menú de ese día y con lo que cuesta, con el
+// almuerzo primero.
 function detallarLineas(lineas, fecha = obtenerFechaDeHoy()) {
-  return lineas.flatMap((linea) => {
+  const articulos = lineas.flatMap((linea) => {
     const platillo = obtenerPlatillo(linea.id, fecha);
     return platillo
       ? [{ linea, platillo, precio: obtenerPrecio(platillo, linea), cantidad: linea.cantidad }]
       : [];
   });
+  return ordenarPorVentana(articulos);
 }
 
 // "Filete de pollo (combo)": son combos los platos con guarnición.
@@ -148,11 +150,36 @@ function describirEnFrase(platillo, linea) {
   return unirConPuntos([frase, ...sin].filter(Boolean));
 }
 
+// Cómo se llama cada parte de un pedido mixto
+const NOMBRES_DE_PARTE = { almuerzo: "Almuerzo", tipicos: "Típicos" };
+
+// Las líneas de hora de la revisión: una o, en un pedido mixto, una por parte.
+function describirRecogidaEnRevision(horaRecogida) {
+  return esPedidoMixto(horaRecogida)
+    ? Object.entries(horaRecogida).map(
+        ([parte, hora]) => `${NOMBRES_DE_PARTE[parte]}: hoy a las ${formatearHora(hora)}`,
+      )
+    : [`Recoger hoy a las ${formatearHora(horaRecogida)}`];
+}
+
+// La del ticket va en una sola línea: "Almuerzo 12:30 p. m. · Típicos 3:00 p. m."
+function describirRecogidaEnTicket(horaRecogida) {
+  return esPedidoMixto(horaRecogida)
+    ? [
+        unirConPuntos(
+          Object.entries(horaRecogida).map(
+            ([parte, hora]) => `${NOMBRES_DE_PARTE[parte]} ${formatearHora(hora)}`,
+          ),
+        ),
+      ]
+    : describirRecogidaEnRevision(horaRecogida);
+}
+
 // Caja gris con la hora y la cafetería. La usan la revisión y el ticket.
-function crearCajaDeRecogida(hora, idCafeteria) {
+function crearCajaDeRecogida(horas, idCafeteria) {
   const caja = crearElemento("div", "recogida");
   caja.append(
-    crearElemento("p", "recogida__hora", `Recoger hoy a las ${formatearHora(hora)}`),
+    ...horas.map((hora) => crearElemento("p", "recogida__hora", hora)),
     crearElemento("p", "recogida__lugar", nombrarCafeteria(idCafeteria)),
   );
   return caja;
@@ -232,20 +259,8 @@ function mostrarHorarioCerrado(contenedor) {
 
 /* ---------- Apartar un platillo ---------- */
 
-const AVISO_PEDIDO_MIXTO = "Pedido mixto: próximamente";
-
-// ¿Se puede sumar este platillo a lo que ya está en el pedido en curso?
-function cabeEnElPedido(platillo) {
-  const enCurso = detallarLineas(obtenerPedidoEnCurso()).map((una) => una.platillo);
-  return esDeLaMismaVentana(enCurso, platillo);
-}
-
 // Lo que hace el botón "Apartar": recuerda lo elegido y pasa a hora y cafetería.
 function apartar(platillo, linea) {
-  if (!cabeEnElPedido(platillo)) {
-    mostrarAviso("info", AVISO_PEDIDO_MIXTO);
-    return;
-  }
   guardarSeleccion(linea);
   location.hash = `#/apartar/${platillo.id}`;
 }
@@ -281,14 +296,35 @@ function crearPregunta(clase, titulo, explicacion, opciones) {
   return pregunta;
 }
 
-function crearPreguntaDeHora(ventana, elegida) {
+// Textos de cada bloque de hora en un pedido mixto (Figma 1377:9318)
+const PREGUNTAS_DE_PARTE = {
+  almuerzo: "¿A qué hora recoges el almuerzo?",
+  tipicos: "¿A qué hora recoges los típicos?",
+};
+
+// "Filete de pollo". TODO: Figma no muestra una parte con varios platillos; se unen
+// con comas y "y".
+function nombrarPlatillosDeLaParte(articulos) {
+  return unirEnFrase(
+    contarPorPlatillo(articulos).map(({ platillo }, posicion) =>
+      posicion ? empezarEnMinuscula(platillo.nombre) : platillo.nombre,
+    ),
+  );
+}
+
+// El bloque de horas de una parte. En un pedido mixto dice de qué platillos es. El
+// grupo se llama "hora-almuerzo" u "hora-tipicos": cada bloque exige elegir una.
+function crearPreguntaDeHora(ventana, elegida, articulos, mixto) {
   const rango = formatearRango(obtenerRangoDeRecogida(ventana));
+  const deLaParte = articulos.filter(
+    ({ platillo }) => platillo.ventana_recogida === ventana,
+  );
   return crearPregunta(
     "horas",
-    "¿A qué hora lo recoges?",
-    `Hoy, de ${rango}`,
+    mixto ? PREGUNTAS_DE_PARTE[ventana] : "¿A qué hora lo recoges?",
+    mixto ? `${nombrarPlatillosDeLaParte(deLaParte)} · hoy, de ${rango}` : `Hoy, de ${rango}`,
     crearHorasDeRecogida(ventana).map((hora) =>
-      crearOpcion("chip", "hora", hora, hora === elegida, [
+      crearOpcion("chip", `hora-${ventana}`, hora, hora === elegida, [
         crearElemento("span", "chip__hora", formatearHora(hora)),
       ]),
     ),
@@ -312,11 +348,13 @@ function crearCajaDePresentacion(platillo, elegida) {
   return caja;
 }
 
-function crearPreguntaDeCafeteria(elegida) {
+function crearPreguntaDeCafeteria(elegida, mixto) {
   return crearPregunta(
     "cafeterias",
     "¿Dónde lo recoges?",
-    "Funda Gondra lleva tu pedido a la cafetería que elijas.",
+    mixto
+      ? "Las dos partes se entregan en la misma cafetería."
+      : "Funda Gondra lleva tu pedido a la cafetería que elijas.",
     CAFETERIAS.map((cafeteria) => {
       const textos = crearElemento("span", "cafeteria__textos");
       textos.append(
@@ -359,7 +397,7 @@ function crearLineaDeRevision(articulo, editando, alQuitar) {
 // cierran. "Cambiar algo" muestra (u oculta) el botón para quitar cada platillo.
 function crearHojaDeRevision({
   articulos,
-  hora,
+  horaRecogida,
   cafeteria,
   editando,
   alQuitar,
@@ -416,8 +454,16 @@ function crearHojaDeRevision({
     encabezado,
     lineas,
     total,
-    crearCajaDeRecogida(hora, cafeteria),
-    crearElemento("p", "hoja__pago", "Pagas en caja al recoger, no antes."),
+    crearCajaDeRecogida(describirRecogidaEnRevision(horaRecogida), cafeteria),
+    crearElemento(
+      "p",
+      "hoja__pago",
+      // En el pedido mixto, Figma (1377:9586) repite la frase de un solo platillo; la
+      // decisión aprobada es decir que todo se paga en la primera recogida.
+      esPedidoMixto(horaRecogida)
+        ? "Pagas todo en caja al recoger el almuerzo."
+        : "Pagas en caja al recoger, no antes.",
+    ),
     agregar,
     confirmar,
     cambiar,
@@ -496,11 +542,6 @@ function dibujarApartar(contenedor, { id }) {
     mostrarHorarioCerrado(contenedor);
     return;
   }
-  if (!cabeEnElPedido(platillo)) {
-    mostrarAviso("info", AVISO_PEDIDO_MIXTO);
-    location.replace("#/menu");
-    return;
-  }
   let nueva = obtenerLineaNueva(platillo);
   const armarLineas = () =>
     nueva ? unirLineas(obtenerPedidoEnCurso(), nueva) : obtenerPedidoEnCurso();
@@ -511,7 +552,7 @@ function dibujarApartar(contenedor, { id }) {
 
   // Lo ya marcado en la pantalla, para no perderlo al quitar un platillo
   const elecciones = {
-    hora: null,
+    horas: {}, // por parte: { almuerzo: "12:30", tipicos: "15:00" }
     cafeteria: CAFETERIAS.find((una) => una.predeterminada).id,
   };
   const formulario = crearElemento("form", "apartar");
@@ -524,10 +565,14 @@ function dibujarApartar(contenedor, { id }) {
     if (nueva && obtenerPresentaciones(platillo).length) {
       partes.push(crearCajaDePresentacion(platillo, nueva.opciones.presentacion));
     }
+    const ventanas = obtenerVentanas(articulos.map((articulo) => articulo.platillo));
+    const mixto = ventanas.length > 1;
     formulario.replaceChildren(
       ...partes,
-      crearPreguntaDeHora(articulos[0].platillo.ventana_recogida, elecciones.hora),
-      crearPreguntaDeCafeteria(elecciones.cafeteria),
+      ...ventanas.map((ventana) =>
+        crearPreguntaDeHora(ventana, elecciones.horas[ventana], articulos, mixto),
+      ),
+      crearPreguntaDeCafeteria(elecciones.cafeteria, mixto),
       continuar,
     );
     // "Continuar" se activa cuando no falta nada por elegir
@@ -564,17 +609,24 @@ function dibujarApartar(contenedor, { id }) {
   const abrirRevision = (editando = false) => {
     const lineas = armarLineas();
     const articulos = detallarLineas(lineas);
+    const pedido = {
+      articulos,
+      cafeteria: elecciones.cafeteria,
+      horaRecogida: juntarHoras(
+        elecciones.horas,
+        obtenerVentanas(articulos.map((articulo) => articulo.platillo)),
+      ),
+    };
     abrirDialogo(
       contenedor,
       crearHojaDeRevision({
-        articulos,
-        ...elecciones,
+        ...pedido,
         editando,
         alQuitar: quitar,
         alAgregar: () => agregarOtroPlatillo(lineas),
         alConfirmar: (boton) => {
           boton.disabled = true; // un segundo toque no debe crear otro pedido
-          confirmarPedido(contenedor, { articulos, ...elecciones });
+          confirmarPedido(contenedor, pedido);
         },
       }),
     );
@@ -587,8 +639,10 @@ function dibujarApartar(contenedor, { id }) {
       formulario
         .querySelector(".apartar__platillos")
         .replaceWith(crearResumenDeApartar(detallarLineas(armarLineas())));
+    } else if (target.name === "cafeteria") {
+      elecciones.cafeteria = target.value;
     } else {
-      elecciones[target.name] = target.value;
+      elecciones.horas[target.name.replace("hora-", "")] = target.value;
     }
     continuar.disabled = !formulario.checkValidity();
   });
@@ -610,7 +664,7 @@ function dibujarApartar(contenedor, { id }) {
 // El ticket del pedido que se acaba de confirmar abre con "¡Pedido apartado!"
 let pedidoRecienApartado = null;
 
-function confirmarPedido(contenedor, { articulos, hora, cafeteria }) {
+function confirmarPedido(contenedor, { articulos, horaRecogida, cafeteria }) {
   // Pudieron pasar las 11:00 mientras se revisaba (nota de Figma 1375:9324)
   if (!estaAbiertoApartar()) {
     mostrarHorarioCerrado(contenedor);
@@ -620,7 +674,7 @@ function confirmarPedido(contenedor, { articulos, hora, cafeteria }) {
     articulos,
     fecha: obtenerFechaDeHoy(),
     cafeteria,
-    horaRecogida: hora,
+    horaRecogida,
     anteriores: obtenerPedidos(),
   });
   if (!guardarPedido(pedido)) {
@@ -657,7 +711,13 @@ function crearTicket(pedido, articulos) {
   const textosDePago = crearElemento("div", "pago-en-caja__textos");
   textosDePago.append(
     crearElemento("p", "pago-en-caja__titulo", "Pago en caja"),
-    crearElemento("p", "pago-en-caja__mensaje", "Se paga al recoger tu pedido, no antes."),
+    crearElemento(
+      "p",
+      "pago-en-caja__mensaje",
+      esPedidoMixto(pedido.horaRecogida)
+        ? "Pagas todo al recoger el almuerzo."
+        : "Se paga al recoger tu pedido, no antes.",
+    ),
   );
   const pago = crearElemento("div", "pago-en-caja");
   pago.append(
@@ -676,7 +736,7 @@ function crearTicket(pedido, articulos) {
   datos.append(
     crearElemento("p", "ticket__numero", `PEDIDO #${pedido.numero}`),
     crearElemento("h2", "ticket__titulo", titularTicket(articulos)),
-    crearCajaDeRecogida(pedido.horaRecogida, pedido.cafeteria),
+    crearCajaDeRecogida(describirRecogidaEnTicket(pedido.horaRecogida), pedido.cafeteria),
     desglose,
     pago,
   );
@@ -701,19 +761,40 @@ function crearTicket(pedido, articulos) {
   return ticket;
 }
 
+// Lo que cambia entre un pedido de una sola hora y uno mixto (Figma 1374:9674,
+// 1374:9745, 1377:9654 y 1377:9697): la indicación del ticket y el mensaje de
+// "¡Pedido apartado!", que en el mixto menciona las dos horas.
+function redactarAvisosDelTicket({ horaRecogida, cafeteria }) {
+  const lugar = nombrarCafeteria(cafeteria);
+  if (esPedidoMixto(horaRecogida)) {
+    const almuerzo = formatearHora(horaRecogida.almuerzo);
+    const tipicos = formatearHora(horaRecogida.tipicos);
+    return {
+      indicacion: "Recoge cada parte a su hora, con el mismo PIN.",
+      exito:
+        `Te esperamos en ${lugar}: el almuerzo a las ${almuerzo} y los típicos a las ` +
+        `${tipicos} Pagas todo al recoger el almuerzo.`,
+    };
+  }
+  const hora = formatearHora(horaRecogida);
+  return {
+    indicacion: `Llévalo a ${lugar} a las ${hora}`,
+    exito: `Te esperamos hoy a las ${hora} en ${lugar}. Pagas en caja al recoger.`,
+  };
+}
+
 function dibujarTicket(contenedor, { id }) {
   const pedido = obtenerPedidos().find((uno) => uno.id === id);
   if (!pedido) {
     location.replace("#/menu");
     return;
   }
-  const lugar = nombrarCafeteria(pedido.cafeteria);
-  const hora = formatearHora(pedido.horaRecogida);
+  const avisos = redactarAvisosDelTicket(pedido);
 
   const titulos = crearElemento("header", "ticket-pantalla__titulos");
   titulos.append(
     crearElemento("h1", "ticket-pantalla__titulo", "Tu ticket"),
-    crearElemento("p", "ticket-pantalla__indicacion", `Llévalo a ${lugar} a las ${hora}`),
+    crearElemento("p", "ticket-pantalla__indicacion", avisos.indicacion),
   );
 
   const acciones = crearElemento("div", "ticket-pantalla__acciones");
@@ -727,6 +808,7 @@ function dibujarTicket(contenedor, { id }) {
   );
 
   const pantalla = contenedor.querySelector(".ticket-pantalla");
+  pantalla.classList.toggle("ticket-pantalla--mixto", esPedidoMixto(pedido.horaRecogida));
   pantalla.append(
     titulos,
     crearTicket(pedido, detallarLineas(pedido.platillos, pedido.fecha)),
@@ -738,7 +820,7 @@ function dibujarTicket(contenedor, { id }) {
     const ventana = crearVentana({
       tipo: "exito",
       titulo: "¡Pedido apartado!",
-      mensaje: `Te esperamos hoy a las ${hora} en ${lugar}. Pagas en caja al recoger.`,
+      mensaje: avisos.exito,
       textoBoton: "Ver mi ticket",
       alTocar: () => {
         ventana.close();

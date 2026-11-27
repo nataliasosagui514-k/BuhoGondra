@@ -2585,6 +2585,11 @@ dialog:focus {
     var(--margen-inferior-ticket);
 }
 
+/* En el pedido mixto la tarjeta es más alta y va más cerca (Figma 1377:9654) */
+.ticket-pantalla--mixto {
+  gap: var(--espacio-16);
+}
+
 .ticket-pantalla__titulos {
   display: flex;
   flex-direction: column;

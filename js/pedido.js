@@ -128,6 +128,37 @@ function crearHorasDeRecogida(ventana) {
   return horas;
 }
 
+/* ---------- Partes del pedido (pedido mixto) ---------- */
+
+// Las partes en el orden en que se recogen. Un pedido mixto tiene las dos: lleva dos
+// horas, pero una sola cafetería, un solo número, un solo PIN y se paga todo al
+// recoger el almuerzo.
+const VENTANAS_DE_RECOGIDA = ["almuerzo", "tipicos"];
+
+function obtenerVentanas(platillos) {
+  return VENTANAS_DE_RECOGIDA.filter((ventana) =>
+    platillos.some((platillo) => platillo.ventana_recogida === ventana),
+  );
+}
+
+// Primero lo del almuerzo y después los típicos; dentro de cada parte no cambia el orden.
+function ordenarPorVentana(articulos) {
+  const posicion = ({ platillo }) => VENTANAS_DE_RECOGIDA.indexOf(platillo.ventana_recogida);
+  return [...articulos].sort((uno, otro) => posicion(uno) - posicion(otro));
+}
+
+// Lo que se guarda como hora de recogida: "12:30" y, en un pedido mixto, la de cada
+// parte: { almuerzo: "12:30", tipicos: "15:00" }. "horas" tiene lo elegido por parte.
+function juntarHoras(horas, ventanas) {
+  return ventanas.length === 1
+    ? horas[ventanas[0]]
+    : Object.fromEntries(ventanas.map((ventana) => [ventana, horas[ventana]]));
+}
+
+function esPedidoMixto(horaRecogida) {
+  return typeof horaRecogida === "object";
+}
+
 /* ---------- Líneas del pedido ---------- */
 
 // Una línea es lo que se guarda de cada platillo: su id, la cantidad y las opciones.
@@ -177,11 +208,6 @@ function unirLineas(lineas, nueva) {
     });
     return crearLineaPorTipos(linea.id, sumadas);
   });
-}
-
-// Un pedido admite una sola ventana de recogida (los pedidos mixtos son de otra fase).
-function esDeLaMismaVentana(platillosDelPedido, platillo) {
-  return platillosDelPedido.every((otro) => otro.ventana_recogida === platillo.ventana_recogida);
 }
 
 /* ---------- Presentaciones ---------- */
