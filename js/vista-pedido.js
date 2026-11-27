@@ -81,6 +81,47 @@ function detallarLineas(lineas) {
   });
 }
 
+// "Filete de pollo (combo)": son combos los platos con guarnición.
+function nombrarEnElPedido(platillo) {
+  const esCombo = platillo.opciones?.some((grupo) => grupo.id === "guarnicion");
+  return esCombo ? `${platillo.nombre} (combo)` : platillo.nombre;
+}
+
+// "1 × Filete de pollo (combo)"
+function nombrarConCantidad(articulo) {
+  return `${articulo.cantidad} × ${nombrarEnElPedido(articulo.platillo)}`;
+}
+
+// "Con arroz, ensalada fresca, fresco de tamarindo y 2 tortillas"
+function describirEnFrase(platillo, linea) {
+  if (linea.opciones.tipo) {
+    return describirLinea(platillo, linea);
+  }
+  const elegidas = listarOpciones(platillo, linea.opciones);
+  const incluidas = elegidas.filter((opcion) => !opcion.startsWith("sin "));
+  const ultima = incluidas.pop();
+  const frase = ultima
+    ? `Con ${incluidas.length ? `${incluidas.join(", ")} y ${ultima}` : ultima}`
+    : "";
+  // TODO: Figma no muestra cómo se escribe un grupo "Sin …"
+  const sin = elegidas.filter((opcion) => opcion.startsWith("sin "));
+  return unirConPuntos([frase, ...sin].filter(Boolean));
+}
+
+// Caja gris con la hora y la cafetería. La usan la revisión y el ticket.
+function crearCajaDeRecogida(hora, idCafeteria) {
+  const caja = crearElemento("div", "recogida");
+  caja.append(
+    crearElemento("p", "recogida__hora", `Recoger hoy a las ${formatearHora(hora)}`),
+    crearElemento("p", "recogida__lugar", nombrarCafeteria(idCafeteria)),
+  );
+  return caja;
+}
+
+function nombrarCafeteria(idCafeteria) {
+  return `Cafetería ${CAFETERIAS.find((una) => una.id === idCafeteria)?.nombre ?? ""}`;
+}
+
 /* ---------- Ventana (Figma 834:2458) ---------- */
 
 const ICONOS_DE_VENTANA = {
@@ -228,6 +269,98 @@ function crearPreguntaDeCafeteria() {
   );
 }
 
+/* ---------- Revisa tu pedido (Figma 1374:9516) ---------- */
+
+// Hoja inferior sobre la pantalla de hora. Tocar el fondo, la X, "Cambiar algo" o
+// la tecla Escape la cierran y se vuelve a lo que se estaba haciendo.
+function crearHojaDeRevision({ articulos, hora, cafeteria, alAgregar, alConfirmar }) {
+  const hoja = crearElemento("dialog", "hoja");
+  const cerrar = () => {
+    hoja.close();
+    hoja.remove();
+  };
+
+  const titulo = crearElemento("h2", "hoja__titulo", "Revisa tu pedido");
+  titulo.id = "titulo-revision";
+  hoja.setAttribute("aria-labelledby", titulo.id);
+
+  const equis = crearElemento("button", "hoja__cerrar");
+  equis.type = "button";
+  equis.setAttribute("aria-label", "Cerrar");
+  equis.append(crearIconoSvg("icono", 24, ["M18 6L6 18M6 6L18 18"]));
+  equis.addEventListener("click", cerrar);
+
+  const encabezado = crearElemento("div", "hoja__encabezado");
+  encabezado.append(titulo, equis);
+
+  const lineas = crearElemento("ul", "hoja__lineas");
+  lineas.append(
+    ...articulos.map((articulo) => {
+      const renglon = crearElemento("p", "hoja__renglon");
+      renglon.append(
+        crearElemento("span", "hoja__platillo", nombrarConCantidad(articulo)),
+        crearElemento("span", "hoja__precio", formatearPrecio(calcularTotal([articulo]))),
+      );
+      const elemento = crearElemento("li", "hoja__linea");
+      elemento.append(renglon);
+      const frase = describirEnFrase(articulo.platillo, articulo.linea);
+      if (frase) {
+        elemento.append(crearElemento("p", "hoja__detalle", frase));
+      }
+      return elemento;
+    }),
+  );
+
+  const total = crearElemento("p", "hoja__total");
+  total.append(
+    crearElemento("span", "hoja__total-etiqueta", "Total"),
+    crearElemento("span", "hoja__total-monto", formatearPrecio(calcularTotal(articulos))),
+  );
+
+  const agregar = crearElemento("button", "boton boton--texto", "+ Agregar otro platillo");
+  const confirmar = crearElemento("button", "boton boton--primario", "Confirmar pedido");
+  const cambiar = crearElemento("button", "boton boton--contorno", "Cambiar algo");
+  agregar.type = confirmar.type = cambiar.type = "button";
+  agregar.addEventListener("click", alAgregar);
+  confirmar.addEventListener("click", () => alConfirmar(confirmar));
+  cambiar.addEventListener("click", cerrar);
+
+  hoja.append(
+    crearElemento("span", "hoja__asa"),
+    encabezado,
+    lineas,
+    total,
+    crearCajaDeRecogida(hora, cafeteria),
+    crearElemento("p", "hoja__pago", "Pagas en caja al recoger, no antes."),
+    agregar,
+    confirmar,
+    cambiar,
+  );
+
+  hoja.addEventListener("cancel", (evento) => {
+    evento.preventDefault();
+    cerrar();
+  });
+  // Un toque en el fondo llega al diálogo, pero fuera de su rectángulo
+  hoja.addEventListener("click", (evento) => {
+    if (evento.target === hoja && evento.clientY < hoja.getBoundingClientRect().top) {
+      cerrar();
+    }
+  });
+  return hoja;
+}
+
+// Guarda lo que ya se eligió y vuelve al menú para sumar otro platillo.
+function agregarOtroPlatillo(lineas) {
+  if (!guardarPedidoEnCurso(lineas)) {
+    // TODO: Figma no define este mensaje
+    mostrarAviso("error", "No se pudo guardar tu pedido");
+    return;
+  }
+  guardarSeleccion(null);
+  location.hash = "#/menu";
+}
+
 // Lo que se va a apartar: el pedido en curso más el platillo que se está eligiendo.
 // Devuelve null si falta elegir algo en el detalle.
 function armarLineas(platillo) {
@@ -311,6 +444,21 @@ function dibujarApartar(contenedor, { id }) {
   });
   formulario.addEventListener("submit", (evento) => {
     evento.preventDefault();
+    if (!estaAbiertoApartar()) {
+      mostrarHorarioCerrado(contenedor);
+      return;
+    }
+    const datos = new FormData(formulario);
+    abrirDialogo(
+      contenedor,
+      crearHojaDeRevision({
+        articulos,
+        hora: datos.get("hora"),
+        cafeteria: datos.get("cafeteria"),
+        alAgregar: () => agregarOtroPlatillo(lineas),
+        alConfirmar: () => {},
+      }),
+    );
   });
 
   contenedor.querySelector(".menu").append(formulario);

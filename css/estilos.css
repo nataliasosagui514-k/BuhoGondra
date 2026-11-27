@@ -321,6 +321,11 @@
   --margen-ventana: 32px;
   --tamano-circulo-ventana: 56px;
   --tamano-icono-ventana: 28px;
+  --relleno-superior-hoja: 12px;
+  --relleno-inferior-hoja: 46px;
+  --ancho-asa: 40px;
+  --alto-asa: 5px;
+  --radio-asa: 3px;
 
   /* Menú de la semana */
   --ancho-pestana-dia: 62px;
@@ -2354,4 +2359,136 @@ dialog:focus {
 
 .ventana .detalle__boton {
   margin-top: var(--espacio-24);
+}
+
+/* ---------- Hoja inferior "Revisa tu pedido" (Figma 1374:9609) ---------- */
+.hoja {
+  width: 100%;
+  max-width: var(--ancho-maximo-app);
+  max-height: calc(100% - var(--espacio-48));
+  margin: auto auto 0;
+  padding: var(--relleno-superior-hoja) var(--margen-lateral-pantalla)
+    var(--relleno-inferior-hoja);
+  overflow-y: auto;
+  border: var(--borde-fino) solid var(--color-brillo-70);
+  border-bottom: 0;
+  border-radius: var(--radio-hoja) var(--radio-hoja) 0 0;
+  background: var(--color-superficie);
+  box-shadow: var(--sombra-interior-barra);
+  color: var(--color-texto-principal);
+}
+
+.hoja[open] {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-16);
+}
+
+/* Si no cabe, la hoja se desplaza: sus partes no se aplastan */
+.hoja > * {
+  flex-shrink: 0;
+}
+
+.hoja__asa {
+  align-self: center;
+  width: var(--ancho-asa);
+  height: var(--alto-asa);
+  border-radius: var(--radio-asa);
+  background: var(--color-borde-normal);
+}
+
+.hoja__encabezado,
+.hoja__renglon,
+.hoja__total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espacio-12);
+}
+
+.hoja__titulo {
+  font-family: var(--fuente-titulos);
+  font-size: var(--letra-titulo-2);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-titulo-2);
+  letter-spacing: var(--interletra-titulo-2);
+}
+
+.hoja__cerrar {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--tamano-boton-volver);
+  height: var(--tamano-boton-volver);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radio-pildora);
+  background: var(--color-fondo-atenuado);
+  color: var(--color-texto-principal);
+  cursor: pointer;
+}
+
+/* Un divisor antes de las líneas y otro después */
+.hoja__lineas {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-16);
+  padding: var(--espacio-16) 0;
+  border-block: var(--borde-fino) solid var(--color-borde-suave);
+  list-style: none;
+}
+
+.hoja__linea {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-16);
+}
+
+.hoja__platillo,
+.hoja__detalle,
+.recogida__lugar {
+  font-size: var(--letra-texto);
+  line-height: var(--linea-texto);
+}
+
+.hoja__precio,
+.recogida__hora {
+  font-size: var(--letra-etiqueta);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-etiqueta);
+}
+
+.hoja__detalle,
+.recogida__lugar {
+  color: var(--color-texto-secundario);
+}
+
+.hoja__total-etiqueta,
+.hoja__total-monto {
+  font-family: var(--fuente-titulos);
+  font-size: var(--letra-titulo-3);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-titulo-3);
+}
+
+.hoja__total-monto {
+  font-size: var(--letra-precio);
+  font-weight: var(--peso-negrita);
+}
+
+.hoja__pago {
+  color: var(--color-texto-secundario);
+  font-size: var(--letra-texto-pequeno);
+  line-height: var(--linea-texto-pequeno);
+  letter-spacing: var(--interletra-texto-pequeno);
+}
+
+.recogida {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-4);
+  padding: var(--espacio-16);
+  border-radius: var(--radio-imagen);
+  background: var(--color-fondo-atenuado);
 }
