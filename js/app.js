@@ -69,6 +69,7 @@ const pantallas = {
   "#/mas/perfil/contrasena": crearPantallaDePerfil("Cambiar contraseña", (c) => dibujarCambiarContrasena(c)),
   "#/mas/perfil/buho": crearPantallaDePerfil("Cambiar mi búho", (c) => dibujarCambiarBuho(c)),
   "#/mas/perfil/eliminar": crearPantallaDePerfil("Eliminar cuenta", (c) => dibujarEliminarCuenta(c)),
+  "#/mas/historial": crearPantallaDeMas("Historial", (c) => dibujarHistorial(c), { conSesion: true }),
   // Se abre con el calendario del menú; también dibuja su propio encabezado
   "#/semana": {
     titulo: "Menú de la semana",
@@ -100,7 +101,8 @@ const pantallas = {
 
 // Rutas con el id de un platillo: #/platillo/ID, #/personalizar/ID, #/apartar/ID,
 // #/comentarios/ID y #/comentarios/ID/escribir. Y las del ticket (#/ticket/PEDIDO)
-// y del premio canjeado (#/puntos/premio/ID)
+// del premio canjeado (#/puntos/premio/ID) y del detalle de un pedido
+// (#/mas/historial/ID)
 const pantallasConId = {
   personalizar: {
     titulo: "Personaliza tu plato",
@@ -153,6 +155,10 @@ const pantallasConId = {
     plantilla: "plantilla-comentarios",
     preparar: dibujarComentarios,
   },
+  // El id es el del pedido
+  "mas/historial": crearPantallaDeMas("Detalle de pedido", dibujarDetalleDePedido, {
+    conSesion: true,
+  }),
   "comentarios/escribir": {
     titulo: "Escribir mi opinión",
     enBarra: false,
@@ -176,7 +182,7 @@ function buscarPantalla(hash) {
     return { ...pantallas[ruta], ruta, parametros };
   }
   const partes = ruta.match(
-    /^#\/(platillo|personalizar|apartar|ticket|comentarios|puntos\/premio)\/([^/]+?)(\/escribir)?$/,
+    /^#\/(platillo|personalizar|apartar|ticket|comentarios|puntos\/premio|mas\/historial)\/([^/]+?)(\/escribir)?$/,
   );
   const tipo = partes && `${partes[1]}${partes[3] ?? ""}`;
   return Object.hasOwn(pantallasConId, tipo)

@@ -757,3 +757,254 @@ function confirmarEliminacion(contenedor) {
   // La tecla Escape llama a "alCerrar": nunca elimina
   abrirDialogo(contenedor, ventana);
 }
+
+/* ---------- Pantallas sin contenido (50b, 60b y 93c) ---------- */
+
+// Búho, título y explicación al centro, y el botón abajo.
+function crearEstadoVacio({ imagen, clase, titulo, texto }) {
+  const bloque = crearElemento("div", "vacio");
+  bloque.append(
+    crearImagen(`vacio__imagen ${clase}`, imagen),
+    crearElemento("h1", "vacio__titulo", titulo),
+    crearElemento("p", "vacio__texto", texto),
+  );
+  return bloque;
+}
+
+function crearBotonAlMenu() {
+  return crearBotonInferior("Ver el menú de hoy", () => {
+    location.hash = "#/menu";
+  });
+}
+
+/* ---------- Historial (Figma 50 y 50b) ---------- */
+
+// Solo hay dos estados porque la app solo conoce la fecha del pedido (ver estaEnCurso).
+// TODO: "Cancelado" y "No recogido" (51c, 51d y 51e) necesitan un dato que no existe
+const ESTADOS_DE_PEDIDO = {
+  curso: { texto: "En curso", trazos: null },
+  entregado: { texto: "Entregado", trazos: [[2.92, 4.38, "M0 2.92L2.62 5.54L8.17 0"]] },
+};
+
+function crearEtiquetaDeEstado(pedido) {
+  const clave = estaEnCurso(pedido) ? "curso" : "entregado";
+  const { texto, trazos } = ESTADOS_DE_PEDIDO[clave];
+  const etiqueta = crearElemento("span", `etiqueta estado estado--${clave}`);
+  etiqueta.append(
+    trazos ? crearIconoSvg("estado__icono", 14, trazos) : crearElemento("span", "estado__punto"),
+    texto,
+  );
+  return etiqueta;
+}
+
+// "20 nov"
+function formatearFechaCorta(fecha) {
+  const mes = convertirAFecha(fecha).toLocaleDateString("es", { month: "short" }).replace(".", "");
+  return `${Number(fecha.slice(-2))} ${mes}`;
+}
+
+// "Hoy · 12:30 p. m. · Central · $4.00" o "20 nov · Jardines · $4.00". Figma no pone
+// el total en la tarjeta; se agregó porque la lista debe mostrarlo.
+function describirEnLista(pedido) {
+  const horas = esPedidoMixto(pedido.horaRecogida)
+    ? Object.values(pedido.horaRecogida)
+    : [pedido.horaRecogida];
+  const cuando = estaEnCurso(pedido)
+    ? ["Hoy", unirEnFrase(horas.map(formatearHora))]
+    : [formatearFechaCorta(pedido.fecha)];
+  const cafeteria = CAFETERIAS.find((una) => una.id === pedido.cafeteria)?.nombre;
+  return unirConPuntos([...cuando, cafeteria, formatearPrecio(pedido.total)].filter(Boolean));
+}
+
+// Lo que se muestra de un pedido: sus platillos con precio y su nombre
+function resumirPedido(pedido) {
+  const articulos = detallarLineas(pedido.platillos, pedido.fecha);
+  // TODO: un platillo que ya no está en el menú no se puede nombrar
+  return { articulos, titulo: articulos.length ? titularTicket(articulos) : "Pedido" };
+}
+
+function crearTarjetaDePedido(pedido) {
+  const { articulos, titulo } = resumirPedido(pedido);
+  const textos = crearElemento("span", "pedido__textos");
+  textos.append(
+    crearElemento("span", "pedido__numero", `Pedido #${pedido.numero}`),
+    crearElemento("span", "pedido__titulo", titulo),
+    crearEtiquetaDeEstado(pedido),
+    crearElemento("span", "pedido__datos", describirEnLista(pedido)),
+  );
+  const tarjeta = crearElemento("a", "pedido");
+  tarjeta.href = `#/mas/historial/${pedido.id}`;
+  tarjeta.append(
+    crearFoto(articulos[0]?.platillo ?? { foto: null }, "pedido__foto"),
+    textos,
+    crearIconoSvg("fila__flecha", 20, ["M7.5 5L12.5 10L7.5 15"]),
+  );
+  const elemento = crearElemento("li", "");
+  elemento.append(tarjeta);
+  return elemento;
+}
+
+function crearGrupoDePedidos(titulo, pedidos) {
+  const lista = crearElemento("ul", "pedidos__lista");
+  lista.append(...pedidos.map(crearTarjetaDePedido));
+  const grupo = crearElemento("section", "pedidos__grupo");
+  grupo.append(crearSubtitulo(titulo), lista);
+  return grupo;
+}
+
+function dibujarHistorial(contenedor) {
+  const encabezado = { titulo: "Historial", anterior: "#/mas" };
+  // Del más reciente al más antiguo (se guardan en el orden en que se hicieron)
+  const pedidos = obtenerPedidosDeLaSesion()
+    .reverse()
+    .sort((uno, otro) => otro.fecha.localeCompare(uno.fecha));
+  if (!pedidos.length) {
+    montarPantallaDeMas(
+      contenedor,
+      encabezado,
+      crearEstadoVacio({
+        imagen: "img/buhi-historial.png",
+        clase: "vacio__imagen--historial",
+        titulo: "Todavía no tienes pedidos",
+        texto: "Cuando apartes un platillo, aquí verás si está en curso, entregado o cancelado.",
+      }),
+      crearBotonAlMenu(),
+    );
+    return;
+  }
+  const grupos = crearElemento("div", "pedidos");
+  grupos.append(
+    ...[
+      ["En curso", pedidos.filter((pedido) => estaEnCurso(pedido))],
+      ["Anteriores", pedidos.filter((pedido) => !estaEnCurso(pedido))],
+    ]
+      .filter(([, lista]) => lista.length)
+      .map(([titulo, lista]) => crearGrupoDePedidos(titulo, lista)),
+  );
+  montarPantallaDeMas(contenedor, encabezado, crearElemento("h1", "solo-lectores", "Historial"), grupos);
+}
+
+/* ---------- Detalle de pedido (Figma 51 y 51b) ---------- */
+
+// TODO: Figma no muestra cómo se llama la categoría de un típico
+const NOMBRES_DE_LINEA = {
+  economicos: "Plato económico",
+  "platos-fuertes": "Plato fuerte",
+  complementos: "Complemento",
+  tipicos: "Típico",
+};
+
+function crearSeccionDeDetalle(titulo, ...partes) {
+  const seccion = crearElemento("section", "detalle-pedido__seccion");
+  seccion.append(crearElemento("h2", "mas__subtitulo", titulo), ...partes);
+  return seccion;
+}
+
+function crearDesgloseDePedido(pedido, articulos) {
+  const lineas = crearElemento("ul", "detalle-pedido__lineas");
+  lineas.append(
+    ...articulos.map((articulo) => {
+      const nombre = crearElemento("div", "");
+      nombre.append(
+        crearElemento("p", "detalle-pedido__categoria", NOMBRES_DE_LINEA[articulo.platillo.categoria]),
+        crearElemento("p", "detalle-pedido__platillo", nombrarConCantidad(articulo)),
+      );
+      const linea = crearElemento("li", "detalle-pedido__linea");
+      linea.append(nombre, crearElemento("p", "detalle-pedido__precio", formatearPrecio(calcularTotal([articulo]))));
+      return linea;
+    }),
+  );
+  const total = crearElemento("p", "detalle-pedido__total");
+  total.append(
+    crearElemento("span", "", "Total"),
+    crearElemento("span", "detalle-pedido__monto", formatearPrecio(pedido.total)),
+  );
+  return crearSeccionDeDetalle(
+    "Tu pedido",
+    lineas,
+    total,
+    crearElemento("p", "mas__nota", estaEnCurso(pedido) ? "Pagas en caja al recoger" : "Pagado en caja"),
+  );
+}
+
+function crearEntregaDePedido(pedido) {
+  if (estaEnCurso(pedido)) {
+    return crearSeccionDeDetalle(
+      "Detalles de la entrega",
+      crearCajaDeRecogida(describirRecogidaEnRevision(pedido.horaRecogida), pedido.cafeteria),
+    );
+  }
+  // TODO: Figma muestra "Entregado a las 12:45 p. m.", pero la app no sabe esa hora
+  const puntos = pedido.puntos ? ["Este pedido sumó puntos a tu nivel."] : [];
+  return crearSeccionDeDetalle(
+    "Detalles de la entrega",
+    crearCajaGris(["Entregado"], unirConPuntos([nombrarCafeteria(pedido.cafeteria), ...puntos])),
+  );
+}
+
+// En curso: ver el ticket y pedir ayuda. Entregado: calificar lo que falte.
+function crearAccionesDePedido(pedido, articulos) {
+  if (estaEnCurso(pedido)) {
+    return [
+      crearBotonInferior("Ver mi ticket", () => {
+        location.hash = `#/ticket/${pedido.id}`;
+      }),
+      // TODO: Figma abre el chat de Búhi, que todavía no existe
+      crearBotonDeTexto("Ayuda con este pedido", avisarPantallaPendiente),
+    ];
+  }
+  const sinCalificar = articulos.find(({ platillo }) => !obtenerMiOpinion(platillo.id));
+  return sinCalificar
+    ? [
+        crearBotonInferior(
+          "Calificar platillo",
+          () => {
+            location.hash = `#/comentarios/${sinCalificar.platillo.id}/escribir`;
+          },
+          "contorno",
+        ),
+      ]
+    : [];
+}
+
+// El id es el del pedido. Cada quien ve solo los suyos.
+function dibujarDetalleDePedido(contenedor, { id }) {
+  const pedido = obtenerPedidosDeLaSesion().find((uno) => uno.id === id);
+  if (!pedido) {
+    location.replace(obtenerSesion() ? "#/mas/historial" : "#/mas");
+    return;
+  }
+  const { articulos, titulo } = resumirPedido(pedido);
+
+  const volver = crearBotonVolver(() => volverA("#/mas/historial"));
+  volver.classList.add("boton-volver--sobre-foto");
+  const portada = crearElemento("div", "detalle-pedido__portada");
+  portada.append(volver, crearFoto(articulos[0]?.platillo ?? { foto: null }, "detalle-pedido__foto"));
+
+  const estado = crearElemento("p", "detalle-pedido__estado");
+  estado.append(
+    crearEtiquetaDeEstado(pedido),
+    crearElemento("span", "pedido__numero", `Pedido #${pedido.numero}`),
+  );
+  const fecha = empezarEnMinuscula(formatearFechaLarga(convertirAFecha(pedido.fecha)));
+  const titulos = crearElemento("header", "detalle-pedido__titulos");
+  titulos.append(
+    estado,
+    crearElemento("h1", "cuenta__titulo", titulo),
+    crearElemento(
+      "p",
+      "detalle-pedido__fecha",
+      estaEnCurso(pedido) ? `Pedido hoy, ${fecha}` : `Pedido el ${fecha}`,
+    ),
+  );
+
+  const acciones = crearElemento("div", "detalle-pedido__acciones");
+  acciones.append(...crearAccionesDePedido(pedido, articulos));
+
+  const hoja = crearElemento("div", "detalle-pedido__hoja");
+  hoja.append(titulos, crearDesgloseDePedido(pedido, articulos), crearEntregaDePedido(pedido), acciones);
+
+  const pantalla = contenedor.querySelector(".cuenta");
+  pantalla.classList.add("detalle-pedido");
+  pantalla.replaceChildren(portada, hoja);
+}

@@ -327,6 +327,14 @@
   --alto-asa: 5px;
   --radio-asa: 3px;
 
+  /* Historial, detalle de pedido y pantallas sin contenido */
+  --tamano-foto-pedido: 88px;
+  --alto-portada-pedido: 320px;
+  --ancho-buho-historial: 149px;
+  --alto-buho-historial: 160px;
+  --ancho-buho-ayuda: 150px;
+  --alto-buho-ayuda: 116px;
+
   /* Avatar grande de Mi perfil (Figma 1051:5422) */
   --tamano-avatar-perfil: 96px;
   --tamano-imagen-avatar-perfil: 144px;
@@ -4457,4 +4465,281 @@ dialog:focus {
   align-self: stretch;
   margin-top: var(--espacio-16);
   text-align: left;
+}
+
+/* El título que solo hace falta para los lectores de pantalla */
+.solo-lectores {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- Pantallas sin contenido (Figma 1063:6000) ---------- */
+.vacio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--espacio-8);
+  margin-block: auto;
+  padding-block: var(--espacio-24);
+  text-align: center;
+}
+
+.vacio__imagen {
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.vacio__imagen--historial {
+  width: var(--ancho-buho-historial);
+  height: var(--alto-buho-historial);
+}
+
+.vacio__imagen--ayuda {
+  width: var(--ancho-buho-ayuda);
+  height: var(--alto-buho-ayuda);
+}
+
+.vacio__titulo {
+  font-size: var(--letra-titulo-2);
+  line-height: var(--linea-titulo-2);
+  letter-spacing: var(--interletra-titulo-2);
+}
+
+.vacio__texto {
+  color: var(--color-texto-secundario);
+  font-size: var(--letra-texto);
+  line-height: var(--linea-texto);
+  overflow-wrap: anywhere;
+}
+
+.vacio ~ .detalle__boton {
+  flex-shrink: 0;
+  margin-top: 0;
+}
+
+/* ---------- Historial (Figma 1063:5907) ---------- */
+.pedidos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-32);
+  margin-top: var(--espacio-24);
+}
+
+.pedidos__grupo,
+.pedidos__lista {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-12);
+}
+
+.pedidos__grupo {
+  gap: var(--espacio-8);
+}
+
+.pedidos__lista {
+  padding: 0;
+  list-style: none;
+}
+
+.pedido {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-16);
+  padding: var(--espacio-12);
+  border: var(--borde-fino) solid var(--color-borde-suave);
+  border-radius: var(--radio-icono);
+  background: var(--color-superficie);
+  color: var(--color-texto-principal);
+  text-decoration: none;
+}
+
+.pedido__foto {
+  flex-shrink: 0;
+  width: var(--tamano-foto-pedido);
+  height: var(--tamano-foto-pedido);
+  border-radius: var(--radio-imagen);
+  background-color: var(--color-fondo-atenuado);
+  object-fit: cover;
+}
+
+.pedido__textos {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--espacio-4);
+  min-width: 0;
+}
+
+.pedido__numero {
+  color: var(--color-texto-secundario);
+  font-size: var(--letra-texto-pequeno);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-texto-pequeno);
+}
+
+.pedido__titulo {
+  font-family: var(--fuente-titulos);
+  font-size: var(--letra-titulo-3);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-titulo-tarjeta);
+}
+
+.pedido__datos {
+  color: var(--color-texto-secundario);
+  font-size: var(--letra-texto-pequeno);
+  line-height: var(--linea-texto-pequeno);
+}
+
+/* Etiquetas de estado */
+.estado {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espacio-4);
+  height: var(--alto-etiqueta);
+  padding-inline: var(--espacio-12);
+}
+
+.estado--curso {
+  background: var(--color-fondo-info-suave);
+  color: var(--color-texto-enlace);
+}
+
+.estado--entregado {
+  background: var(--color-fondo-exito-suave);
+  color: var(--color-texto-sobre-exito-suave);
+}
+
+.estado__punto {
+  width: var(--tamano-punto);
+  height: var(--tamano-punto);
+  border-radius: var(--radio-pildora);
+  background: currentColor;
+}
+
+.estado__icono {
+  width: var(--tamano-icono-etiqueta);
+  height: var(--tamano-icono-etiqueta);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.98;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ---------- Detalle de pedido (Figma 1064:6144) ---------- */
+.cuenta.detalle-pedido {
+  padding: 0;
+}
+
+.detalle-pedido__portada {
+  position: relative;
+  flex-shrink: 0;
+  height: var(--alto-portada-pedido);
+  overflow: hidden;
+}
+
+.detalle-pedido__foto {
+  border-radius: var(--radio-ninguno);
+  width: 100%;
+  height: 100%;
+  background-color: var(--color-fondo-atenuado);
+  object-fit: cover;
+}
+
+.detalle-pedido__hoja {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  margin-top: calc(-1 * var(--espacio-32));
+  padding: var(--espacio-24) var(--margen-lateral-pantalla) var(--margen-inferior-cuenta);
+  border-radius: var(--radio-hoja) var(--radio-hoja) 0 0;
+  background: var(--color-fondo-app);
+}
+
+.detalle-pedido__estado {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-8);
+  margin-bottom: var(--espacio-12);
+}
+
+.detalle-pedido__fecha {
+  margin-top: var(--espacio-4);
+  color: var(--color-texto-secundario);
+  font-size: var(--letra-texto);
+  line-height: var(--linea-texto);
+}
+
+.detalle-pedido__seccion {
+  display: flex;
+  flex-direction: column;
+  margin-top: var(--espacio-24);
+  padding-top: var(--espacio-24);
+  border-top: var(--borde-fino) solid var(--color-borde-suave);
+}
+
+.detalle-pedido__seccion .mas__subtitulo {
+  margin-bottom: var(--espacio-12);
+}
+
+.detalle-pedido__lineas {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-12);
+  padding: 0;
+  list-style: none;
+}
+
+.detalle-pedido__linea,
+.detalle-pedido__total {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--espacio-12);
+  font-size: var(--letra-texto);
+  line-height: var(--linea-texto);
+}
+
+.detalle-pedido__categoria,
+.detalle-pedido__precio {
+  font-weight: var(--peso-seminegrita);
+}
+
+.detalle-pedido__platillo {
+  color: var(--color-texto-secundario);
+}
+
+.detalle-pedido__total {
+  margin-block: var(--espacio-16) var(--espacio-4);
+  padding-top: var(--espacio-16);
+  border-top: var(--borde-fino) solid var(--color-borde-suave);
+  font-family: var(--fuente-titulos);
+  font-size: var(--letra-titulo-3);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-titulo-3);
+}
+
+.detalle-pedido__monto {
+  font-weight: var(--peso-negrita);
+}
+
+.detalle-pedido__acciones {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-12);
+  margin-top: var(--espacio-32);
+}
+
+.detalle-pedido__acciones .detalle__boton {
+  flex-shrink: 0;
+  margin: 0;
+}
+
+.detalle-pedido__acciones .boton--texto {
+  align-self: center;
 }

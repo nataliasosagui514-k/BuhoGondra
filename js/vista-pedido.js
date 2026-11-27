@@ -893,10 +893,14 @@ function dibujarTicket(contenedor, { id }) {
   );
 
   const acciones = crearElemento("div", "ticket-pantalla__acciones");
-  // TODO (fase de Más): Figma pone sobre "Listo" la nota "También lo encuentras en
-  // Más › Historial, aunque no tengas internet.". Volver a ponerla cuando exista.
+  // Abierto desde el Historial, "Listo" regresa allí y no toca el pedido que se arma
+  const desde = history.state?.desde ?? "";
   acciones.append(
     crearBotonInferior("Listo", () => {
+      if (desde.startsWith("#/mas/historial")) {
+        history.back();
+        return;
+      }
       borrarPedidoEnCurso();
       location.hash = "#/menu";
     }),
