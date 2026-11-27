@@ -45,9 +45,13 @@ La Web Crypto API solo funciona al abrir el archivo directamente, en `localhost`
 
 ## Pruebas
 
+Al abrir `index.html` sin nada después, aparece el Splash 4.5 segundos y luego "Inicia sesión" (o el menú, si ya hay sesión). Con una ruta, como `index.html#/menu`, se entra directo.
+
+Sin sesión se puede ver el menú, los platillos y los comentarios, pero no apartar ni comentar.
+
 Mientras no exista la pantalla Más, la sesión se cierra desde la consola: ejecuta `cerrarSesion()` y recarga la página.
 
-Los puntos se calculan con los pedidos guardados que se confirmaron **con la sesión abierta**; los que se hicieron sin sesión no suman.
+Los puntos se calculan con los pedidos confirmados con la sesión de cada cuenta; los pedidos antiguos que quedaron como "invitado" no suman.
 
 Para probar los premios sin confirmar muchos pedidos, con la sesión abierta pega este comando: guarda un pedido de prueba de 50 puntos (repítelo para llegar a 100 y 150).
 

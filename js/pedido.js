@@ -70,9 +70,8 @@ function obtenerSiguienteNumero(pedidos) {
 
 /* ---------- El pedido que se guarda ---------- */
 
-// El autor es el correo de la sesión; sin sesión, "invitado" (esos pedidos no suman
-// puntos).
-// TODO (fase de Registro): falta la regla de lo que puede hacer una persona invitada.
+// El autor es el correo de la sesión. "invitado" queda en los pedidos hechos antes de
+// que apartar pidiera una cuenta (no suman puntos y no se modifican).
 const AUTOR_INVITADO = "invitado";
 
 // Arma el pedido con los datos del diseño y ningún otro. "articulos" son las líneas

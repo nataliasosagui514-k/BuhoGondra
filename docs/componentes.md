@@ -52,8 +52,8 @@ Un guion (—) en el id significa que no se encontró un componente para esa var
 | Etiqueta | Menú desactualizado | Normal | `870:2950` | Pendiente |
 | Etiqueta | En curso | Normal | `905:4103` | Pendiente |
 | Etiqueta | No recogido | Normal | `905:4106` | Pendiente |
-| Etiqueta | Estudiante | Normal | `963:4600` | Pendiente |
-| Etiqueta | Docente o empleado | Normal | `963:4606` | Pendiente |
+| Etiqueta | Estudiante | Normal | `963:4600` | Hecho en «Crea tu cuenta» (aún no aparece en #/componentes) |
+| Etiqueta | Docente o empleado | Normal | `963:4606` | Hecho en «Crea tu cuenta» (aún no aparece en #/componentes) |
 
 ## Avisos
 
@@ -82,7 +82,18 @@ La posición, la entrada y la duración del aviso flotante vienen de Figma. Solo
 | Comentario | Con y sin texto | Normal | `1189:4679` | Hecho |
 | Avatar de búho (pequeño) | Búhos 1 a 6 | Normal | `901:3528` | Hecho |
 | Calificación (selector) | Valor 0 a 5 | Normal | `827:2507` | Hecho |
-| Campo de texto | Vacío, Foco y Lleno | — | `725:2427` | Hecho en «Tu comentario»; Error y Deshabilitado pendientes |
+| Campo de texto | Vacío, Foco, Lleno y Error | — | `725:2427` | Hecho (en cuenta: `crearCampo`); Deshabilitado pendiente |
+
+## Registro e inicio de sesión
+
+| Pantalla o componente | Nodo de Figma | Dónde está |
+|---|---|---|
+| Splash | `976:4524` | `dibujarSplash` en `js/vista-cuenta.js` |
+| Inicia sesión y sus errores (01 y 01b a 01e) | `940:4228`, sección `1412:9942` | `dibujarLogin` |
+| Crear cuenta (02 a 07) | `940:4307`, `964:4642` y vecinos | funciones `dibujarRegistro…` |
+| Código de 6 dígitos | `964:4642` | `crearFormularioDeCodigo` (registro y recuperación) |
+| Recuperar contraseña (08 a 11) | sección `1156:7059` | funciones `dibujarRecuperar…` |
+| Ventana de invitado (Apartar, Puntos y comentarios) | sección `1429:10116`, `1003:4839` | `pedirCuenta` |
 
 ## Apartar pedido
 

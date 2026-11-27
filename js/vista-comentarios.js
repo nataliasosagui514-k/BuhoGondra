@@ -88,7 +88,8 @@ function crearFilaDeComentarios(platilloId, opiniones) {
 /* ---------- Pantalla de comentarios ---------- */
 
 const OPINIONES_POR_PAGINA = 20;
-// TODO: búho de quien no ha elegido uno. M5d muestra el 3; elegirlo es de la fase de Registro
+// Búho de un autor sin cuenta en este navegador (algunas opiniones de ejemplo). M5d
+// muestra el 3
 const BUHO_SIN_ELEGIR = 3;
 
 // "Hace un momento", "Hace 2 días", "Hace 1 semana"…
