@@ -5144,3 +5144,13 @@ dialog:focus {
 .cuenta__acciones .aviso {
   margin-bottom: var(--espacio-12);
 }
+
+/* ---------- Línea del descuento de empleado UCA (text/success) ---------- */
+.linea-descuento,
+.linea-descuento > span {
+  color: var(--color-texto-exito);
+}
+
+.linea-descuento > span:last-child {
+  flex-shrink: 0;
+}

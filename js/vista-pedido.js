@@ -408,6 +408,24 @@ function crearPreguntaDeCafeteria(elegida, mixto) {
   );
 }
 
+/* ---------- Línea del descuento (Figma 1440:10850 y 1440:10948) ---------- */
+
+// La fila verde con el descuento. La usan la revisión, el ticket y el detalle del
+// pedido, cada uno con sus clases. Solo muestra el número que recibe.
+function crearLineaDeDescuento(descuento, { fila, nombre, monto }) {
+  const linea = crearElemento("li", `${fila} linea-descuento`);
+  linea.append(
+    crearElemento("span", nombre, ETIQUETA_DE_DESCUENTO),
+    crearElemento("span", monto, formatearDescuento(descuento)),
+  );
+  return linea;
+}
+
+// "−$0.40"
+function formatearDescuento(descuento) {
+  return `−${formatearPrecio(descuento)}`;
+}
+
 /* ---------- Revisa tu pedido (Figma 1374:9516) ---------- */
 
 // Una línea de la revisión, con su botón para quitarla (oculto hasta "Cambiar algo").
@@ -467,11 +485,22 @@ function crearHojaDeRevision({
   lineas.append(
     ...articulos.map((articulo) => crearLineaDeRevision(articulo, editando, alQuitar)),
   );
+  // Figma no pone una fila "Subtotal": el descuento va tras los platillos y antes del total
+  const cobro = calcularCobro(articulos, obtenerSesion()?.tipo);
+  if (cobro.descuento) {
+    lineas.append(
+      crearLineaDeDescuento(cobro.descuento, {
+        fila: "hoja__renglon",
+        nombre: "hoja__platillo",
+        monto: "hoja__precio",
+      }),
+    );
+  }
 
   const total = crearElemento("p", "hoja__total");
   total.append(
     crearElemento("span", "hoja__total-etiqueta", "Total"),
-    crearElemento("span", "hoja__total-monto", formatearPrecio(calcularTotal(articulos))),
+    crearElemento("span", "hoja__total-monto", formatearPrecio(cobro.total)),
   );
 
   const agregar = crearElemento("button", "boton boton--texto", "+ Agregar otro platillo");
