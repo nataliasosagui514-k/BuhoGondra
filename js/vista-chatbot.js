@@ -32,7 +32,7 @@ function crearAccesoAlChat() {
   const burbuja = crearElemento("span", "ayuda-chat__burbuja");
   burbuja.append(forma, crearElemento("span", "ayuda-chat__texto", "Ayuda con el pedido"));
 
-  const boton = crearElemento("span", "ayuda-chat__boton");
+  const boton = crearElemento("span", "ayuda-chat__boton efecto-cristal");
   boton.append(crearIconoSvg("ayuda-chat__icono", 20, ICONO_DEL_CHATBOT), "ChatBot");
 
   const enlace = crearElemento("a", "ayuda-chat");

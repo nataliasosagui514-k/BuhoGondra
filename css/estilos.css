@@ -150,7 +150,10 @@
   /* Desenfoques de cristal */
   --desenfoque-suave: blur(8px);
   --desenfoque-medio: blur(10px);
-  --desenfoque-barra: blur(12px);
+
+  /* Clase .efecto-cristal */
+  --color-cristal-blanco: rgb(255 255 255 / 70%);
+  --filtro-cristal: blur(20px) saturate(180%);
 
   /* Tipografía: Outfit en títulos, precios y botones; Inter en texto y etiquetas */
   --fuente-titulos: "Outfit", sans-serif;
@@ -576,6 +579,17 @@ h1 {
   stroke-linejoin: round;
 }
 
+/* Efecto de cristal, solo en los componentes que en Figma tienen "Background blur":
+   barra de navegación, botón de volver y botón ChatBot. Va antes que ellos para que
+   cada uno pueda conservar su propio relleno. En Figma los rellenos son opacos: el blanco
+   al 70 % es un valor elegido para que el efecto se vea. El borde sí es el de Figma. */
+.efecto-cristal {
+  border: var(--borde-fino) solid var(--color-brillo-70);
+  background: var(--color-cristal-blanco);
+  -webkit-backdrop-filter: var(--filtro-cristal);
+  backdrop-filter: var(--filtro-cristal);
+}
+
 /* Botón de volver */
 .boton-volver {
   display: flex;
@@ -585,10 +599,8 @@ h1 {
   width: var(--tamano-boton-volver);
   height: var(--tamano-boton-volver);
   padding: 0;
-  border: var(--borde-fino) solid var(--color-brillo-70);
   border-radius: var(--radio-pildora);
-  background: var(--fondo-volver-encabezado); /* así se ve en los encabezados de Figma */
-  backdrop-filter: var(--desenfoque-suave);
+  background-image: var(--fondo-volver-encabezado); /* así se ve en los encabezados de Figma */
   color: var(--color-texto-principal);
   cursor: pointer;
 }
@@ -619,11 +631,9 @@ h1 {
   display: flex;
   align-items: center;
   padding-inline: var(--espacio-8);
-  border: var(--borde-fino) solid var(--color-brillo-70);
   border-radius: var(--radio-pildora);
-  background: var(--brillo-barra), var(--color-superficie); /* sin sombra exterior */
+  background-image: var(--brillo-barra); /* sin sombra exterior */
   box-shadow: var(--sombra-interior-barra);
-  backdrop-filter: var(--desenfoque-barra);
 }
 
 .barra-navegacion ul {
