@@ -356,8 +356,8 @@ function crearCajaDeOpciones(titulo, lineas, nota = "") {
 }
 
 // Selector de cantidad (Figma 1293:4703). Avisa cada cambio con alCambiar().
-function crearSelectorDeCantidad({ etiqueta, detalle, minimo, alCambiar }) {
-  let cantidad = minimo;
+function crearSelectorDeCantidad({ etiqueta, detalle, minimo, inicial = minimo, alCambiar }) {
+  let cantidad = Math.max(minimo, inicial);
 
   const fila = crearElemento("div", "selector");
   const textos = crearElemento("div", "selector__textos");
@@ -390,13 +390,18 @@ function crearSelectorDeCantidad({ etiqueta, detalle, minimo, alCambiar }) {
 }
 
 // Un selector por platillo, o uno por cada tipo (pupusas). En cada cambio avisa el
-// total y la línea que se apartaría.
-function crearCajaDeCantidad(platillo, alCambiar) {
+// total y la línea que se apartaría. "anterior" es una línea que ya se había elegido.
+function crearCajaDeCantidad(platillo, alCambiar, anterior = null) {
   const tipos = platillo.opciones?.find((grupo) => grupo.id === "tipo")?.valores;
   const filas = tipos ? tipos.map((tipo) => tipo.nombre) : ["Cantidad"];
   // Con tipos, cada uno empieza en 0 y se necesita al menos 1 en total
   const minimo = tipos ? 0 : 1;
-  const cantidades = Object.fromEntries(filas.map((fila) => [fila, minimo]));
+  const cantidades = Object.fromEntries(
+    filas.map((fila) => {
+      const elegida = tipos ? anterior?.opciones.tipo?.[fila] : anterior?.cantidad;
+      return [fila, elegida ?? minimo];
+    }),
+  );
   const avisar = () => {
     const linea = tipos
       ? crearLineaPorTipos(platillo.id, cantidades)
@@ -415,6 +420,7 @@ function crearCajaDeCantidad(platillo, alCambiar) {
         etiqueta,
         detalle: `${formatearPrecio(platillo.precio)} c/u`,
         minimo,
+        inicial: cantidades[etiqueta],
         alCambiar: (cantidad) => {
           cantidades[etiqueta] = cantidad;
           avisar();
@@ -521,7 +527,7 @@ function crearAccionesDeDetalle(platillo, esDeHoy) {
       boton.disabled = total === 0;
       const precio = formatearPrecio(calcularSubtotal(platillo.precio, total));
       boton.textContent = total > 1 ? `Apartar ${total} · ${precio}` : `Apartar · ${precio}`;
-    });
+    }, lineaDeInvitado?.id === platillo.id ? lineaDeInvitado : null);
     return [caja, boton];
   }
 

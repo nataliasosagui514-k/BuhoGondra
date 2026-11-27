@@ -101,9 +101,6 @@ function borrarPedidoEnCurso() {
 
 /* ---------- Opiniones ---------- */
 
-// TODO: sin sesión, el autor es "Tú". La revisión de sesión y de persona invitada
-// (que solo puede leer) se hace en la fase de Registro.
-const AUTOR_SIN_SESION = "Tú";
 const MAXIMO_CARACTERES_OPINION = 200;
 
 // Una opinión sirve si tiene platillo, autor, de 1 a 5 estrellas, texto corto y fecha.
@@ -143,11 +140,12 @@ function obtenerOpiniones(platilloId) {
     .sort((una, otra) => new Date(otra.fecha) - new Date(una.fecha));
 }
 
-// La opinión propia sobre un platillo, o null si todavía no la ha escrito.
+// La opinión de la sesión sobre un platillo, o null si no hay sesión o no la ha escrito.
 function obtenerMiOpinion(platilloId) {
+  const correo = obtenerSesion()?.correo;
   return (
     obtenerOpinionesGuardadas().find(
-      (opinion) => opinion.platilloId === platilloId && opinion.autor === AUTOR_SIN_SESION,
+      (opinion) => opinion.platilloId === platilloId && opinion.autor === correo,
     ) ?? null
   );
 }

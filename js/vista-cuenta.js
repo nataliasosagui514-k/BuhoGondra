@@ -1,5 +1,5 @@
-// Pantallas de cuenta: Splash, registro, inicio de sesión y recuperar contraseña. Las
-// reglas están en js/cuenta.js.
+// Pantallas de cuenta: Splash, registro, inicio de sesión, recuperar contraseña y la
+// ventana de invitado. Las reglas están en js/cuenta.js.
 
 /* ---------- Piezas comunes ---------- */
 
@@ -400,7 +400,8 @@ function dibujarRegistroCorreo(contenedor) {
 
   montarPantallaDeCuenta(
     contenedor,
-    crearEncabezadoDeCuenta(() => volverA("#/login")),
+    // Atrás regresa a la pantalla desde la que se llegó
+    crearEncabezadoDeCuenta(() => (regreso ? regresarA(regreso) : volverA("#/login"))),
     crearTitulosDeCuenta({
       paso: "PASO 1 DE 3",
       titulo: "Crea tu cuenta",
@@ -751,15 +752,28 @@ function dibujarLogin(contenedor) {
   filaOlvidaste.append(olvidaste);
 
   const entrar = crearBotonDeEnvio("Iniciar sesión");
+  // N15b: si se venía a apartar, un aviso recuerda el platillo
+  const paraApartar = regreso?.tipo === "apartar" ? regreso : null;
+  const recordatorio =
+    paraApartar &&
+    crearAviso(
+      "info",
+      "Inicia sesión para apartar",
+      `${paraApartar.platillo} te espera. Al entrar, regresas a ese platillo.`,
+    );
   let aviso = null;
   const quitarAviso = () => {
     aviso?.remove();
     aviso = null;
     entrar.textContent = "Iniciar sesión";
     alVolverLaConexion = null;
+    if (recordatorio && !recordatorio.isConnected) {
+      formulario.before(recordatorio);
+    }
   };
   const mostrarError = (...datos) => {
     quitarAviso();
+    recordatorio?.remove();
     aviso = crearAviso(...datos);
     aviso.setAttribute("role", "alert");
     formulario.before(aviso);
@@ -769,9 +783,11 @@ function dibujarLogin(contenedor) {
   const lema = crearElemento("p", "marca__lema", "El menú de las cafeterías UCA, en tu mano");
   marca.append(crearMarca("h1"), crearImagen("marca__imagen", "img/buho-taza.png"), lema);
 
-  const comoInvitado = crearBotonDeTexto("Ver el menú como invitado", () => {
-    location.hash = "#/menu";
-  });
+  const comoInvitado = paraApartar
+    ? crearBotonDeTexto("Volver al platillo", () => regresarA(paraApartar))
+    : crearBotonDeTexto("Ver el menú como invitado", () => {
+        location.hash = "#/menu";
+      });
   const pie = crearPieDeCuenta("¿No tienes cuenta?", "Crea tu cuenta", () => {
     location.hash = "#/registro/correo";
   });
@@ -823,6 +839,9 @@ function dibujarLogin(contenedor) {
   }
 
   montarPantallaDeCuenta(contenedor, espacio, marca, formulario);
+  if (recordatorio) {
+    formulario.before(recordatorio);
+  }
   // Con el correo ya escrito tras cambiar la contraseña, el cursor queda en ella (11)
   if (enfocarContraseña) {
     enfocarContraseña = false;
@@ -980,9 +999,72 @@ function dibujarRecuperarNueva(contenedor) {
   );
 }
 
+/* ---------- Invitado (Figma 1003:4839 y sección 1429:10116) ---------- */
+
+// A dónde se regresa al entrar: { hash, tipo, platillo }. Solo en memoria
+let regreso = null;
+// Lo que una persona invitada había elegido al tocar "Apartar"
+let lineaDeInvitado = null;
+
+// Única función que crea la ventana de invitado. Tocar fuera es "Ahora no": se queda
+// en la pantalla.
+function pedirCuenta(contenedor, { titulo, mensaje, destino }) {
+  const ir = (ruta) => {
+    regreso = destino;
+    location.hash = ruta;
+  };
+  const ventana = crearVentana({
+    tipo: "invitado",
+    titulo,
+    mensaje,
+    textoBoton: "Iniciar sesión",
+    alTocar: () => ir("#/login"),
+    segundo: { texto: "Crear cuenta", alTocar: () => ir("#/registro/correo") },
+    alCerrar: () => {
+      ventana.close();
+      ventana.remove();
+    },
+  });
+  abrirDialogo(contenedor, ventana);
+}
+
+// N15a: "Inicia sesión para apartar"
+function pedirCuentaParaApartar(platillo, linea) {
+  lineaDeInvitado = linea;
+  pedirCuenta(document.getElementById("contenido"), {
+    titulo: "Inicia sesión para apartar",
+    mensaje:
+      "Necesitas tu cuenta UCA para apartar y recibir tu ticket con PIN. Después regresas a este platillo.",
+    destino: { hash: location.hash, tipo: "apartar", platillo: platillo.nombre },
+  });
+}
+
+// Vuelve a la pantalla desde la que se pidió la cuenta
+function regresarA({ hash }) {
+  volverA(hash.split("?")[0], hash);
+}
+
+// Al salir de las pantallas de cuenta se olvida lo que quedó a medias
+function salirDeCuenta() {
+  regreso = null;
+  registro = crearRegistroVacio();
+  recuperacion = { correo: "", verificado: false };
+}
+
 /* ---------- Entrar a la app ---------- */
 
-// Lo que pasa al iniciar sesión o crear la cuenta.
+// Lo que pasa al iniciar sesión o crear la cuenta: va al menú, o regresa a donde se
+// estaba si venía como invitado.
 function terminarEntrada() {
-  location.replace("#/menu");
+  const destino = regreso;
+  regreso = null;
+  if (!destino) {
+    location.replace("#/menu");
+    return;
+  }
+  regresarA(destino);
+  if (destino.tipo === "apartar") {
+    // N15c
+    mostrarAviso("exito", "Ya iniciaste sesión", `Ahora puedes apartar tu ${destino.platillo}.`);
+  }
 }

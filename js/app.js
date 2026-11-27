@@ -9,6 +9,7 @@ function crearPantallaDeCuenta(titulo, preparar) {
     sinNavegacion: true,
     plantilla: "plantilla-cuenta",
     preparar,
+    deCuenta: true,
   };
 }
 
@@ -38,6 +39,7 @@ const pantallas = {
     plantilla: "plantilla-ayuda-puntos",
     preparar: dibujarAyudaDePuntos,
   },
+  // TODO (fase de Más): aquí irá "Iniciar sesión" para invitados y cerrar sesión
   "#/mas": { titulo: "Más", enBarra: true },
   // Se abre con el calendario del menú; también dibuja su propio encabezado
   "#/semana": {
@@ -187,7 +189,11 @@ function mostrarPantalla() {
     pestana = ruta,
     id,
     parametros,
+    deCuenta = false,
   } = buscarPantalla(location.hash);
+  if (!deCuenta) {
+    salirDeCuenta();
+  }
 
   document.title = `${titulo} · BúhoGondra`;
   document.getElementById("titulo-pantalla").textContent = titulo;

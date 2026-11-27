@@ -229,7 +229,7 @@ function crearVentana({ tipo, titulo, destacado, mensaje, textoBoton, alTocar, s
     circulo,
     encabezado,
     ...(destacado ? [crearElemento("p", "ventana__destacado", destacado)] : []),
-    crearElemento("p", "ventana__mensaje", mensaje),
+    ...(mensaje ? [crearElemento("p", "ventana__mensaje", mensaje)] : []),
     crearBotonInferior(textoBoton, alTocar),
     ...(segundo ? [crearBotonInferior(segundo.texto, segundo.alTocar, "contorno")] : []),
   );
@@ -281,9 +281,15 @@ function mostrarHorarioCerrado(contenedor) {
 
 /* ---------- Apartar un platillo ---------- */
 
-// Lo que hace el botón "Apartar": recuerda lo elegido y pasa a hora y cafetería.
+// Lo que hace el botón "Apartar": recuerda lo elegido y pasa a hora y cafetería. Sin
+// sesión, aparece la ventana de invitado.
 function apartar(platillo, linea) {
   guardarSeleccion(linea);
+  if (!obtenerSesion()) {
+    pedirCuentaParaApartar(platillo, linea);
+    return;
+  }
+  lineaDeInvitado = null;
   location.hash = `#/apartar/${platillo.id}`;
 }
 
@@ -558,6 +564,11 @@ function dibujarApartar(contenedor, { id }) {
   });
   const platillo = obtenerPlatilloDeHoy(contenedor, id);
   if (!platillo) {
+    return;
+  }
+  // Para apartar se necesita una cuenta
+  if (!obtenerSesion()) {
+    location.replace(`#/platillo/${id}`);
     return;
   }
   if (!estaAbiertoApartar()) {
@@ -854,7 +865,9 @@ function redactarAvisosDelTicket({ horaRecogida, cafeteria }) {
 }
 
 function dibujarTicket(contenedor, { id }) {
-  const pedido = obtenerPedidos().find((uno) => uno.id === id);
+  // Cada quien ve solo sus tickets: el PIN no se muestra en otra cuenta
+  const autor = obtenerSesion()?.correo ?? AUTOR_INVITADO;
+  const pedido = obtenerPedidos().find((uno) => uno.id === id && uno.autor === autor);
   if (!pedido) {
     location.replace("#/menu");
     return;

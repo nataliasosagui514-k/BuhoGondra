@@ -80,6 +80,16 @@ function guardarCuenta(correo, cuenta) {
   return escribirDato(CLAVE_CUENTAS, { ...obtenerCuentas(), [correo]: cuenta });
 }
 
+// Cómo se muestra el autor de una opinión. El correo nunca se muestra.
+// TODO: Figma solo muestra nombres de ejemplo; "Tú" y la inicial del apellido se decidieron aquí
+function nombrarAutor(autor) {
+  if (autor === obtenerSesion()?.correo) {
+    return "Tú";
+  }
+  const cuenta = obtenerCuenta(autor);
+  return cuenta ? `${cuenta.nombre} ${cuenta.apellido.charAt(0)}.` : autor;
+}
+
 // La sesión guarda solo el correo, el tipo, el búho y la fecha de inicio.
 function abrirSesion(correo, { tipo, buho }) {
   const sesion = { correo, tipo, buho, inicio: new Date().toISOString() };

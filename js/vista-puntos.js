@@ -189,28 +189,6 @@ function crearTarjetaDePremio(premio, acciones) {
   return elemento;
 }
 
-/* ---------- Invitado (Figma 1003:4839) ---------- */
-
-// "Acumula puntos y gana premios". Tocar fuera es "Ahora no": se queda en la pantalla.
-function crearVentanaDeInvitado() {
-  // TODO (fase de Registro): "Iniciar sesión" lleva a la pantalla 01 y "Crear cuenta"
-  // a la 02; después de entrar se regresa a Puntos
-  const avisarProximamente = () => mostrarAviso("info", "Próximamente");
-  const ventana = crearVentana({
-    tipo: "invitado",
-    titulo: "Acumula puntos y gana premios",
-    mensaje: "Para que puedas comenzar a acumular puntos, inicia sesión o regístrate.",
-    textoBoton: "Iniciar sesión",
-    alTocar: avisarProximamente,
-    segundo: { texto: "Crear cuenta", alTocar: avisarProximamente },
-    alCerrar: () => {
-      ventana.close();
-      ventana.remove();
-    },
-  });
-  return ventana;
-}
-
 /* ---------- Puntos (Figma 1003:4398) ---------- */
 
 function abrirTicketDePremio(premio) {
@@ -257,7 +235,12 @@ function dibujarPuntos(contenedor) {
   // Sin sesión, la pantalla queda sin puntos ni nivel y encima va la ventana
   pintar();
   if (!obtenerSesion()) {
-    abrirDialogo(contenedor, crearVentanaDeInvitado());
+    // Figma 1003:4839
+    pedirCuenta(contenedor, {
+      titulo: "Acumula puntos y gana premios",
+      mensaje: "Para que puedas comenzar a acumular puntos, inicia sesión o regístrate.",
+      destino: { hash: "#/puntos", tipo: "puntos" },
+    });
   }
 }
 

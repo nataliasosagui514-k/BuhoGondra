@@ -125,7 +125,7 @@ function formatearFechaRelativa(fecha, ahora = new Date()) {
 function crearComentario(opinion) {
   const buho = document.createElement("img");
   buho.className = "avatar__buho";
-  buho.src = `img/avatar-buho-${opinion.buho ?? BUHO_SIN_ELEGIR}.png`;
+  buho.src = `img/avatar-buho-${opinion.buho ?? obtenerCuenta(opinion.autor)?.buho ?? BUHO_SIN_ELEGIR}.png`;
   buho.alt = "";
   const avatar = crearElemento("span", "avatar");
   avatar.append(buho);
@@ -133,7 +133,7 @@ function crearComentario(opinion) {
   const fecha = crearElemento("time", "comentario__fecha", formatearFechaRelativa(opinion.fecha));
   fecha.dateTime = opinion.fecha;
   const textos = crearElemento("div", "comentario__textos");
-  textos.append(crearElemento("p", "comentario__nombre", opinion.autor), fecha);
+  textos.append(crearElemento("p", "comentario__nombre", nombrarAutor(opinion.autor)), fecha);
 
   const autor = crearElemento("div", "comentario__autor");
   autor.append(
@@ -259,6 +259,16 @@ function dibujarComentarios(contenedor, { id }) {
   }
   // Sin opiniones, escribir es la acción principal (M5c)
   escribir.classList.add(opiniones.length ? "boton--contorno" : "boton--primario");
+  // Una persona invitada solo puede leer (notas de Figma de M5)
+  if (!obtenerSesion()) {
+    escribir.addEventListener("click", (evento) => {
+      evento.preventDefault();
+      pedirCuenta(contenedor, {
+        titulo: "Inicia sesión o regístrate para calificar y comentar",
+        destino: { hash: location.hash, tipo: "opinion" },
+      });
+    });
+  }
 
   if (!opiniones.length) {
     resumen.remove();
@@ -311,6 +321,10 @@ function prepararSelectorDeEstrellas(bloque, inicial, alElegir) {
 
 function dibujarEscribirOpinion(contenedor, { id }) {
   const volverAComentarios = () => volverA(`#/comentarios/${id}`);
+  if (!obtenerSesion()) {
+    location.replace(`#/comentarios/${id}`);
+    return;
+  }
   if (!prepararPantallaDeOpiniones(contenedor, id, volverAComentarios)) {
     return;
   }
@@ -343,7 +357,7 @@ function dibujarEscribirOpinion(contenedor, { id }) {
     }
     const guardada = guardarOpinion({
       platilloId: id,
-      autor: AUTOR_SIN_SESION,
+      autor: obtenerSesion().correo,
       calificacion,
       texto: entrada.value.trim(),
       fecha: new Date().toISOString(),
