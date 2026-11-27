@@ -39,8 +39,8 @@ const pantallas = {
     plantilla: "plantilla-ayuda-puntos",
     preparar: dibujarAyudaDePuntos,
   },
-  // TODO (fase de Más): aquí irá "Iniciar sesión" para invitados y cerrar sesión
-  "#/mas": { titulo: "Más", enBarra: true },
+  // No es una pantalla: es un panel que se abre encima de la anterior (Figma 40)
+  "#/mas": { titulo: "Más", esPanel: true },
   // Se abre con el calendario del menú; también dibuja su propio encabezado
   "#/semana": {
     titulo: "Menú de la semana",
@@ -165,10 +165,19 @@ function recordarOrigen() {
   hashAnterior = location.hash;
 }
 
+// La pantalla que está dibujada y la última con barra, que es la que queda detrás del
+// panel Más
+let hashDibujado = null;
+let fondoDelPanel = "#/menu";
+
 // Cambia la dirección de la pantalla actual sin crear otra entrada en el historial.
 function cambiarDireccion(ruta) {
   history.replaceState(history.state, "", ruta);
   hashAnterior = location.hash;
+  if (fondoDelPanel === hashDibujado) {
+    fondoDelPanel = location.hash;
+  }
+  hashDibujado = location.hash;
 }
 
 // Muestra la pantalla que indica el hash de la dirección.
@@ -178,6 +187,39 @@ function mostrarPantalla() {
     history.replaceState(history.state, "", pantallaInicial);
   }
   recordarOrigen();
+  const pantalla = buscarPantalla(location.hash);
+  if (!pantalla.deCuenta) {
+    salirDeCuenta();
+  }
+
+  const panelAbierto = document.querySelector("#contenido > .panel");
+  if (pantalla.esPanel) {
+    abrirPanel(pantalla);
+    return;
+  }
+  // Al cerrar el panel, la pantalla de atrás sigue como estaba
+  if (panelAbierto && location.hash === hashDibujado) {
+    panelAbierto.remove();
+    const { titulo, ruta, pestana = ruta } = pantalla;
+    document.title = `${titulo} · BúhoGondra`;
+    marcarPestanaActiva(pestana);
+    return;
+  }
+  dibujarPantalla(pantalla, location.hash);
+}
+
+function abrirPanel({ titulo, ruta }) {
+  if (hashDibujado !== fondoDelPanel) {
+    dibujarPantalla(buscarPantalla(fondoDelPanel), fondoDelPanel);
+  }
+  const contenido = document.getElementById("contenido");
+  contenido.querySelector(":scope > .panel")?.remove();
+  document.title = `${titulo} · BúhoGondra`;
+  marcarPestanaActiva(ruta);
+  abrirDialogo(contenido, crearPanel());
+}
+
+function dibujarPantalla(pantalla, hash) {
   const {
     titulo,
     enBarra,
@@ -189,10 +231,10 @@ function mostrarPantalla() {
     pestana = ruta,
     id,
     parametros,
-    deCuenta = false,
-  } = buscarPantalla(location.hash);
-  if (!deCuenta) {
-    salirDeCuenta();
+  } = pantalla;
+  hashDibujado = hash;
+  if (!sinNavegacion) {
+    fondoDelPanel = hash;
   }
 
   document.title = `${titulo} · BúhoGondra`;

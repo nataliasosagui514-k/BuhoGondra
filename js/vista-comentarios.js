@@ -25,8 +25,13 @@ function crearIconoSvg(clase, caja, trazos) {
   icono.setAttribute("viewBox", `0 0 ${caja} ${caja}`);
   icono.setAttribute("aria-hidden", "true");
   trazos.forEach((trazo) => {
+    // Un trazo es la ruta sola o [x, y, ruta] si va desplazada dentro de la caja
+    const [x, y, forma] = Array.isArray(trazo) ? trazo : [0, 0, trazo];
     const ruta = document.createElementNS(espacio, "path");
-    ruta.setAttribute("d", trazo);
+    ruta.setAttribute("d", forma);
+    if (x || y) {
+      ruta.setAttribute("transform", `translate(${x} ${y})`);
+    }
     icono.append(ruta);
   });
   return icono;

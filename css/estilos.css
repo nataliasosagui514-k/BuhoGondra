@@ -327,6 +327,16 @@
   --alto-asa: 5px;
   --radio-asa: 3px;
 
+  /* Panel Más y sus filas (Figma 1050:4983) */
+  --ancho-panel: 312px;
+  --margen-izquierdo-panel: 78px;
+  --relleno-superior-panel: 54px;
+  --relleno-inferior-panel: 34px;
+  --alto-fila: 48px;
+  --alto-fila-con-detalle: 68px;
+  --tamano-punto-aviso: 10px;
+  --duracion-panel: 250ms;
+
   /* Tu ticket y "Ticket con PIN" (Figma 1374:9674 y 874:3386) */
   --margen-superior-ticket: 78px;
   --margen-inferior-ticket: 34px;
@@ -4104,4 +4114,206 @@ dialog:focus {
   font: inherit;
   text-decoration: underline;
   cursor: pointer;
+}
+
+/* ---------- Filas del panel y de sus pantallas (Figma 1050:4983) ---------- */
+.fila {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--espacio-16);
+  width: 100%;
+  min-height: var(--alto-fila);
+  padding: var(--espacio-12);
+  border: 0;
+  border-radius: var(--radio-imagen);
+  background: transparent;
+  color: var(--color-texto-principal);
+  font-family: var(--fuente-texto);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.fila:active {
+  background: var(--color-fondo-atenuado);
+}
+
+.fila:focus-visible {
+  outline: var(--borde-campo) solid var(--color-anillo-foco);
+  outline-offset: calc(-1 * var(--borde-campo));
+}
+
+.fila--con-detalle {
+  min-height: var(--alto-fila-con-detalle);
+}
+
+.fila__marco {
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+  color: var(--color-accion-primaria);
+}
+
+.fila__icono {
+  width: var(--tamano-icono);
+  height: var(--tamano-icono);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.fila__textos {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.fila__titulo {
+  font-family: var(--fuente-titulos);
+  font-size: var(--letra-texto-grande);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-texto-grande);
+}
+
+.fila__detalle {
+  color: var(--color-texto-secundario);
+  font-size: var(--letra-texto);
+  line-height: var(--linea-texto);
+  overflow-wrap: anywhere;
+}
+
+.fila__flecha {
+  flex-shrink: 0;
+  width: var(--tamano-flecha);
+  height: var(--tamano-flecha);
+  fill: none;
+  stroke: var(--color-texto-secundario);
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* "Eliminar cuenta" va en rojo */
+.fila--peligro,
+.fila--peligro .fila__marco,
+.fila--peligro .fila__titulo {
+  color: var(--color-texto-error);
+}
+
+/* ---------- Panel Más (Figma 1050:4983 y 1050:5203) ---------- */
+.panel {
+  width: min(var(--ancho-panel), calc(100% - var(--margen-izquierdo-panel)));
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  /* En pantallas anchas se queda en el borde derecho de la app, no de la ventana */
+  margin: 0 max(0px, calc((100% - var(--ancho-maximo-app)) / 2)) 0 auto;
+  padding: var(--relleno-superior-panel) var(--margen-lateral-pantalla)
+    var(--relleno-inferior-panel);
+  overflow-y: auto;
+  border: 0;
+  border-radius: var(--radio-tarjeta) 0 0 var(--radio-tarjeta);
+  background: var(--color-superficie);
+  color: var(--color-texto-principal);
+  touch-action: pan-y;
+}
+
+.panel[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .panel[open] {
+    animation: entrar-panel var(--duracion-panel) ease-out;
+  }
+}
+
+@keyframes entrar-panel {
+  from { translate: 100% 0; }
+  to { translate: 0 0; }
+}
+
+.panel__cabecera {
+  display: flex;
+  flex-shrink: 0;
+  align-items: flex-start;
+  gap: var(--espacio-12);
+  padding-bottom: var(--espacio-24);
+  border-bottom: var(--borde-fino) solid var(--color-borde-suave);
+}
+
+.panel__cabecera--invitado {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.panel__cabecera--invitado .detalle__boton {
+  flex-shrink: 0;
+  height: var(--alto-boton-compacto);
+  margin: 0;
+}
+
+.panel__cabecera--invitado .boton--texto {
+  align-self: center;
+}
+
+.panel__datos {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.panel__nombre {
+  font-family: var(--fuente-titulos);
+  font-size: var(--letra-titulo-3);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-titulo-3);
+  overflow-wrap: anywhere;
+}
+
+.panel__correo,
+.panel__invitacion {
+  color: var(--color-texto-secundario);
+  overflow-wrap: anywhere;
+}
+
+.panel__correo {
+  font-size: var(--letra-texto-pequeno);
+  line-height: var(--linea-texto-pequeno);
+}
+
+.panel__invitacion {
+  font-size: var(--letra-texto);
+  line-height: var(--linea-texto);
+}
+
+/* La etiqueta de docente es larga: puede ocupar dos renglones */
+.panel__datos .etiqueta {
+  height: auto;
+  min-height: var(--alto-etiqueta);
+  margin-top: var(--espacio-8);
+  white-space: normal;
+}
+
+.panel__filas {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-4);
+  padding-top: var(--espacio-16);
+}
+
+.panel__pie {
+  margin-top: auto;
+  padding-top: var(--espacio-16);
+  color: var(--color-texto-secundario);
+  font-size: var(--letra-nota);
+  font-weight: var(--peso-media);
+  line-height: var(--linea-nota);
+  letter-spacing: var(--interletra-nota);
 }
