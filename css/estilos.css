@@ -373,6 +373,34 @@
   --alto-foto-premio-grande: 160px;
   --ancho-foto-premio-grande: 256px;
   --tamano-foto-premio-marcador: 128px;
+
+  /* Cuenta (Figma, sección "Bloque 1 · Entrada y registro") */
+  --margen-inferior-cuenta: 34px;
+  --separacion-formulario: 25px;
+  --separacion-enlace-error: 2px;
+  --tamano-marca-error: 16px;
+  --tamano-icono-etiqueta: 14px;
+  --alto-casilla: 56px;
+  --alto-tarjeta-buho: 90px;
+  --tamano-marco-buho-perfil: 48px;
+  --tamano-imagen-buho-perfil: 56px;
+  --tamano-vista-buho: 256px;
+  --alto-vista-buho: 284px;
+  --ancho-opcion-buho: 81px;
+  --alto-opcion-buho: 86px;
+  --separacion-opciones-buho: 32px;
+  --tamano-circulo-buho: 69px;
+  --izquierda-circulo-buho: 6px;
+  --arriba-circulo-buho: 17px;
+  --tamano-imagen-opcion-buho: 104px;
+  --izquierda-imagen-buho: -11px;
+  --arriba-imagen-buho: -10px;
+  --borde-circulo-buho: 0.72px;
+  --borde-circulo-buho-elegido: 2.88px;
+  --borde-insignia-buho: 1.44px;
+  --izquierda-insignia-buho: 55px;
+  --arriba-insignia-buho: 66px;
+  --tamano-buho-bienvenida: 173px;
 }
 
 /* Reset básico */
@@ -3396,4 +3424,457 @@ dialog:focus {
 .premio-pantalla__imagen--marcador {
   width: var(--tamano-foto-premio-marcador);
   height: var(--tamano-foto-premio-marcador);
+}
+
+/* ---------- Cuenta: piezas comunes (Figma 940:4267) ---------- */
+.cuenta {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: var(--margen-superior-menu) var(--margen-lateral-pantalla)
+    var(--margen-inferior-cuenta);
+}
+
+.cuenta .encabezado-interno {
+  flex-shrink: 0;
+}
+
+.cuenta__encabezado {
+  font-family: var(--fuente-titulos);
+  font-size: var(--letra-titulo-3);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-titulo-3);
+}
+
+.cuenta__titulos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-8);
+  margin-top: var(--espacio-16);
+}
+
+.cuenta__paso {
+  color: var(--color-texto-secundario);
+  font-size: var(--letra-texto-pequeno);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-texto-pequeno);
+}
+
+.cuenta__titulo {
+  font-size: var(--letra-titulo-1);
+  line-height: var(--linea-titulo-1);
+  letter-spacing: var(--interletra-titulo-1);
+}
+
+.cuenta__descripcion {
+  color: var(--color-texto-secundario);
+  overflow-wrap: anywhere; /* un correo largo no debe salirse */
+}
+
+.cuenta__formulario {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  margin-top: var(--espacio-24);
+}
+
+.cuenta__campos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--separacion-formulario);
+}
+
+.cuenta__acciones {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-4);
+  margin-top: auto;
+  padding-top: var(--espacio-24);
+}
+
+.cuenta__acciones .boton--texto {
+  align-self: center;
+}
+
+.cuenta__pie {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--espacio-4);
+  color: var(--color-texto-secundario);
+  font-size: var(--letra-texto);
+  line-height: var(--linea-texto);
+}
+
+.cuenta__nota {
+  margin-bottom: var(--espacio-4);
+  color: var(--color-texto-secundario);
+  font-size: var(--letra-texto-pequeno);
+  line-height: var(--linea-texto-pequeno);
+  text-align: center;
+}
+
+/* En 02d va casi pegado al mensaje de error: 2 px en lugar de 8 */
+.cuenta__enlace-izquierda {
+  align-self: flex-start;
+  margin-top: calc(var(--separacion-enlace-error) - var(--espacio-8));
+}
+
+/* Campo: ojo de la contraseña y error (Figma 964:4478) */
+.campo__control {
+  position: relative;
+}
+
+.campo__entrada::placeholder {
+  color: var(--color-texto-secundario);
+}
+
+.campo__entrada--con-ojo {
+  padding-right: calc(var(--alto-boton-compacto) + var(--espacio-12));
+}
+
+.campo__ojo {
+  position: absolute;
+  top: 50%;
+  right: var(--espacio-8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--alto-boton-compacto);
+  height: var(--alto-boton-compacto);
+  padding: 0;
+  transform: translateY(-50%);
+  border: 0;
+  border-radius: var(--radio-pildora);
+  background: transparent;
+  color: var(--color-texto-secundario);
+  cursor: pointer;
+}
+
+.campo__icono-ojo {
+  width: var(--tamano-icono);
+  height: var(--tamano-icono);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.campo__ojo[aria-pressed="true"] {
+  color: var(--color-texto-enlace);
+}
+
+.campo--error .campo__entrada {
+  border-color: var(--color-borde-error);
+}
+
+.campo__error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--espacio-4);
+  padding-left: var(--espacio-12);
+  color: var(--color-texto-error);
+  font-size: var(--letra-texto-pequeno);
+  line-height: var(--linea-texto-pequeno);
+}
+
+/* El signo acompaña al color: el error no depende solo de él */
+.campo__error::before {
+  content: "!";
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--tamano-marca-error);
+  height: var(--tamano-marca-error);
+  border-radius: var(--radio-pildora);
+  background: var(--color-estado-error);
+  color: var(--color-texto-sobre-peligro);
+  font-size: var(--letra-nota);
+  font-weight: var(--peso-seminegrita);
+}
+
+/* Tipo de cuenta (Figma 963:4600 y 963:4606) */
+.cuenta__correo,
+.cuenta__tipo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-8);
+}
+
+.cuenta__tipo:empty {
+  display: none;
+}
+
+.etiqueta--estudiante,
+.etiqueta--docente {
+  align-self: flex-start;
+}
+
+.etiqueta--estudiante {
+  background: var(--color-fondo-info-suave);
+  color: var(--color-texto-enlace);
+}
+
+.etiqueta--docente {
+  background: var(--color-fondo-exito-suave);
+  color: var(--color-texto-sobre-exito-suave);
+}
+
+.etiqueta__icono {
+  flex-shrink: 0;
+  width: var(--tamano-icono-etiqueta);
+  height: var(--tamano-icono-etiqueta);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+
+/* ---------- Código de 6 dígitos (Figma 940:4307 y 964:4642) ---------- */
+.cuenta__formulario--codigo .cuenta__campos {
+  gap: var(--espacio-8);
+}
+
+.codigo {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: var(--espacio-8);
+}
+
+.codigo__casilla {
+  width: 100%;
+  height: var(--alto-casilla);
+  padding: 0;
+  border: var(--borde-fino) solid var(--color-borde-normal);
+  border-radius: var(--radio-chip);
+  background: var(--color-superficie);
+  color: var(--color-texto-principal);
+  font-family: var(--fuente-titulos);
+  font-size: var(--letra-titulo-2);
+  font-weight: var(--peso-seminegrita);
+  text-align: center;
+}
+
+.codigo__casilla:focus {
+  border: var(--borde-campo) solid var(--color-borde-foco);
+  outline: 0;
+}
+
+.codigo--error .codigo__casilla {
+  border-color: var(--color-borde-error);
+}
+
+.cuenta__campos .codigo + .aviso {
+  margin-top: var(--espacio-4);
+}
+
+.codigo__opciones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+/* ---------- Tus datos y elegir búho (Figma 942:4274 y 942:4317) ---------- */
+.buho-de-perfil {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-12);
+  min-height: var(--alto-tarjeta-buho);
+  padding: var(--espacio-12) var(--espacio-8) var(--espacio-12) var(--espacio-16);
+  border: var(--borde-fino) solid var(--color-borde-normal);
+  border-radius: var(--radio-imagen);
+  background: var(--color-superficie);
+}
+
+.buho-de-perfil__marco {
+  position: relative;
+  flex-shrink: 0;
+  width: var(--tamano-marco-buho-perfil);
+  height: var(--tamano-marco-buho-perfil);
+  border-radius: var(--radio-pildora);
+  background: var(--color-fondo-info-suave);
+}
+
+.buho-de-perfil__imagen {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--tamano-imagen-buho-perfil);
+  height: var(--tamano-imagen-buho-perfil);
+  transform: translate(-50%, -50%);
+}
+
+.buho-de-perfil__textos {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--espacio-4);
+  min-width: 0;
+  font-size: var(--letra-texto);
+  line-height: var(--linea-texto);
+}
+
+.buho-de-perfil__titulo {
+  font-weight: var(--peso-seminegrita);
+}
+
+.buho-de-perfil__detalle {
+  color: var(--color-texto-secundario);
+}
+
+.cuenta__formulario--buho {
+  margin-top: var(--espacio-8);
+}
+
+.vista-de-buho {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--espacio-4);
+  min-height: var(--alto-vista-buho);
+}
+
+.vista-de-buho__imagen {
+  width: var(--tamano-vista-buho);
+  height: var(--tamano-vista-buho);
+}
+
+.vista-de-buho__nombre {
+  font-family: var(--fuente-titulos);
+  font-size: var(--letra-titulo-3);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-titulo-3);
+}
+
+.vista-de-buho__vacia {
+  color: var(--color-texto-secundario);
+  text-align: center;
+}
+
+.opciones-de-buho {
+  display: grid;
+  grid-template-columns: repeat(3, var(--ancho-opcion-buho));
+  justify-content: center;
+  gap: var(--espacio-16) var(--separacion-opciones-buho);
+  min-width: 0;
+  padding: 0;
+  border: 0;
+}
+
+.opcion-buho {
+  position: relative;
+  height: var(--alto-opcion-buho);
+  cursor: pointer;
+}
+
+/* El botón de opción cubre el búho y no se ve */
+.opcion-buho__entrada {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.opcion-buho__circulo {
+  position: absolute;
+  top: var(--arriba-circulo-buho);
+  left: var(--izquierda-circulo-buho);
+  width: var(--tamano-circulo-buho);
+  height: var(--tamano-circulo-buho);
+  border: var(--borde-circulo-buho) solid var(--color-borde-suave);
+  border-radius: var(--radio-pildora);
+  background: var(--color-fondo-info-suave);
+}
+
+.opcion-buho__imagen {
+  position: absolute;
+  top: var(--arriba-imagen-buho);
+  left: var(--izquierda-imagen-buho);
+  width: var(--tamano-imagen-opcion-buho);
+  height: var(--tamano-imagen-opcion-buho);
+  max-width: none;
+}
+
+.opcion-buho__insignia {
+  position: absolute;
+  top: var(--arriba-insignia-buho);
+  left: var(--izquierda-insignia-buho);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--tamano-marca);
+  height: var(--tamano-marca);
+  border: var(--borde-insignia-buho) solid var(--color-superficie);
+  border-radius: var(--radio-pildora);
+  background: var(--color-accion-secundaria);
+  color: var(--color-texto-sobre-secundario);
+}
+
+.opcion-buho__palomita {
+  width: var(--espacio-12);
+  height: var(--espacio-12);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.opcion-buho__entrada:checked ~ .opcion-buho__circulo {
+  border: var(--borde-circulo-buho-elegido) solid var(--color-accion-secundaria);
+}
+
+.opcion-buho__entrada:checked ~ .opcion-buho__insignia {
+  display: flex;
+}
+
+.opcion-buho__entrada:focus-visible ~ .opcion-buho__circulo {
+  outline: var(--borde-campo) solid var(--color-anillo-foco);
+  outline-offset: var(--separacion-foco);
+}
+
+/* ---------- Términos y condiciones (Figma 950:4689) ---------- */
+.bienvenida {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--espacio-12);
+  margin-block: auto;
+  text-align: center;
+}
+
+.bienvenida__imagen {
+  width: var(--tamano-buho-bienvenida);
+  height: var(--tamano-buho-bienvenida);
+  margin-bottom: calc(var(--espacio-32) - var(--espacio-4));
+}
+
+.bienvenida__titulo {
+  font-size: var(--letra-titulo-pantalla);
+  line-height: var(--linea-titulo-pantalla);
+  letter-spacing: var(--interletra-titulo-pantalla);
+}
+
+.bienvenida__texto {
+  color: var(--color-texto-secundario);
+}
+
+.bienvenida__enlace {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-texto-enlace);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
 }

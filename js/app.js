@@ -1,5 +1,17 @@
 // Navegación por hash y avisos de BúhoGondra.
 
+// Las pantallas de cuenta dibujan todo su contenido y no llevan barra.
+function crearPantallaDeCuenta(titulo, preparar) {
+  return {
+    titulo,
+    enBarra: false,
+    sinEncabezado: true,
+    sinNavegacion: true,
+    plantilla: "plantilla-cuenta",
+    preparar,
+  };
+}
+
 // Pantallas disponibles. Las que no están en la barra muestran el botón de volver.
 const pantallas = {
   // El menú dibuja su propio encabezado
@@ -36,6 +48,12 @@ const pantallas = {
     plantilla: "plantilla-semana",
     preparar: dibujarSemana,
   },
+  // Cuenta: sin barra (se dibujan en js/vista-cuenta.js)
+  "#/registro/correo": crearPantallaDeCuenta("Crea tu cuenta", (c) => dibujarRegistroCorreo(c)),
+  "#/registro/codigo": crearPantallaDeCuenta("Verifica tu correo", (c) => dibujarRegistroCodigo(c)),
+  "#/registro/datos": crearPantallaDeCuenta("Crea tu cuenta", (c) => dibujarRegistroDatos(c)),
+  "#/registro/buho": crearPantallaDeCuenta("Elige a tu búhi", (c) => dibujarRegistroBuho(c)),
+  "#/registro/terminar": crearPantallaDeCuenta("Bienvenida", (c) => dibujarRegistroTerminar(c)),
   // Ruta oculta: no tiene enlace en la app
   "#/componentes": {
     titulo: "Componentes",
