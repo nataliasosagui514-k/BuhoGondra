@@ -101,6 +101,11 @@ const pantallas = {
     plantilla: "plantilla-semana",
     preparar: dibujarSemana,
   },
+  // Chat de Búhi: una sola pantalla; los pasos no crean entradas en el historial
+  "#/chatbot": {
+    ...crearPantallaDeCuenta("Búhi, tu asistente", (c, datos) => dibujarChatbot(c, datos)),
+    deCuenta: false,
+  },
   // Cuenta: sin barra (se dibujan en js/vista-cuenta.js)
   "#/splash": crearPantallaDeCuenta("BúhoGondra", (c) => dibujarSplash(c)),
   "#/login": crearPantallaDeCuenta("Inicia sesión", (c) => dibujarLogin(c)),
