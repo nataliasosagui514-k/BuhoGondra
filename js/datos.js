@@ -66,19 +66,25 @@ const SOLO_LA_PORCION = {
   porDefecto: null, // si no se elige, vale el precio del platillo
 };
 
+/* "enCombo" es cómo se nombra cada alternativa en la caja "El combo incluye" del
+   detalle (Figma 1193:7688). Esa frase no menciona "Sin guarnición" ni "Sin ensalada". */
 const GUARNICION = {
   id: "guarnicion",
   nombre: "Guarnición",
-  valores: [{ nombre: "Arroz" }, { nombre: "Casamiento" }, { nombre: "Sin guarnición" }],
+  valores: [
+    { nombre: "Arroz", enCombo: "Arroz" },
+    { nombre: "Casamiento", enCombo: "casamiento" },
+    { nombre: "Sin guarnición" },
+  ],
   porDefecto: "Arroz",
 };
 const ENSALADA = {
   id: "ensalada",
   nombre: "Ensalada",
   valores: [
-    { nombre: "Ensalada fresca" },
-    { nombre: "Ensalada de coditos" },
-    { nombre: "Vegetales al vapor" },
+    { nombre: "Ensalada fresca", enCombo: "Ensalada fresca" },
+    { nombre: "Ensalada de coditos", enCombo: "de coditos" },
+    { nombre: "Vegetales al vapor", enCombo: "vegetales al vapor" },
     { nombre: "Sin ensalada" },
   ],
   porDefecto: "Ensalada fresca",
@@ -86,13 +92,21 @@ const ENSALADA = {
 const BEBIDA = {
   id: "bebida",
   nombre: "Bebida",
-  valores: [{ nombre: "Fresco de Tamarindo" }, { nombre: "Fresco de Jamaica" }],
+  valores: [
+    { nombre: "Fresco de Tamarindo", enCombo: "Fresco de tamarindo" },
+    { nombre: "Fresco de Jamaica", enCombo: "de Jamaica" },
+  ],
   porDefecto: "Fresco de Tamarindo",
 };
 const TORTILLAS = {
   id: "tortillas",
   nombre: "Tortillas",
-  valores: [{ nombre: "2 tortillas" }, { nombre: "1 tortilla" }, { nombre: "Sin tortillas" }],
+  prefijoEnCombo: "Tortillas: ",
+  valores: [
+    { nombre: "2 tortillas", enCombo: "2" },
+    { nombre: "1 tortilla", enCombo: "1" },
+    { nombre: "Sin tortillas", enCombo: "ninguna" },
+  ],
   porDefecto: "2 tortillas",
 };
 

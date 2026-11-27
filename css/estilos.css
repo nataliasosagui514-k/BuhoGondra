@@ -1115,6 +1115,13 @@ main.contenido--completo {
   list-style: none;
 }
 
+/* Opción por defecto del combo.
+   TODO: Figma no la marca en esta caja; se usa seminegrita y el texto principal */
+.caja__por-defecto {
+  color: var(--color-texto-principal);
+  font-weight: var(--peso-seminegrita);
+}
+
 .caja__nota,
 .selector__detalle {
   color: var(--color-texto-secundario);

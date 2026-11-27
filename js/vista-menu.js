@@ -205,7 +205,14 @@ function dibujarMenu(contenedor, { parametros }) {
 function crearCajaDeOpciones(titulo, lineas, nota = "") {
   const caja = crearElemento("section", "caja");
   const lista = crearElemento("ul", "caja__lista");
-  lista.append(...lineas.map((linea) => crearElemento("li", "caja__linea", linea)));
+  // Cada línea es un texto, o una lista de textos y elementos
+  lista.append(
+    ...lineas.map((linea) => {
+      const elemento = crearElemento("li", "caja__linea");
+      elemento.append(...[linea].flat());
+      return elemento;
+    }),
+  );
   caja.append(crearElemento("h2", "caja__titulo", titulo), lista);
   if (nota) {
     caja.append(crearElemento("p", "caja__nota", nota));
@@ -279,6 +286,26 @@ function crearCajaDeCantidad(platillo, alCambiarTotal) {
   return caja;
 }
 
+// Orden en que Figma nombra los grupos en la caja del combo (1193:7688)
+const ORDEN_EN_COMBO = ["guarnicion", "ensalada", "tortillas", "bebida"];
+
+// "• Arroz o casamiento": todas las alternativas del grupo, con la de siempre marcada.
+function crearLineaDeCombo(grupo) {
+  const alternativas = grupo.valores.filter((valor) => valor.enCombo);
+  const linea = [`• ${grupo.prefijoEnCombo ?? ""}`];
+  alternativas.forEach((valor, posicion) => {
+    if (posicion > 0) {
+      linea.push(posicion === alternativas.length - 1 ? " o " : ", ");
+    }
+    linea.push(
+      valor.nombre === grupo.porDefecto
+        ? crearElemento("strong", "caja__por-defecto", valor.enCombo)
+        : valor.enCombo,
+    );
+  });
+  return linea;
+}
+
 // Botón inferior que lleva a otra ruta.
 function crearBotonInferior(texto, alTocar, tipo = "primario") {
   const boton = crearElemento("button", `boton boton--${tipo} detalle__boton`, texto);
@@ -308,9 +335,16 @@ function crearAccionesDeDetalle(platillo) {
   const textoApartar = (precio) => `Apartar · ${formatearPrecio(precio)}`;
 
   if (platillo.categoria === "platos-fuertes") {
-    const incluye = platillo.opciones.map((grupo) => `• ${grupo.porDefecto}`);
+    const incluye = ORDEN_EN_COMBO.map((idGrupo) =>
+      platillo.opciones.find((grupo) => grupo.id === idGrupo),
+    )
+      .filter(Boolean)
+      .map(crearLineaDeCombo);
+    // En Figma, las sopas (sin guarnición) no llevan esta nota (1193:7745)
+    const llevaGuarnicion = platillo.opciones.some((grupo) => grupo.id === "guarnicion");
+    const nota = llevaGuarnicion ? "Los eliges en el siguiente paso." : "";
     return [
-      crearCajaDeOpciones("El combo incluye", incluye, "Los eliges en el siguiente paso."),
+      crearCajaDeOpciones("El combo incluye", incluye, nota),
       crearBotonInferior("Elegir acompañamientos", irAApartar),
     ];
   }
