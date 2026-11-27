@@ -1,8 +1,9 @@
-// Guardado local de pedidos, puntos y opiniones con localStorage.
+// Guardado local de pedidos, sesión, premios y opiniones con localStorage.
 // Si no está disponible, las funciones devuelven un valor vacío y la app sigue.
 
 const CLAVE_PEDIDOS = "buhogondra.pedidos";
-const CLAVE_PUNTOS = "buhogondra.puntos";
+const CLAVE_SESION = "buhogondra.sesion";
+const CLAVE_PREMIOS = "buhogondra.premios";
 const CLAVE_OPINIONES = "buhogondra.opiniones";
 
 // Lee un valor guardado; devuelve null si no existe o no se puede leer.
@@ -39,18 +40,24 @@ function guardarPedido(pedido) {
   return escribirDato(CLAVE_PEDIDOS, [...obtenerPedidos(), pedido]) ? pedido : null;
 }
 
-// Devuelve el total de puntos guardado (0 si no hay).
-function obtenerPuntos() {
-  const puntos = leerDato(CLAVE_PUNTOS);
-  return Number.isInteger(puntos) && puntos >= 0 ? puntos : 0;
+/* ---------- Sesión y premios ---------- */
+
+// La sesión abierta ({ correo }), o null si no hay.
+function obtenerSesion() {
+  const sesion = leerDato(CLAVE_SESION);
+  return typeof sesion?.correo === "string" ? sesion : null;
 }
 
-// Reemplaza el total de puntos. Devuelve la cantidad, o null si no se guardó.
-function guardarPuntos(cantidad) {
-  if (!Number.isInteger(cantidad) || cantidad < 0) {
-    return null;
-  }
-  return escribirDato(CLAVE_PUNTOS, cantidad) ? cantidad : null;
+// Los premios que ya se canjearon: { id, autor, pin, disponibleDesde }. Los puntos no
+// se guardan: se calculan con los pedidos (js/puntos.js).
+function obtenerPremiosCanjeados() {
+  const premios = leerDato(CLAVE_PREMIOS);
+  return Array.isArray(premios) ? premios : [];
+}
+
+// Devuelve lo guardado, o null si no se pudo guardar.
+function guardarPremioCanjeado(premio) {
+  return escribirDato(CLAVE_PREMIOS, [...obtenerPremiosCanjeados(), premio]) ? premio : null;
 }
 
 /* ---------- Pedido en curso y selección ---------- */

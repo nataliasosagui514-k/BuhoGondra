@@ -40,19 +40,24 @@ function calcularPuntos(platillos) {
   return [...porCategoria.values()].reduce((suma, puntos) => suma + puntos, 0);
 }
 
-// PIN al azar de 4 dígitos que no tenga otro pedido de ese día en esa cafetería.
+// PIN al azar de 4 dígitos que no esté en "usados". Lo usan los pedidos y los premios.
 // Es texto para no perder los ceros del principio ("0427").
+function generarPinLibre(usados, azar = Math.random) {
+  let pin;
+  do {
+    pin = String(Math.floor(azar() * 10 ** CIFRAS_DEL_PIN)).padStart(CIFRAS_DEL_PIN, "0");
+  } while (usados.has(pin));
+  return pin;
+}
+
+// El PIN de un pedido no se repite entre los de ese día en esa cafetería.
 function generarPin(pedidos, fecha, cafeteria, azar = Math.random) {
   const usados = new Set(
     pedidos
       .filter((pedido) => pedido.fecha === fecha && pedido.cafeteria === cafeteria)
       .map((pedido) => pedido.pin),
   );
-  let pin;
-  do {
-    pin = String(Math.floor(azar() * 10 ** CIFRAS_DEL_PIN)).padStart(CIFRAS_DEL_PIN, "0");
-  } while (usados.has(pin));
-  return pin;
+  return generarPinLibre(usados, azar);
 }
 
 // Consecutivo: "A-1043", "A-1044"…
@@ -65,13 +70,21 @@ function obtenerSiguienteNumero(pedidos) {
 
 /* ---------- El pedido que se guarda ---------- */
 
-// TODO (fase de Registro): sin sesión, el autor es "invitado". Falta la regla de lo
-// que puede hacer una persona invitada.
+// El autor es el correo de la sesión; sin sesión, "invitado" (esos pedidos no suman
+// puntos).
+// TODO (fase de Registro): falta la regla de lo que puede hacer una persona invitada.
 const AUTOR_INVITADO = "invitado";
 
 // Arma el pedido con los datos del diseño y ningún otro. "articulos" son las líneas
 // junto con su platillo, precio y cantidad; "anteriores", los pedidos ya guardados.
-function crearPedido({ articulos, fecha, cafeteria, horaRecogida, anteriores }) {
+function crearPedido({
+  articulos,
+  fecha,
+  cafeteria,
+  horaRecogida,
+  anteriores,
+  autor = AUTOR_INVITADO,
+}) {
   const numero = obtenerSiguienteNumero(anteriores);
   return {
     id: `${fecha}-${numero}`,
@@ -83,7 +96,7 @@ function crearPedido({ articulos, fecha, cafeteria, horaRecogida, anteriores }) 
     pin: generarPin(anteriores, fecha, cafeteria),
     numero,
     puntos: calcularPuntos(articulos.map(({ platillo }) => platillo)),
-    autor: AUTOR_INVITADO,
+    autor,
   };
 }
 

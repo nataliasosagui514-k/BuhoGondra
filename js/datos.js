@@ -353,11 +353,34 @@ const HORARIOS = {
 
 const LIMITE_UNIDADES_POR_PEDIDO = null; // null: no hay límite
 
-// Niveles de puntos y premio de cada uno
+// Niveles de puntos y premio de cada uno, de menor a mayor. "id" es el del premio.
+// TODO: no hay fotos de los premios; se usan las imágenes marcador de Figma. "fotoGrande"
+// es la de "Premio canjeado", que Figma solo dibuja para el postre.
 const NIVELES_PUNTOS = [
-  { nombre: "Búhi Pro", puntos: 50, premio: "Postre" },
-  { nombre: "Búhi Mega Pro", puntos: 100, premio: "Típico" },
-  { nombre: "Búhi Supremo", puntos: 150, premio: "Plato fuerte" },
+  {
+    id: "buhi-pro",
+    nombre: "Búhi Pro",
+    puntos: 50,
+    premio: "Postre",
+    foto: "img/premio-postre.png",
+    fotoGrande: "img/premio-postre-grande.png",
+  },
+  {
+    id: "buhi-mega-pro",
+    nombre: "Búhi Mega Pro",
+    puntos: 100,
+    premio: "Típico",
+    foto: "img/premio-tipico.png",
+    fotoGrande: null,
+  },
+  {
+    id: "buhi-supremo",
+    nombre: "Búhi Supremo",
+    puntos: 150,
+    premio: "Plato fuerte",
+    foto: "img/premio-plato-fuerte.png",
+    fotoGrande: null,
+  },
 ];
 
 /* Opiniones de ejemplo, marcadas con "ejemplo": true. Cubren SOLO algunos platillos

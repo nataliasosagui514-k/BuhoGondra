@@ -715,6 +715,7 @@ function confirmarPedido(contenedor, { articulos, horaRecogida, cafeteria }) {
     cafeteria,
     horaRecogida,
     anteriores: obtenerPedidos(),
+    autor: obtenerSesion()?.correo,
   });
   if (!guardarPedido(pedido)) {
     contenedor.querySelector("dialog.hoja")?.remove(); // el aviso debe verse
@@ -722,7 +723,6 @@ function confirmarPedido(contenedor, { articulos, horaRecogida, cafeteria }) {
     mostrarAviso("error", "No se pudo guardar tu pedido");
     return;
   }
-  guardarPuntos(obtenerPuntos() + pedido.puntos);
   borrarPedidoEnCurso();
   pedidoRecienApartado = pedido.id;
   // El ticket reemplaza a "Hora y cafetería": volver atrás no repite el pedido
