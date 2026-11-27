@@ -425,6 +425,33 @@ function dibujarRegistroCodigo(contenedor) {
     return;
   }
   const cambiarCorreo = () => volverA("#/registro/correo");
+  // TODO: quitar este aviso cuando haya envío real de correos. La app no tiene servidor,
+  // así que en modo de demostración el código se muestra aquí, sobre sus casillas.
+  const demostracion = crearAviso("info", "");
+  demostracion.classList.add("codigo__demostracion");
+  const mostrarCodigo = (codigo) => {
+    demostracion.querySelector(".aviso__titulo").textContent =
+      `Modo demostración: tu código es ${codigo}`;
+  };
+  const formulario = crearFormularioDeCodigo({
+    textoBoton: "Verificar",
+    alReenviar: () => mostrarCodigo(generarCodigo(registro.correo)),
+    alCambiarCorreo: cambiarCorreo,
+    alVerificar: (codigo) => {
+      if (!verificarCodigo(codigo)) {
+        return false;
+      }
+      registro.verificado = true;
+      mostrarAviso("exito", "Correo verificado");
+      location.hash = "#/registro/datos";
+      return true;
+    },
+  });
+  // Un código ya usado no se vuelve a mostrar
+  if (codigoActivo) {
+    mostrarCodigo(codigoActivo.codigo);
+    formulario.querySelector(".cuenta__campos").prepend(demostracion);
+  }
   montarPantallaDeCuenta(
     contenedor,
     crearEncabezadoDeCuenta(cambiarCorreo),
@@ -433,24 +460,13 @@ function dibujarRegistroCodigo(contenedor) {
       titulo: "Verifica tu correo",
       descripcion: `Te enviamos un código de 6 dígitos a ${registro.correo}. Vence en 10 minutos.`,
     }),
-    crearFormularioDeCodigo({
-      textoBoton: "Verificar",
-      alReenviar: () => generarCodigo(registro.correo),
-      alCambiarCorreo: cambiarCorreo,
-      alVerificar: (codigo) => {
-        if (!verificarCodigo(codigo)) {
-          return false;
-        }
-        registro.verificado = true;
-        mostrarAviso("exito", "Correo verificado");
-        location.hash = "#/registro/datos";
-        return true;
-      },
-    }),
+    formulario,
   );
 }
 
 // 04 y 06 · Tus datos
+// TODO: revisar con Figma. La cuenta no se crea aquí sino en 07, con "Aceptar y
+// continuar"; nombre y apellido se quedan en esta pantalla (#/registro/datos).
 function dibujarRegistroDatos(contenedor) {
   if (faltaUnPaso(registro.verificado)) {
     return;
@@ -1001,7 +1017,7 @@ function dibujarRecuperarNueva(contenedor) {
 
 /* ---------- Invitado (Figma 1003:4839 y sección 1429:10116) ---------- */
 
-// A dónde se regresa al entrar: { hash, tipo, platillo }. Solo en memoria
+// A dónde se regresa al entrar: { hash, tipo }. Solo en memoria
 let regreso = null;
 // Lo que una persona invitada había elegido al tocar "Apartar"
 let lineaDeInvitado = null;
@@ -1035,7 +1051,7 @@ function pedirCuentaParaApartar(platillo, linea) {
     titulo: "Inicia sesión para apartar",
     mensaje:
       "Necesitas tu cuenta UCA para apartar y recibir tu ticket con PIN. Después regresas a este platillo.",
-    destino: { hash: location.hash, tipo: "apartar", platillo: platillo.nombre },
+    destino: { hash: location.hash, tipo: "apartar" },
   });
 }
 
@@ -1065,6 +1081,7 @@ function terminarEntrada() {
   regresarA(destino);
   if (destino.tipo === "apartar") {
     // N15c
-    mostrarAviso("exito", "Ya iniciaste sesión", `Ahora puedes apartar tu ${destino.platillo}.`);
+    // TODO: revisar con Figma, que nombra el platillo en este aviso
+    mostrarAviso("exito", "Ya iniciaste sesión", "Ahora puedes apartar tu pedido.");
   }
 }

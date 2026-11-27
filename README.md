@@ -22,7 +22,9 @@ La app no tiene servidor: las cuentas se guardan en este navegador y **no se env
 
 ### Código de verificación
 
-Al registrarte o recuperar la contraseña, el código de 6 dígitos aparece en la **consola del navegador** (tecla F12, pestaña "Consola"):
+Al registrarte, la pantalla "Verifica tu correo" muestra el aviso "Modo demostración: tu código es NNNNNN". Se quitará cuando haya envío real de correos.
+
+Al recuperar la contraseña, el código de 6 dígitos solo aparece en la **consola del navegador** (tecla F12, pestaña "Consola"), porque un aviso en pantalla revelaría si el correo tiene cuenta:
 
 ```
 BúhoGondra (demostración) · Código para 00123425@uca.edu.sv: 482173. Vence en 10 minutos.

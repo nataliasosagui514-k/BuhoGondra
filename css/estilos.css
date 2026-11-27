@@ -3862,6 +3862,11 @@ dialog:focus {
   gap: var(--espacio-8);
 }
 
+/* El aviso de modo demostración va un poco más separado de las casillas */
+.codigo__demostracion {
+  margin-bottom: var(--espacio-8);
+}
+
 .codigo {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
