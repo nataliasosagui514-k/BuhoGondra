@@ -29,7 +29,9 @@ function calcularTotal(articulos) {
 /* ---------- Descuento de empleado UCA (Figma 1440:10850) ---------- */
 
 const PORCENTAJE_DE_DESCUENTO_DOCENTE = 10;
-const ETIQUETA_DE_DESCUENTO = `Descuento empleado UCA (${PORCENTAJE_DE_DESCUENTO_DOCENTE}00a0%)`;
+// El espacio antes de "%" no deja partir "10 %" en dos renglones
+const ESPACIO_SIN_SALTO = String.fromCharCode(160);
+const ETIQUETA_DE_DESCUENTO = `Descuento empleado UCA (${PORCENTAJE_DE_DESCUENTO_DOCENTE}${ESPACIO_SIN_SALTO}%)`;
 
 // Solo las cuentas "docente" (docentes y empleados) tienen descuento. Se redondea a
 // centavos. Sin sesión no hay tipo de cuenta, así que no hay descuento.
