@@ -125,9 +125,18 @@ function obtenerOpinionesGuardadas() {
   return Array.isArray(opiniones) ? opiniones.filter(esOpinionValida) : [];
 }
 
+// Las opiniones de ejemplo, con la fecha contada hacia atrás desde ahora.
+function fecharOpinionesDeEjemplo(ahora = new Date()) {
+  return OPINIONES_DE_EJEMPLO.map(({ haceDias, ...opinion }) => {
+    const fecha = new Date(ahora.getTime());
+    fecha.setDate(fecha.getDate() - haceDias);
+    return { ...opinion, fecha: fecha.toISOString() };
+  });
+}
+
 // Opiniones de un platillo (guardadas y de ejemplo), de la más reciente a la más antigua.
 function obtenerOpiniones(platilloId) {
-  return [...obtenerOpinionesGuardadas(), ...OPINIONES_DE_EJEMPLO]
+  return [...obtenerOpinionesGuardadas(), ...fecharOpinionesDeEjemplo()]
     .filter((opinion) => opinion.platilloId === platilloId)
     .sort((una, otra) => new Date(otra.fecha) - new Date(una.fecha));
 }
