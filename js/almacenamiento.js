@@ -34,6 +34,16 @@ function obtenerPedidos() {
   return Array.isArray(pedidos) ? pedidos : [];
 }
 
+// Reemplaza el pedido que tiene el mismo id y autor. Devuelve true si se guardó.
+function actualizarPedido(cambiado) {
+  const pedidos = obtenerPedidos();
+  const esEse = (pedido) => pedido.id === cambiado.id && pedido.autor === cambiado.autor;
+  return (
+    pedidos.some(esEse) &&
+    escribirDato(CLAVE_PEDIDOS, pedidos.map((pedido) => (esEse(pedido) ? cambiado : pedido)))
+  );
+}
+
 // Agrega un pedido a la lista. Devuelve el pedido, o null si no se guardó.
 // Guarda lo que recibe: quien lo llame debe enviar solo datos del diseño.
 function guardarPedido(pedido) {
