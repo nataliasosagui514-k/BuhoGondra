@@ -1,4 +1,5 @@
-// Guardado local de pedidos, sesión, premios y opiniones con localStorage.
+// Guardado local de pedidos, premios y opiniones con localStorage. La sesión y las
+// cuentas se manejan en js/cuenta.js.
 // Si no está disponible, las funciones devuelven un valor vacío y la app sigue.
 
 const CLAVE_PEDIDOS = "buhogondra.pedidos";
@@ -40,31 +41,7 @@ function guardarPedido(pedido) {
   return escribirDato(CLAVE_PEDIDOS, [...obtenerPedidos(), pedido]) ? pedido : null;
 }
 
-/* ---------- Sesión y premios ---------- */
-
-// La sesión abierta ({ correo }), o null si no hay.
-function obtenerSesion() {
-  const sesion = leerDato(CLAVE_SESION);
-  return typeof sesion?.correo === "string" ? sesion : null;
-}
-
-// Solo para probar Puntos (ver "Pruebas" en el README): abre una sesión con un correo
-// inventado, sin contraseña. Devuelve la sesión, o null si no se pudo guardar.
-// TODO (fase de Registro): reemplazar por el inicio de sesión de verdad.
-const CORREO_DE_PRUEBA = "prueba@ejemplo.com";
-
-function iniciarSesionDePrueba() {
-  const sesion = { correo: CORREO_DE_PRUEBA };
-  return escribirDato(CLAVE_SESION, sesion) ? sesion : null;
-}
-
-function cerrarSesionDePrueba() {
-  try {
-    localStorage.removeItem(CLAVE_SESION);
-  } catch {
-    // Sin almacenamiento no hay sesión que cerrar
-  }
-}
+/* ---------- Premios ---------- */
 
 // Los premios que ya se canjearon: { id, autor, pin, disponibleDesde }. Los puntos no
 // se guardan: se calculan con los pedidos (js/puntos.js).

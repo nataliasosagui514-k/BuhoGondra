@@ -128,6 +128,25 @@ async function crearCuenta(correo, contraseña, buho, { nombre = "", apellido = 
 
 /* ---------- Inicio y cierre de sesión ---------- */
 
+// La sesión abierta ({ correo, tipo, buho, inicio }), o null. Solo vale si su cuenta existe.
+function obtenerSesion() {
+  const sesion = leerDato(CLAVE_SESION);
+  return typeof sesion?.correo === "string" && obtenerCuenta(sesion.correo) ? sesion : null;
+}
+
+function borrarSesion() {
+  try {
+    localStorage.removeItem(CLAVE_SESION);
+  } catch {
+    // Sin almacenamiento no hay sesión que borrar
+  }
+}
+
+// Al abrir la app se borra una sesión sin cuenta, como la de prueba de la fase de Puntos
+if (leerDato(CLAVE_SESION) && !obtenerSesion()) {
+  borrarSesion();
+}
+
 // Intentos con datos incorrectos desde que se abrió la app
 let intentosFallidos = 0;
 
@@ -156,11 +175,7 @@ async function iniciarSesion(correo, contraseña) {
 // Borra la sesión y el pedido que se estaba armando. Las cuentas, los pedidos y los
 // premios se conservan.
 function cerrarSesion() {
-  try {
-    localStorage.removeItem(CLAVE_SESION);
-  } catch {
-    // Sin almacenamiento no hay sesión que cerrar
-  }
+  borrarSesion();
   borrarPedidoEnCurso();
 }
 
