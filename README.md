@@ -56,6 +56,24 @@ La Web Crypto API solo funciona al abrir el archivo directamente, en `localhost`
 
 Las cuentas de docente o empleado (correo de solo letras) tienen 10 % de descuento sobre todo el pedido, redondeado a centavos. Se calcula en `js/pedido.js` y se guarda en el pedido como `descuento` (un número; 0 si no aplica). El `total` guardado ya lo trae restado. Los puntos no cambian.
 
+## Chat de Búhi
+
+Con un pedido activo, el Menú de hoy muestra el botón "ChatBot" y la burbuja "Ayuda con el pedido". Un pedido está activo si es de hoy, no se canceló y no ha terminado su horario de recogida (almuerzo hasta las 2:00 p. m.; típicos hasta las 5:30 p. m.).
+
+| Cambio | Hasta cuándo |
+|---|---|
+| Cancelar | Antes de las 11:00 a. m. |
+| Cambiar de cafetería | Antes de las 11:00 a. m. |
+| Cambiar la hora (otra hora de la misma ventana que no haya pasado) | Mientras queden horas |
+
+El límite de las 11:00 viene de Figma (31d y 33c) y está por confirmar con Funda Gondra. Las reglas están en `js/chatbot.js` y las pantallas en `js/vista-chatbot.js`.
+
+Un pedido cancelado no se borra: guarda en el campo `cancelado` la fecha y hora en que se canceló, aparece así en Historial y en su ticket, y ya no suma puntos. Los premios canjeados y sin vencer de un nivel que ya no se alcanza se borran junto con su PIN.
+
+Como la app no tiene servidor, la cafetería **no se entera** de estos cambios.
+
+Para probarlo a cualquier hora usa la [ruta de demostración](#ruta-de-demostración), por ejemplo `index.html?hora=10:00#/menu`.
+
 ## Pruebas
 
 Al abrir `index.html` sin nada después, aparece el Splash 4.5 segundos y luego "Inicia sesión" (o el menú, si ya hay sesión). Con una ruta, como `index.html#/menu`, se entra directo.

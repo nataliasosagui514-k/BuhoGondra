@@ -18,8 +18,10 @@ Un guion (—) en el id significa que no se encontró un componente para esa var
 | Barra de navegación | Puntos activo | Normal | `839:2534` | Hecho |
 | Barra de navegación | Más activo | Normal | `839:2550` | Hecho |
 | Barra de navegación | Con aviso en Más | Normal | `1112:4696` (punto de aviso) | Hecho (también en la fila Notificaciones) |
-| Botón del chatbot | Sin aviso | Normal | `839:2567` | Pendiente |
+| Botón del chatbot | Sin aviso | Normal | `839:2567` | Hecho (`crearAccesoAlChat`, solo en Menú de hoy con pedido activo) |
 | Botón del chatbot | Con aviso | Con aviso | `839:2575` | Pendiente |
+| Burbuja de ayuda | — | Normal | `1792:4731` | Hecho, con el tamaño de M1c (`1526:11315`) |
+| Respuesta rápida del chat | — | Normal | sección `1010:4869` | Hecho (`crearRespuesta`) |
 
 ## Encabezado y botones de un icono
 
@@ -47,7 +49,7 @@ Un guion (—) en el id significa que no se encontró un componente para esa var
 | Etiqueta | Agotado | Normal | `820:2419` | Hecho |
 | Etiqueta | Calificación | Normal | `820:2412` | Hecho en detalle y comentarios (aún no aparece en #/componentes) |
 | Etiqueta | Entregado | Normal | `820:2422` | Hecho en Historial (`crearEtiquetaDeEstado`; aún no aparece en #/componentes) |
-| Etiqueta | Cancelado | Normal | `820:2426` | Pendiente |
+| Etiqueta | Cancelado | Normal | `820:2426` | Hecho en Historial y ticket, con las medidas de 51c (aún no aparece en #/componentes) |
 | Etiqueta | Menú actualizado | Normal | `870:2946` | Pendiente |
 | Etiqueta | Menú desactualizado | Normal | `870:2950` | Pendiente |
 | Etiqueta | En curso | Normal | `905:4103` | Hecho en Historial (`crearEtiquetaDeEstado`; aún no aparece en #/componentes) |
@@ -101,11 +103,18 @@ La posición, la entrada y la duración del aviso flotante vienen de Figma. Solo
 |---|---|---|
 | Panel (40 y 40b) | `1050:4983` | `crearPanel` y `crearFila` en `js/vista-mas.js` |
 | Perfil, Configuración, cambios y eliminar cuenta (41 a 47e) | pantallas 41 a 47 | `js/vista-mas.js`; los cambios de cuenta en `js/cuenta.js` |
-| Historial y detalle (50, 50b, 51 y 51b; 51c a 51e pendientes) | pantallas 50 y 51 | `dibujarHistorial`, `dibujarDetalleDePedido` |
+| Historial y detalle (50, 50b, 51, 51b y 51c; 51d y 51e pendientes) | pantallas 50 y 51 | `dibujarHistorial`, `dibujarDetalleDePedido` |
 | Notificaciones (60, 60b y 60d; 60c no aplica en la web) | pantallas 60 | `js/notificaciones.js` y `dibujarNotificaciones` |
 | Cotizar eventos (70 y 70b) | `1123:6569` | `dibujarCotizar` |
 | Sobre Funda Gondra y sus áreas (80 a 84) | `1134:6527` | `dibujarSobre`, `dibujarArea` |
 | Centro de ayuda (90 a 93c) | `1145:6600`, `1145:6652`, `1146:6818`, `1147:7006` | `dibujarCentroDeAyuda` y las funciones que le siguen |
+
+## Chat de Búhi
+
+| Pantalla | Nodo de Figma | Dónde está |
+|---|---|---|
+| Menú de hoy con pedido activo (M1c) | `1526:11315` | `mostrarAccesoAlChat` en `js/vista-chatbot.js` |
+| Chat (30 a 34) | sección `1010:4869` | `dibujarChatbot` y los pasos en `js/vista-chatbot.js`; reglas en `js/chatbot.js` |
 
 ## Apartar pedido
 
