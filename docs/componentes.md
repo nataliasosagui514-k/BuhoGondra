@@ -117,6 +117,7 @@ La posición, la entrada y la duración del aviso flotante vienen de Figma. Solo
 | Hoja inferior | Revisa tu pedido | Abierta | `1374:9609` | Hecho |
 | Ventana de confirmación | Éxito e Informativa | Abierta | `834:2458` | Hecho (Éxito, Informativa y Peligro); Confirmar pendiente |
 | Ticket con PIN | Pedido | — | `874:3386` | Hecho; Premio pendiente |
+| Línea de descuento de empleado UCA | Revisión y ticket (M30c, M32c, M30d, M32d) | — | `1440:10850`, `1440:10948`, `1449:4426`, `1449:4605` | Hecho; en Historial y detalle, que Figma no dibuja, usa el mismo estilo |
 
 ## Puntos
 
