@@ -401,6 +401,35 @@
   --izquierda-insignia-buho: 55px;
   --arriba-insignia-buho: 66px;
   --tamano-buho-bienvenida: 173px;
+
+  /* Inicia sesión (Figma 940:4228) */
+  --letra-marca: 44.8px;
+  --linea-marca: 49px;
+  --separacion-marca: 11px;
+  --tamano-buho-marca: 128px;
+  --alto-espacio-inicio: 51px;
+  --alto-espacio-con-errores: 27px;
+  --alto-espacio-con-aviso: 11px;
+  --separacion-aviso-inicio: 22px;
+  --margen-inferior-con-aviso: 18px;
+  --separacion-marca-formulario: 38px;
+  --separacion-olvidaste: 3px;
+  --separacion-entrar: 19px;
+
+  /* Splash (Figma 976:4524). Las posiciones son sobre una pantalla de 390 × 844 */
+  --letra-marca-splash: 56px;
+  --linea-marca-splash: 62px;
+  --arriba-marca-splash: 25.2%;
+  --alto-franja-splash: 98px;
+  --arriba-logo-uca: 28px;
+  --derecha-logo-uca: 18px;
+  --ancho-logo-uca: 103px;
+  --ancho-humo: 100px;
+  --izquierda-humo: -109px;
+  --abajo-humo: 267px;
+  --ancho-buho-splash: 329px;
+  --izquierda-buho-splash: -121px;
+  --abajo-buho-splash: 47px;
 }
 
 /* Reset básico */
@@ -3633,6 +3662,194 @@ dialog:focus {
   stroke: currentColor;
   stroke-width: 1.5;
   stroke-linecap: round;
+}
+
+/* ---------- Inicia sesión (Figma 940:4228) ---------- */
+/* Deja aire arriba; se encoge en pantallas bajas */
+.inicio__espacio {
+  flex: 0 1 var(--alto-espacio-inicio);
+}
+
+.marca {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--separacion-marca);
+  text-align: center;
+}
+
+.marca__nombre {
+  display: flex;
+  justify-content: center;
+  font-family: var(--fuente-titulos);
+  font-size: var(--letra-marca);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-marca);
+  letter-spacing: 0;
+}
+
+.marca__buho {
+  color: var(--color-accion-primaria);
+}
+
+.marca__gondra {
+  color: var(--color-accion-secundaria);
+}
+
+.marca__imagen {
+  width: var(--tamano-buho-marca);
+  height: var(--tamano-buho-marca);
+}
+
+.marca__lema {
+  font-size: var(--letra-texto-pequeno);
+  line-height: var(--linea-texto-pequeno);
+}
+
+/* Como en Figma 1412:9943 y 1412:10004: con errores o con aviso, el logo sube */
+.cuenta:has(.inicio__formulario .campo__error) .inicio__espacio {
+  flex-basis: var(--alto-espacio-con-errores);
+}
+
+.cuenta:has(> .marca ~ .aviso) {
+  padding-bottom: var(--margen-inferior-con-aviso);
+}
+
+.cuenta:has(> .marca ~ .aviso) .inicio__espacio {
+  flex-basis: var(--alto-espacio-con-aviso);
+}
+
+.inicio__formulario {
+  margin-top: var(--separacion-marca-formulario);
+}
+
+.marca ~ .aviso,
+.marca ~ .aviso + .inicio__formulario {
+  margin-top: var(--separacion-aviso-inicio);
+}
+
+.inicio__olvidaste {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: calc(var(--separacion-olvidaste) - var(--separacion-formulario));
+}
+
+.inicio__formulario .cuenta__acciones {
+  flex: 1;
+  margin-top: 0;
+  padding-top: var(--separacion-entrar);
+  gap: var(--espacio-8);
+}
+
+.inicio__formulario .cuenta__pie {
+  margin-top: auto;
+  padding-top: var(--espacio-8);
+}
+
+/* ---------- Splash (Figma 976:4524) ---------- */
+.cuenta:has(> .splash) {
+  padding: 0;
+}
+
+.splash {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+}
+
+.splash > * {
+  position: absolute;
+}
+
+.splash__franja {
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: var(--alto-franja-splash);
+  background: var(--color-accion-secundaria-presionada);
+}
+
+.splash__logo-uca {
+  top: var(--arriba-logo-uca);
+  right: var(--derecha-logo-uca);
+  width: var(--ancho-logo-uca);
+  animation: splash-aparecer 0.5s ease-out both;
+}
+
+.splash .marca__nombre {
+  top: var(--arriba-marca-splash);
+  right: 0;
+  left: 0;
+  font-size: var(--letra-marca-splash);
+  line-height: var(--linea-marca-splash);
+}
+
+/* "Búho" sube de 0.5 a 1.0 s y "Gondra" aparece de 1.5 a 1.9 s (nota 976:4787) */
+.splash .marca__buho {
+  animation: splash-subir 0.5s ease-out 0.5s both;
+}
+
+.splash .marca__gondra {
+  animation: splash-aparecer 0.4s ease-out 1.5s both;
+}
+
+.splash__humo {
+  bottom: var(--abajo-humo);
+  left: calc(50% + var(--izquierda-humo));
+  width: var(--ancho-humo);
+  animation:
+    splash-aparecer 0.6s ease-out 0.5s both,
+    splash-ondular 1.6s ease-in-out 0.5s infinite alternate;
+}
+
+.splash__buho {
+  bottom: var(--abajo-buho-splash);
+  left: calc(50% + var(--izquierda-buho-splash));
+  width: var(--ancho-buho-splash);
+  height: var(--ancho-buho-splash);
+  transform-origin: 50% 90%;
+  /* Máscara de Figma (976:4651): oculta el humo dibujado en la imagen */
+  clip-path: polygon(0 40%, 30% 40%, 30% 25%, 38% 25%, 38% 0, 100% 0, 100% 100%, 0 100%);
+  animation: splash-balancear 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes splash-aparecer {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes splash-subir {
+  from {
+    opacity: 0;
+    translate: 0 var(--espacio-24);
+  }
+}
+
+/* TODO: Figma no define cuánto se mueven el humo y el búho */
+@keyframes splash-ondular {
+  from {
+    transform: translateY(0) skewX(-4deg);
+  }
+  to {
+    transform: translateY(-8px) skewX(4deg);
+  }
+}
+
+@keyframes splash-balancear {
+  from {
+    transform: rotate(-3deg);
+  }
+  to {
+    transform: rotate(3deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .splash > *,
+  .splash .marca__nombre span {
+    animation: none;
+  }
 }
 
 /* ---------- Código de 6 dígitos (Figma 940:4307 y 964:4642) ---------- */

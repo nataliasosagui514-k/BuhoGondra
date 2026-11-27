@@ -1,4 +1,5 @@
-// Pantallas de cuenta: registro. Las reglas están en js/cuenta.js.
+// Pantallas de cuenta: Splash, registro e inicio de sesión. Las reglas están en
+// js/cuenta.js.
 
 /* ---------- Piezas comunes ---------- */
 
@@ -469,9 +470,10 @@ function dibujarRegistroDatos(contenedor) {
     return { ...campo, clave, etiqueta };
   });
 
-  const miniatura = crearElemento("img", "buho-de-perfil__imagen");
-  miniatura.src = registro.buho ? `img/avatar-buho-${registro.buho}.png` : "img/buho-taza.png";
-  miniatura.alt = "";
+  const miniatura = crearImagen(
+    "buho-de-perfil__imagen",
+    registro.buho ? `img/avatar-buho-${registro.buho}.png` : "img/buho-taza.png",
+  );
   const marco = crearElemento("span", "buho-de-perfil__marco");
   marco.append(miniatura);
   const textos = crearElemento("div", "buho-de-perfil__textos");
@@ -528,9 +530,7 @@ function crearOpcionDeBuho(numero, elegido, alElegir) {
   entrada.checked = elegido;
   entrada.setAttribute("aria-label", `Búhi ${numero}`);
   entrada.addEventListener("change", () => alElegir(numero));
-  const imagen = crearElemento("img", "opcion-buho__imagen");
-  imagen.src = `img/avatar-buho-${numero}.png`;
-  imagen.alt = "";
+  const imagen = crearImagen("opcion-buho__imagen", `img/avatar-buho-${numero}.png`);
   const insignia = crearElemento("span", "opcion-buho__insignia");
   insignia.append(crearIconoSvg("opcion-buho__palomita", 14, ["M2.92 7.29L5.54 9.92L11.08 4.38"]));
   const opcion = crearElemento("label", "opcion-buho");
@@ -557,10 +557,8 @@ function dibujarRegistroBuho(contenedor) {
       );
       return;
     }
-    const grande = crearElemento("img", "vista-de-buho__imagen");
-    grande.src = `img/buho-perfil-${elegido}.png`;
-    grande.alt = "";
-    vista.replaceChildren(grande, crearElemento("p", "vista-de-buho__nombre", `Búhi ${elegido}`));
+    const grande = crearImagen("vista-de-buho__imagen", `img/buho-perfil-${elegido}.png`);
+    vista.replaceChildren(grande,crearElemento("p", "vista-de-buho__nombre", `Búhi ${elegido}`));
   };
 
   const cuadricula = crearElemento("fieldset", "opciones-de-buho");
@@ -600,13 +598,6 @@ function dibujarRegistroBuho(contenedor) {
   );
 }
 
-function crearBuhoEnTaza(clase) {
-  const imagen = crearElemento("img", clase);
-  imagen.src = "img/buho-taza.png";
-  imagen.alt = "";
-  return imagen;
-}
-
 // 07 · Términos y condiciones. Aquí se crea la cuenta.
 function dibujarRegistroTerminar(contenedor) {
   if (faltaUnPaso(registro.verificado && registro.nombre && registro.apellido && registro.buho)) {
@@ -623,7 +614,7 @@ function dibujarRegistroTerminar(contenedor) {
   texto.append(enlace, ".");
   const bienvenida = crearElemento("div", "bienvenida");
   bienvenida.append(
-    crearBuhoEnTaza("bienvenida__imagen"),
+    crearImagen("bienvenida__imagen", "img/buho-taza.png"),
     crearElemento("h1", "bienvenida__titulo", "Bienvenid@ a BúhoGondra"),
     texto,
   );
@@ -654,12 +645,188 @@ function dibujarRegistroTerminar(contenedor) {
   );
 }
 
-/* ---------- Entrar a la app ---------- */
+/* ---------- Splash (Figma 976:4524) ---------- */
+
+const DURACION_DEL_SPLASH = 4500;
+let relojDelSplash = null;
+
+// "Búho" en naranja y "Gondra" en azul
+function crearMarca(etiqueta) {
+  const marca = crearElemento(etiqueta, "marca__nombre");
+  marca.append(
+    crearElemento("span", "marca__buho", "Búho"),
+    crearElemento("span", "marca__gondra", "Gondra"),
+  );
+  return marca;
+}
+
+function crearImagen(clase, ruta, descripcion = "") {
+  const imagen = crearElemento("img", clase);
+  imagen.src = ruta;
+  imagen.alt = descripcion;
+  return imagen;
+}
+
+// Dura 4.5 segundos y no se puede saltar. Con sesión pasa al menú; sin ella, a 01.
+function dibujarSplash(contenedor) {
+  const splash = crearElemento("div", "splash");
+  splash.append(
+    crearElemento("div", "splash__franja"),
+    crearImagen("splash__logo-uca", "img/logo-cafeteria-uca.png", "Cafetería UCA"),
+    crearMarca("h1"),
+    crearImagen("splash__humo", "img/splash-humo.svg"),
+    crearImagen("splash__buho", "img/buho-taza.png"),
+  );
+  montarPantallaDeCuenta(contenedor, splash);
+  clearTimeout(relojDelSplash);
+  relojDelSplash = setTimeout(() => {
+    if (location.hash === "#/splash") {
+      location.replace(obtenerSesion() ? "#/menu" : "#/login");
+    }
+  }, DURACION_DEL_SPLASH);
+}
+
+/* ---------- Inicia sesión (Figma 940:4228 y 1412:9942) ---------- */
+
+// Correo que llega ya escrito a "Inicia sesión"
+let correoParaIniciar = "";
+// Lo que hace la pantalla abierta cuando vuelve internet
+let alVolverLaConexion = null;
+window.addEventListener("online", () => alVolverLaConexion?.());
 
 // Va a "Inicia sesión", con el correo ya escrito si se recibe.
 function irAIniciarSesion(correo = "") {
+  correoParaIniciar = correo;
   location.hash = "#/login";
 }
+
+// Correo que llega ya escrito a "Recuperar contraseña"
+let correoParaRecuperar = "";
+
+function irARecuperar(correo) {
+  correoParaRecuperar = correo;
+  location.hash = "#/recuperar";
+}
+
+// El aviso que va arriba del formulario según lo que falló.
+function redactarErrorDeInicio({ motivo, intentos }) {
+  if (motivo !== "credenciales") {
+    // TODO: Figma no define el aviso de un error general
+    return ["error", "No se pudo iniciar sesión"];
+  }
+  return intentos >= INTENTOS_PARA_AVISAR
+    ? [
+        "info",
+        "¿Olvidaste tu contraseña?",
+        `Llevas ${intentos} intentos. Puedes crear una nueva con tu correo UCA en un minuto.`,
+      ]
+    : ["error", "Correo o contraseña incorrectos", "Revisa los dos datos e inténtalo de nuevo."];
+}
+
+function dibujarLogin(contenedor) {
+  if (obtenerSesion()) {
+    location.replace("#/menu");
+    return;
+  }
+  const correo = crearCampo({
+    id: "inicio-correo",
+    etiqueta: "Correo institucional",
+    tipo: "email",
+    ejemplo: "tucorreo@uca.edu.sv",
+    autocompletar: "username",
+    valor: correoParaIniciar,
+  });
+  const contraseña = crearCampo({
+    id: "inicio-contrasena",
+    etiqueta: "Contraseña",
+    tipo: "password",
+    ejemplo: "Escribe tu contraseña",
+    autocompletar: "current-password",
+  });
+  correoParaIniciar = "";
+
+  const olvidaste = crearBotonDeTexto("¿Olvidaste tu contraseña?", () =>
+    irARecuperar(correo.entrada.value.trim()),
+  );
+  const filaOlvidaste = crearElemento("div", "inicio__olvidaste");
+  filaOlvidaste.append(olvidaste);
+
+  const entrar = crearBotonDeEnvio("Iniciar sesión");
+  let aviso = null;
+  const quitarAviso = () => {
+    aviso?.remove();
+    aviso = null;
+    entrar.textContent = "Iniciar sesión";
+    alVolverLaConexion = null;
+  };
+  const mostrarError = (...datos) => {
+    quitarAviso();
+    aviso = crearAviso(...datos);
+    aviso.setAttribute("role", "alert");
+    formulario.before(aviso);
+  };
+
+  const marca = crearElemento("div", "marca");
+  const lema = crearElemento("p", "marca__lema", "El menú de las cafeterías UCA, en tu mano");
+  marca.append(crearMarca("h1"), crearImagen("marca__imagen", "img/buho-taza.png"), lema);
+
+  const comoInvitado = crearBotonDeTexto("Ver el menú como invitado", () => {
+    location.hash = "#/menu";
+  });
+  const pie = crearPieDeCuenta("¿No tienes cuenta?", "Crea tu cuenta", () => {
+    location.hash = "#/registro/correo";
+  });
+
+  const formulario = crearFormularioDeCuenta(
+    async () => {
+      quitarAviso();
+      const escrito = correo.entrada.value.trim();
+      // Con un campo vacío no se envía nada (01b)
+      if (!escrito) {
+        correo.marcarError("Escribe tu correo institucional");
+      }
+      if (!contraseña.entrada.value) {
+        contraseña.marcarError("Escribe tu contraseña");
+      }
+      if (!escrito || !contraseña.entrada.value) {
+        return;
+      }
+      if (navigator.onLine === false) {
+        mostrarError(
+          "error",
+          "Sin conexión",
+          "Revisa tu internet e inténtalo de nuevo. Tus datos siguen escritos.",
+        );
+        entrar.textContent = "Reintentar";
+        alVolverLaConexion = quitarAviso;
+        return;
+      }
+      entrar.disabled = true;
+      const resultado = await iniciarSesion(escrito, contraseña.entrada.value);
+      entrar.disabled = false;
+      if (resultado.ok) {
+        terminarEntrada();
+        return;
+      }
+      mostrarError(...redactarErrorDeInicio(resultado));
+      if (resultado.intentos >= INTENTOS_PARA_AVISAR) {
+        olvidaste.textContent = "Crear una nueva contraseña";
+      }
+    },
+    [correo.elemento, contraseña.elemento, filaOlvidaste],
+    [entrar, comoInvitado, pie],
+  );
+  formulario.classList.add("inicio__formulario");
+  // El aviso se quita al editar un campo
+  formulario.addEventListener("input", quitarAviso);
+  if (intentosFallidos >= INTENTOS_PARA_AVISAR) {
+    olvidaste.textContent = "Crear una nueva contraseña";
+  }
+
+  montarPantallaDeCuenta(contenedor, crearElemento("div", "inicio__espacio"), marca, formulario);
+}
+
+/* ---------- Entrar a la app ---------- */
 
 // Lo que pasa al iniciar sesión o crear la cuenta.
 function terminarEntrada() {

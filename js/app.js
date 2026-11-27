@@ -49,6 +49,8 @@ const pantallas = {
     preparar: dibujarSemana,
   },
   // Cuenta: sin barra (se dibujan en js/vista-cuenta.js)
+  "#/splash": crearPantallaDeCuenta("BúhoGondra", (c) => dibujarSplash(c)),
+  "#/login": crearPantallaDeCuenta("Inicia sesión", (c) => dibujarLogin(c)),
   "#/registro/correo": crearPantallaDeCuenta("Crea tu cuenta", (c) => dibujarRegistroCorreo(c)),
   "#/registro/codigo": crearPantallaDeCuenta("Verifica tu correo", (c) => dibujarRegistroCodigo(c)),
   "#/registro/datos": crearPantallaDeCuenta("Crea tu cuenta", (c) => dibujarRegistroDatos(c)),
@@ -255,6 +257,10 @@ window.addEventListener("hashchange", mostrarPantalla);
 
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("boton-volver").addEventListener("click", () => history.back());
+  // Al abrir la app sin una ruta se muestra el Splash
+  if (!location.hash) {
+    history.replaceState(null, "", "#/splash");
+  }
   mostrarPantalla();
   console.log("BúhoGondra cargada");
 });
