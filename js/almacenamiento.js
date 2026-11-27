@@ -6,6 +6,7 @@ const CLAVE_PEDIDOS = "buhogondra.pedidos";
 const CLAVE_SESION = "buhogondra.sesion";
 const CLAVE_PREMIOS = "buhogondra.premios";
 const CLAVE_OPINIONES = "buhogondra.opiniones";
+const CLAVE_LEIDAS = "buhogondra.notificacionesLeidas";
 
 // Lee un valor guardado; devuelve null si no existe o no se puede leer.
 function leerDato(clave) {
@@ -53,6 +54,43 @@ function obtenerPremiosCanjeados() {
 // Devuelve lo guardado, o null si no se pudo guardar.
 function guardarPremioCanjeado(premio) {
   return escribirDato(CLAVE_PREMIOS, [...obtenerPremiosCanjeados(), premio]) ? premio : null;
+}
+
+/* ---------- Notificaciones leídas ---------- */
+
+// Solo se guarda qué avisos ya se leyeron: { correo: [ids] }. Los avisos no se guardan,
+// salen de los pedidos (js/notificaciones.js).
+function obtenerLeidasPorCuenta() {
+  const leidas = leerDato(CLAVE_LEIDAS);
+  return leidas && typeof leidas === "object" && !Array.isArray(leidas) ? leidas : {};
+}
+
+/* ---------- Datos de una cuenta ---------- */
+
+// Todo lo que lleva el correo de su autor: pedidos, premios y opiniones.
+const CLAVES_CON_AUTOR = [CLAVE_PEDIDOS, CLAVE_PREMIOS, CLAVE_OPINIONES];
+
+function reescribirDatosDeAutor(cambiar) {
+  return CLAVES_CON_AUTOR.every((clave) => {
+    const lista = leerDato(clave);
+    return !Array.isArray(lista) || escribirDato(clave, cambiar(lista));
+  });
+}
+
+// Al cambiar de correo, sus datos pasan al nuevo.
+function cambiarAutor(anterior, nuevo) {
+  const datos = reescribirDatosDeAutor((lista) =>
+    lista.map((uno) => (uno?.autor === anterior ? { ...uno, autor: nuevo } : uno)),
+  );
+  const { [anterior]: leidas, ...otras } = obtenerLeidasPorCuenta();
+  return datos && (!leidas || escribirDato(CLAVE_LEIDAS, { ...otras, [nuevo]: leidas }));
+}
+
+// Al eliminar una cuenta se borra todo lo suyo.
+function borrarDatosDeAutor(autor) {
+  const datos = reescribirDatosDeAutor((lista) => lista.filter((uno) => uno?.autor !== autor));
+  const { [autor]: leidas, ...otras } = obtenerLeidasPorCuenta();
+  return datos && (!leidas || escribirDato(CLAVE_LEIDAS, otras));
 }
 
 /* ---------- Pedido en curso y selección ---------- */

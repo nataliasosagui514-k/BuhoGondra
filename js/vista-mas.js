@@ -44,6 +44,34 @@ const ICONOS_DE_MAS = {
     [9.4, 6.88, "M0 2.72C0 2.24 0.12 1.76 0.36 1.35C0.61 0.93 0.95 0.58 1.37 0.35C1.79 0.11 2.27 -0.01 2.75 0C3.23 0.01 3.7 0.15 4.12 0.4C4.53 0.65 4.86 1.01 5.09 1.44C5.31 1.86 5.42 2.34 5.4 2.82C5.38 3.3 5.22 3.77 4.96 4.17C4.7 4.58 4.33 4.9 3.9 5.12C3.1 5.52 2.6 6.12 2.6 7.02"],
     [12, 16.9, "M0 0L0.01 0"],
   ],
+  configuracion: [
+    [4, 7, "M0 0L10 0"],
+    [18, 7, "M0 0L2 0"],
+    [4, 17, "M0 0L4 0"],
+    [12, 17, "M0 0L8 0"],
+    [14, 5, "M2 4C3.1 4 4 3.1 4 2C4 0.9 3.1 0 2 0C0.9 0 0 0.9 0 2C0 3.1 0.9 4 2 4Z"],
+    [8, 15, "M2 4C3.1 4 4 3.1 4 2C4 0.9 3.1 0 2 0C0.9 0 0 0.9 0 2C0 3.1 0.9 4 2 4Z"],
+  ],
+  salir: [
+    [4, 4, "M6 0L2 0C1.47 0 0.96 0.21 0.59 0.59C0.21 0.96 0 1.47 0 2L0 14C0 14.53 0.21 15.04 0.59 15.41C0.96 15.79 1.47 16 2 16L6 16"],
+    [15, 8, "M0 0L4 4L0 8"],
+    [9, 12, "M10 0L0 0"],
+  ],
+  eliminar: [
+    [4, 7, "M0 0L16 0"],
+    [9, 4, "M0 3L0 0L6 0L6 3"],
+    [6, 7, "M0 0L1 13L11 13L12 0"],
+    [10, 11, "M0 0L0 6"],
+    [14, 11, "M0 0L0 6"],
+  ],
+  correo: [
+    [4, 6, "M1 0L15 0C15.55 0 16 0.45 16 1L16 11C16 11.55 15.55 12 15 12L1 12C0.45 12 0 11.55 0 11L0 1C0 0.45 0.45 0 1 0Z"],
+    [4, 7, "M0 0L8 6L16 0"],
+  ],
+  candado: [
+    [5, 11, "M2 0L12 0C13.1 0 14 0.9 14 2L14 8C14 9.1 13.1 10 12 10L2 10C0.9 10 0 9.1 0 8L0 2C0 0.9 0.9 0 2 0Z"],
+    [8, 3, "M0 8L0 4C0 1.8 1.8 0 4 0C6.2 0 8 1.8 8 4L8 8"],
+  ],
 };
 
 /* ---------- Filas ---------- */
@@ -164,11 +192,7 @@ function crearCabeceraDelPanel(sesion) {
 
 // Se cierra tocando el fondo, deslizando a la derecha o con la tecla Escape
 function cerrarPanel() {
-  if (history.state?.desde) {
-    history.back();
-  } else {
-    location.replace("#/menu");
-  }
+  volverA(fondoDelPanel.split("?")[0], fondoDelPanel);
 }
 
 function crearPanel() {
@@ -226,4 +250,510 @@ function crearPanel() {
     }
   });
   return panel;
+}
+
+/* ---------- Pantallas que se abren desde el panel ---------- */
+
+// Encabezado con "volver" y el nombre de la pantalla. "anterior" es a donde regresa.
+function montarPantallaDeMas(contenedor, { titulo, anterior }, ...partes) {
+  montarPantallaDeCuenta(
+    contenedor,
+    crearEncabezadoDeCuenta(() => volverA(anterior), titulo),
+    ...partes,
+  );
+}
+
+// Los títulos de las pantallas de Más son más pequeños que los de cuenta (43, 44 y 47)
+function crearTitulosDeMas(titulo, descripcion) {
+  const titulos = crearTitulosDeCuenta({ titulo, descripcion });
+  titulos.classList.add("cuenta__titulos--mas");
+  return titulos;
+}
+
+function crearSubtitulo(texto) {
+  return crearElemento("h2", "mas__subtitulo", texto);
+}
+
+/* ---------- Perfil (Figma 41) ---------- */
+
+function dibujarPerfil(contenedor) {
+  const { sesion, cuenta } = obtenerCuentaDeLaSesion();
+  const resumen = crearElemento("div", "perfil__resumen");
+  resumen.append(
+    crearAvatar(sesion.buho, "avatar--grande"),
+    crearElemento("h1", "perfil__nombre", nombrarCuenta(cuenta)),
+    crearElemento("p", "perfil__correo", sesion.correo),
+  );
+  const etiqueta = sesion.tipo && crearIndicadorDeTipo(sesion.tipo);
+  if (etiqueta) {
+    resumen.append(etiqueta);
+  }
+
+  const filas = crearElemento("div", "mas__filas");
+  filas.append(
+    crearFila({
+      icono: "configuracion",
+      titulo: "Configuración de la cuenta",
+      detalle: "Nombre, correo y contraseña",
+      href: "#/mas/perfil/configuracion",
+      flecha: true,
+    }),
+    crearFila({
+      icono: "perfil",
+      titulo: "Cambiar mi búhi",
+      detalle: "Elige tu foto de perfil",
+      href: "#/mas/perfil/buho",
+      flecha: true,
+    }),
+  );
+  const salida = crearElemento("div", "perfil__salida");
+  salida.append(
+    crearFila({
+      icono: "salir",
+      titulo: "Cerrar sesión",
+      alTocar: () => preguntarCierreDeSesion(contenedor),
+    }),
+  );
+
+  montarPantallaDeMas(
+    contenedor,
+    { titulo: "Mi perfil", anterior: "#/mas" },
+    resumen,
+    filas,
+    salida,
+    crearFila({
+      icono: "eliminar",
+      titulo: "Eliminar cuenta",
+      detalle: "Se borran tu historial y tus puntos",
+      href: "#/mas/perfil/eliminar",
+      flecha: true,
+      clase: "fila--peligro perfil__eliminar",
+    }),
+  );
+}
+
+// 46: tocar fuera es "Quedarme"
+function preguntarCierreDeSesion(contenedor) {
+  const quedarme = () => {
+    ventana.close();
+    ventana.remove();
+  };
+  const ventana = crearVentana({
+    tipo: "invitado",
+    titulo: "¿Cerrar sesión?",
+    mensaje: "Tu pedido apartado seguirá activo. Puedes volver a entrar cuando quieras.",
+    textoBoton: "Cerrar sesión",
+    alTocar: () => {
+      cerrarSesion();
+      location.hash = "#/login";
+    },
+    segundo: { texto: "Quedarme", alTocar: quedarme },
+    alCerrar: quedarme,
+  });
+  abrirDialogo(contenedor, ventana);
+}
+
+/* ---------- Configuración (Figma 42) ---------- */
+
+function dibujarConfiguracion(contenedor) {
+  const { sesion, cuenta } = obtenerCuentaDeLaSesion();
+  const [nombre, apellido] = [
+    { clave: "nombre", etiqueta: "Nombre", autocompletar: "given-name" },
+    { clave: "apellido", etiqueta: "Apellido", autocompletar: "family-name" },
+  ].map(({ clave, etiqueta, autocompletar }) =>
+    crearCampo({
+      id: `cuenta-${clave}`,
+      etiqueta,
+      autocompletar,
+      valor: cuenta[clave],
+    }),
+  );
+  const guardar = crearBotonDeEnvio("Guardar cambios");
+  // Solo se activa si cambió el nombre o el apellido
+  const revisar = () => {
+    guardar.disabled =
+      nombre.entrada.value.trim() === cuenta.nombre &&
+      apellido.entrada.value.trim() === cuenta.apellido;
+  };
+  revisar();
+
+  const datos = crearElemento("div", "cuenta__campos");
+  datos.append(crearSubtitulo("¿Cómo te llamas?"), nombre.elemento, apellido.elemento);
+  const entrada = crearElemento("div", "mas__filas");
+  entrada.append(
+    crearSubtitulo("Datos para entrar"),
+    crearFila({
+      icono: "correo",
+      titulo: "Correo institucional",
+      detalle: sesion.correo,
+      href: "#/mas/perfil/correo",
+      flecha: true,
+    }),
+    crearFila({
+      icono: "candado",
+      titulo: "Contraseña",
+      detalle: "Cámbiala cuando quieras",
+      href: "#/mas/perfil/contrasena",
+      flecha: true,
+    }),
+  );
+
+  const formulario = crearFormularioDeCuenta(
+    () => {
+      // TODO: Figma no define estos mensajes
+      if (!nombre.entrada.value.trim()) {
+        nombre.marcarError("Escribe tu nombre");
+        return;
+      }
+      if (!apellido.entrada.value.trim()) {
+        apellido.marcarError("Escribe tu apellido");
+        return;
+      }
+      if (!cambiarNombre(nombre.entrada.value, apellido.entrada.value)) {
+        // TODO: Figma no define este aviso
+        mostrarAviso("error", "No se pudieron guardar tus datos");
+        return;
+      }
+      const guardada = obtenerCuentaDeLaSesion().cuenta;
+      volverA("#/mas/perfil");
+      // 41b
+      mostrarAviso("exito", "Tus datos se guardaron", `Ahora tu nombre es ${nombrarCuenta(guardada)}.`);
+    },
+    [datos, entrada],
+    [guardar],
+  );
+  formulario.classList.add("configuracion");
+  formulario.addEventListener("input", revisar);
+
+  montarPantallaDeMas(contenedor, { titulo: "Configuración", anterior: "#/mas/perfil" }, formulario);
+}
+
+/* ---------- Cambiar correo (Figma 43 y 43b) ---------- */
+
+// El correo nuevo mientras no se confirma su código. Solo en memoria
+let correoNuevo = "";
+
+const TIPOS_DE_CUENTA = { estudiante: "Estudiante", docente: "Docente o empleado" };
+
+function dibujarCambiarCorreo(contenedor) {
+  const { sesion } = obtenerCuentaDeLaSesion();
+  const correo = crearCampo({
+    id: "cambio-correo",
+    etiqueta: "Correo institucional nuevo",
+    tipo: "email",
+    ejemplo: "tucorreo@uca.edu.sv",
+    autocompletar: "email",
+    valor: correoNuevo,
+  });
+  const tipo = crearElemento("div", "cuenta__tipo");
+  tipo.setAttribute("aria-live", "polite");
+  const mostrarTipo = () => {
+    const indicador = crearIndicadorDeTipo(detectarTipoCorreo(correo.entrada.value));
+    tipo.replaceChildren(...(indicador ? [indicador] : []));
+  };
+  correo.entrada.addEventListener("input", mostrarTipo);
+  mostrarTipo();
+  const bloque = crearElemento("div", "cuenta__correo");
+  bloque.append(correo.elemento, tipo);
+
+  montarPantallaDeMas(
+    contenedor,
+    { titulo: "Cambiar correo", anterior: "#/mas/perfil/configuracion" },
+    crearTitulosDeMas(
+      "Escribe tu nuevo correo",
+      "Te enviaremos un código para confirmar que es tuyo. Tu tipo de cuenta se actualiza según el correo.",
+    ),
+    crearFormularioDeCuenta(
+      () => {
+        // Las mismas revisiones que en el registro (02c y 02d)
+        const escrito = normalizarCorreo(correo.entrada.value);
+        if (detectarTipoCorreo(escrito) === "no-uca") {
+          tipo.replaceChildren();
+          correo.marcarError(
+            escrito ? "Usa tu correo de la UCA (termina en @uca.edu.sv)" : "Escribe tu correo institucional",
+          );
+          return;
+        }
+        if (obtenerCuenta(escrito)) {
+          tipo.replaceChildren();
+          correo.marcarError("Este correo ya tiene una cuenta");
+          return;
+        }
+        correoNuevo = escrito;
+        // TODO: sin envío real de correos, este código solo aparece en la consola
+        generarCodigo(escrito);
+        codigoEnviadoEn = Date.now();
+        location.hash = "#/mas/perfil/correo/codigo";
+      },
+      [
+        bloque,
+        crearElemento("p", "mas__nota", `Mientras no lo confirmes, sigues entrando con ${sesion.correo}.`),
+      ],
+      [crearBotonDeEnvio("Enviar código")],
+    ),
+  );
+}
+
+function dibujarCodigoDeCorreo(contenedor) {
+  if (!correoNuevo) {
+    location.replace("#/mas/perfil/correo");
+    return;
+  }
+  const destino = correoNuevo;
+  const cambiar = () => volverA("#/mas/perfil/correo");
+  montarPantallaDeCuenta(
+    contenedor,
+    crearEncabezadoDeCuenta(cambiar, "Cambiar correo"),
+    crearTitulosDeCuenta({
+      titulo: "Verifica tu nuevo correo",
+      descripcion: `Te enviamos un código de 6 dígitos a ${destino}. Vence en 10 minutos.`,
+    }),
+    crearFormularioDeCodigo({
+      textoBoton: "Confirmar correo",
+      alReenviar: () => generarCodigo(destino),
+      alCambiarCorreo: cambiar,
+      alVerificar: (codigo) => {
+        if (!verificarCodigo(codigo)) {
+          return false;
+        }
+        if (!cambiarCorreo(destino)) {
+          // TODO: Figma no define este aviso
+          mostrarAviso("error", "No se pudo cambiar tu correo");
+          return true;
+        }
+        correoNuevo = "";
+        const nombreDelTipo = TIPOS_DE_CUENTA[obtenerSesion().tipo];
+        location.replace("#/mas/perfil/configuracion");
+        // 42b
+        // TODO: Figma no muestra el aviso para una cuenta sin tipo
+        mostrarAviso(
+          "exito",
+          "Correo actualizado",
+          `Ahora entras con ${destino}.${nombreDelTipo ? ` Tu cuenta es de ${nombreDelTipo}.` : ""}`,
+        );
+        return true;
+      },
+    }),
+  );
+}
+
+/* ---------- Cambiar contraseña (Figma 44 y 44b) ---------- */
+
+function dibujarCambiarContrasena(contenedor) {
+  const { sesion, cuenta } = obtenerCuentaDeLaSesion();
+  const [actual, nueva, repetida] = [
+    { id: "cambio-actual", etiqueta: "Contraseña actual", autocompletar: "current-password" },
+    { id: "cambio-nueva", etiqueta: "Nueva contraseña", ayuda: "Mínimo 8 caracteres", autocompletar: "new-password" },
+    { id: "cambio-repetida", etiqueta: "Repite la nueva contraseña", autocompletar: "new-password" },
+  ].map((datos) => crearCampo({ ...datos, tipo: "password" }));
+
+  const olvidaste = crearBotonDeTexto("¿Olvidaste tu contraseña?", () => irARecuperar(sesion.correo));
+  olvidaste.classList.add("cuenta__enlace-izquierda");
+  const guardar = crearBotonDeEnvio("Guardar contraseña");
+
+  montarPantallaDeMas(
+    contenedor,
+    { titulo: "Cambiar contraseña", anterior: "#/mas/perfil/configuracion" },
+    crearTitulosDeMas(
+      "Cambia tu contraseña",
+      "Primero escribe la que usas ahora. La nueva debe tener al menos 8 caracteres.",
+    ),
+    crearFormularioDeCuenta(
+      async () => {
+        guardar.disabled = true;
+        // Primero se revisa la actual (44b)
+        if (!(await coincideContrasena(cuenta, actual.entrada.value))) {
+          guardar.disabled = false;
+          actual.marcarError("La contraseña actual no es correcta");
+          return;
+        }
+        if (nueva.entrada.value.length < MINIMO_CONTRASENA) {
+          guardar.disabled = false;
+          nueva.marcarError("Mínimo 8 caracteres");
+          return;
+        }
+        if (repetida.entrada.value !== nueva.entrada.value) {
+          guardar.disabled = false;
+          repetida.marcarError("Las contraseñas no coinciden");
+          return;
+        }
+        const resultado = await cambiarContrasena(actual.entrada.value, nueva.entrada.value);
+        if (!resultado.ok) {
+          guardar.disabled = false;
+          // TODO: Figma no define este aviso
+          mostrarAviso("error", "No se pudo guardar tu contraseña");
+          return;
+        }
+        volverA("#/mas/perfil");
+        // TODO: Figma pide un aviso de éxito, pero no da su texto; se usa el título de 11
+        mostrarAviso("exito", "Contraseña actualizada");
+      },
+      [actual.elemento, nueva.elemento, repetida.elemento, olvidaste],
+      [guardar],
+    ),
+  );
+}
+
+/* ---------- Cambiar mi búho (Figma 45) ---------- */
+
+function dibujarCambiarBuho(contenedor) {
+  const { sesion } = obtenerCuentaDeLaSesion();
+  let elegido = sesion.buho;
+  const vista = crearElemento("div", "vista-de-buho");
+  vista.setAttribute("aria-live", "polite");
+  const guardar = crearBotonDeEnvio("Guardar búho");
+  const mostrarElegido = () => {
+    // Solo se guarda un búho distinto del actual
+    guardar.disabled = elegido === sesion.buho;
+    vista.replaceChildren(
+      crearImagen("vista-de-buho__imagen", `img/buho-perfil-${elegido}.png`),
+      crearElemento("p", "vista-de-buho__nombre", `Búhi ${elegido}`),
+    );
+  };
+  const cuadricula = crearElemento("fieldset", "opciones-de-buho");
+  // TODO: Figma no define el nombre del grupo para lectores de pantalla
+  cuadricula.setAttribute("aria-label", "Búhos disponibles");
+  cuadricula.append(
+    ...Array.from({ length: CANTIDAD_DE_BUHOS }, (_, posicion) =>
+      crearOpcionDeBuho(posicion + 1, elegido === posicion + 1, (numero) => {
+        elegido = numero;
+        mostrarElegido();
+      }),
+    ),
+  );
+  mostrarElegido();
+
+  const formulario = crearFormularioDeCuenta(
+    () => {
+      if (!cambiarBuho(elegido)) {
+        // TODO: Figma no define este aviso
+        mostrarAviso("error", "No se pudo guardar tu búho");
+        return;
+      }
+      volverA("#/mas/perfil");
+      // 41c
+      mostrarAviso("exito", "Tu búhi se actualizó", "Así te verán en comentarios y en el panel de Más.");
+    },
+    [vista, cuadricula],
+    [guardar],
+  );
+  formulario.classList.add("cuenta__formulario--buho");
+
+  montarPantallaDeMas(
+    contenedor,
+    { titulo: "Cambiar mi búho", anterior: "#/mas/perfil" },
+    crearTitulosDeCuenta({
+      titulo: "Cambia tu búho",
+      descripcion: `Es tu foto de perfil. Tu búho actual es Búhi ${sesion.buho}.`,
+    }),
+    formulario,
+  );
+}
+
+/* ---------- Eliminar cuenta (Figma 47) ---------- */
+
+const LO_QUE_SE_BORRA = [
+  "Tu cuenta: nombre, correo y búho",
+  "Tu historial de pedidos",
+  "Tus puntos y cupones sin usar",
+];
+
+// 47b. TODO: Figma solo muestra un pedido en curso
+function redactarPedidosEnCurso(pedidos) {
+  const numeros = pedidos.map((pedido) => `#${pedido.numero}`).join(", ");
+  const cuantos = pedidos.length === 1 ? "1 pedido" : `${pedidos.length} pedidos`;
+  return `Tienes ${cuantos} en curso (${numeros}). Cuando termine, podrás eliminar tu cuenta.`;
+}
+
+function dibujarEliminarCuenta(contenedor) {
+  const enCurso = listarPedidosEnCurso();
+  const lista = crearElemento("ul", "eliminar__lista");
+  lista.append(...LO_QUE_SE_BORRA.map((texto) => crearElemento("li", "eliminar__punto", texto)));
+
+  const eliminar = crearBotonInferior(
+    "Eliminar mi cuenta",
+    () => confirmarEliminacion(contenedor),
+    "peligro",
+  );
+  eliminar.disabled = enCurso.length > 0;
+  const acciones = crearElemento("div", "cuenta__acciones");
+  acciones.append(
+    eliminar,
+    crearBotonDeTexto("Mantener mi cuenta", () => volverA("#/mas/perfil")),
+  );
+
+  montarPantallaDeMas(
+    contenedor,
+    { titulo: "Eliminar cuenta", anterior: "#/mas/perfil" },
+    ...(enCurso.length
+      ? [crearAviso("info", "Primero recoge o cancela tus pedidos", redactarPedidosEnCurso(enCurso))]
+      : []),
+    crearTitulosDeMas("¿Seguro que quieres irte?", "Si eliminas tu cuenta, se borra para siempre:"),
+    lista,
+    crearElemento(
+      "p",
+      "mas__nota",
+      "Puedes crear una cuenta nueva con tu correo de la UCA cuando quieras, pero empezarás de cero.",
+    ),
+    acciones,
+  );
+}
+
+// 47c y 47d: pide la contraseña. Tocar fuera es "Mantener mi cuenta"
+function confirmarEliminacion(contenedor) {
+  const contraseña = crearCampo({
+    id: "eliminar-contrasena",
+    etiqueta: "Escribe tu contraseña para confirmar",
+    tipo: "password",
+    autocompletar: "current-password",
+  });
+  const mantener = () => {
+    ventana.close();
+    ventana.remove();
+  };
+  let revisando = false;
+  const confirmar = async () => {
+    if (revisando) {
+      return;
+    }
+    revisando = true;
+    const resultado = await eliminarCuenta(contraseña.entrada.value);
+    revisando = false;
+    if (resultado.ok) {
+      // 47e
+      avisoAlEntrar = ["exito", "Tu cuenta se eliminó", "Puedes crear una cuenta nueva cuando quieras."];
+      location.replace("#/login");
+      return;
+    }
+    if (resultado.motivo === "contrasena") {
+      contraseña.marcarError("Contraseña incorrecta. Inténtalo de nuevo.");
+      return;
+    }
+    mantener();
+    if (resultado.motivo === "pedidos") {
+      mostrarPantalla(); // vuelve a dibujar con el aviso 47b
+      return;
+    }
+    // TODO: Figma no define este aviso
+    mostrarAviso("error", "No se pudo eliminar tu cuenta");
+  };
+  contraseña.entrada.addEventListener("keydown", (evento) => {
+    if (evento.key === "Enter") {
+      evento.preventDefault();
+      confirmar();
+    }
+  });
+  const ventana = crearVentana({
+    tipo: "peligro",
+    titulo: "¿Eliminar tu cuenta?",
+    mensaje: "No se puede deshacer. Se borran tu historial, puntos y cupones.",
+    contenido: [contraseña.elemento],
+    textoBoton: "Sí, eliminar",
+    tipoBoton: "peligro",
+    alTocar: confirmar,
+    segundo: { texto: "Mantener mi cuenta", alTocar: mantener },
+    alCerrar: mantener,
+  });
+  // La tecla Escape llama a "alCerrar": nunca elimina
+  abrirDialogo(contenedor, ventana);
 }

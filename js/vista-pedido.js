@@ -211,12 +211,23 @@ const ICONOS_DE_VENTANA = {
     ],
   },
 };
+// "¿Eliminar tu cuenta?" (47c)
+ICONOS_DE_VENTANA.peligro = {
+  caja: 24,
+  trazos: [
+    "M10.3 3.9L1.8 18C1.1 19.3 2 21 3.5 21H20.5C22 21 22.9 19.3 22.2 18L13.7 3.9C13 2.6 11 2.6 10.3 3.9Z",
+    "M12 9V13",
+    "M12 17H12.01",
+  ],
+};
 // La de invitado (Figma 1003:4839) usa el mismo icono, en azul
 ICONOS_DE_VENTANA.invitado = ICONOS_DE_VENTANA.informacion;
 
 // Ventana centrada sobre un fondo oscuro, con uno o dos botones ("segundo": { texto,
 // alTocar }). Si recibe "alCerrar", también se cierra al tocar fuera.
-function crearVentana({ tipo, titulo, destacado, mensaje, textoBoton, alTocar, segundo, alCerrar }) {
+function crearVentana({
+  tipo, titulo, destacado, mensaje, contenido = [], textoBoton, tipoBoton, alTocar, segundo, alCerrar,
+}) {
   const { caja, trazos } = ICONOS_DE_VENTANA[tipo];
   const circulo = crearElemento("span", "ventana__circulo");
   circulo.append(crearIconoSvg("ventana__icono", caja, trazos));
@@ -230,7 +241,8 @@ function crearVentana({ tipo, titulo, destacado, mensaje, textoBoton, alTocar, s
     encabezado,
     ...(destacado ? [crearElemento("p", "ventana__destacado", destacado)] : []),
     ...(mensaje ? [crearElemento("p", "ventana__mensaje", mensaje)] : []),
-    crearBotonInferior(textoBoton, alTocar),
+    ...contenido,
+    crearBotonInferior(textoBoton, alTocar, tipoBoton),
     ...(segundo ? [crearBotonInferior(segundo.texto, segundo.alTocar, "contorno")] : []),
   );
   // La tecla Escape cierra la ventana o, si no se puede cerrar, hace lo mismo que el botón

@@ -707,6 +707,8 @@ function dibujarSplash(contenedor) {
 
 // Correo que llega ya escrito a "Inicia sesión"
 let correoParaIniciar = "";
+// Un aviso [tipo, título, texto] que se muestra al llegar a "Inicia sesión" (47e)
+let avisoAlEntrar = null;
 // Lo que hace la pantalla abierta cuando vuelve internet
 let alVolverLaConexion = null;
 window.addEventListener("online", () => alVolverLaConexion?.());
@@ -759,6 +761,11 @@ function dibujarLogin(contenedor) {
     // El logo baja para que el aviso de arriba no lo tape (11)
     espacio.classList.add("inicio__espacio--bajo-aviso");
     anunciarContraseñaActualizada(contraseña.entrada);
+  }
+  if (avisoAlEntrar) {
+    espacio.classList.add("inicio__espacio--bajo-aviso");
+    mostrarAviso(...avisoAlEntrar);
+    avisoAlEntrar = null;
   }
 
   const olvidaste = crearBotonDeTexto("¿Olvidaste tu contraseña?", () =>
@@ -911,7 +918,8 @@ function dibujarRecuperar(contenedor) {
   });
   crearPantallaDeRecuperar(
     contenedor,
-    () => volverA("#/login"),
+    // Desde "Cambiar contraseña" (44) se regresa allí
+    () => (history.state?.desde?.startsWith("#/mas/") ? history.back() : volverA("#/login")),
     "¿Olvidaste tu contraseña?",
     "Escribe tu correo de la UCA y te enviaremos un código para crear una nueva.",
     crearFormularioDeCuenta(

@@ -189,6 +189,96 @@ function cerrarSesion() {
   borrarPedidoEnCurso();
 }
 
+/* ---------- Cambios de la cuenta (desde Perfil) ---------- */
+
+// La sesión y su cuenta, o null sin sesión.
+function obtenerCuentaDeLaSesion() {
+  const sesion = obtenerSesion();
+  return sesion && { sesion, cuenta: obtenerCuenta(sesion.correo) };
+}
+
+function actualizarCuentaDeLaSesion(cambios) {
+  const actual = obtenerCuentaDeLaSesion();
+  return Boolean(actual) && guardarCuenta(actual.sesion.correo, { ...actual.cuenta, ...cambios });
+}
+
+function cambiarNombre(nombre, apellido) {
+  return Boolean(nombre.trim() && apellido.trim()) &&
+    actualizarCuentaDeLaSesion({ nombre: nombre.trim(), apellido: apellido.trim() });
+}
+
+// El búho va en la cuenta y en la sesión.
+function cambiarBuho(buho) {
+  if (!Number.isInteger(buho) || buho < 1 || buho > CANTIDAD_DE_BUHOS) {
+    return false;
+  }
+  return actualizarCuentaDeLaSesion({ buho }) &&
+    escribirDato(CLAVE_SESION, { ...obtenerSesion(), buho });
+}
+
+// Compara los hashes: la contraseña guardada no existe en texto.
+async function coincideContrasena(cuenta, contraseña) {
+  const hash = await calcularHash(contraseña, cuenta.sal);
+  return Boolean(hash) && hash === cuenta.hash;
+}
+
+// Devuelve { ok: true } o { ok: false, motivo }.
+async function cambiarContrasena(contraseñaActual, nueva) {
+  const actual = obtenerCuentaDeLaSesion();
+  if (!actual || !(await coincideContrasena(actual.cuenta, contraseñaActual))) {
+    return { ok: false, motivo: "actual" };
+  }
+  if (nueva.length < MINIMO_CONTRASENA) {
+    return { ok: false, motivo: "datos" };
+  }
+  const protegida = await protegerContrasena(nueva);
+  return protegida && actualizarCuentaDeLaSesion(protegida)
+    ? { ok: true }
+    : { ok: false, motivo: "sin-guardado" };
+}
+
+// Cambia el correo, cuyo código se acaba de verificar. El tipo de cuenta sale del
+// correo nuevo y los pedidos, premios y opiniones pasan con él.
+function cambiarCorreo(nuevo) {
+  const actual = obtenerCuentaDeLaSesion();
+  const clave = normalizarCorreo(nuevo);
+  const tipoCorreo = detectarTipoCorreo(clave);
+  if (!actual || correoVerificado !== clave || tipoCorreo === "no-uca" || obtenerCuenta(clave)) {
+    return false;
+  }
+  const { sesion, cuenta } = actual;
+  const { [sesion.correo]: anterior, ...otras } = obtenerCuentas();
+  const tipo = tipoCorreo === "otro-formato" ? null : tipoCorreo;
+  if (!escribirDato(CLAVE_CUENTAS, { ...otras, [clave]: { ...cuenta, tipo } })) {
+    return false;
+  }
+  correoVerificado = null;
+  cambiarAutor(sesion.correo, clave);
+  return escribirDato(CLAVE_SESION, { ...sesion, correo: clave, tipo });
+}
+
+function listarPedidosEnCurso() {
+  return obtenerPedidosDeLaSesion().filter((pedido) => estaEnCurso(pedido));
+}
+
+// Borra para siempre la cuenta y todo lo suyo, y cierra la sesión. No se puede con
+// pedidos en curso. Devuelve { ok: true } o { ok: false, motivo }.
+async function eliminarCuenta(contraseña) {
+  const actual = obtenerCuentaDeLaSesion();
+  if (!actual || !(await coincideContrasena(actual.cuenta, contraseña))) {
+    return { ok: false, motivo: "contrasena" };
+  }
+  if (listarPedidosEnCurso().length) {
+    return { ok: false, motivo: "pedidos" };
+  }
+  const { [actual.sesion.correo]: borrada, ...otras } = obtenerCuentas();
+  if (!borrarDatosDeAutor(actual.sesion.correo) || !escribirDato(CLAVE_CUENTAS, otras)) {
+    return { ok: false, motivo: "sin-guardado" };
+  }
+  cerrarSesion();
+  return { ok: true };
+}
+
 /* ---------- Códigos de verificación ---------- */
 
 // Solo hay un código activo y vive en memoria: no se guarda y se pierde al recargar

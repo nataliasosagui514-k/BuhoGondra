@@ -99,6 +99,13 @@ function crearPedido({
   };
 }
 
+// Un pedido está en curso el día en que se recoge. Los de días anteriores ya cuentan
+// como entregados (regla de la cafetería).
+// TODO: la app no sabe si un pedido se recogió, se canceló o no se recogió
+function estaEnCurso(pedido, hoy = obtenerFechaDeHoy()) {
+  return pedido.fecha >= hoy;
+}
+
 /* ---------- Agotados ---------- */
 
 // Los platillos del pedido que ya no tienen existencias (disponible: false en los

@@ -13,6 +13,27 @@ function crearPantallaDeCuenta(titulo, preparar) {
   };
 }
 
+// Las pantallas de Más se dibujan como las de cuenta, sin barra (js/vista-mas.js).
+// "conSesion": sin sesión se regresa al panel.
+function crearPantallaDeMas(titulo, preparar, { conSesion = false } = {}) {
+  return {
+    titulo,
+    enBarra: false,
+    sinEncabezado: true,
+    sinNavegacion: true,
+    pestana: "#/mas",
+    plantilla: "plantilla-cuenta",
+    preparar: conSesion
+      ? (c, datos) => (obtenerSesion() ? preparar(c, datos) : location.replace("#/mas"))
+      : preparar,
+  };
+}
+
+// Perfil y lo que se abre desde él
+function crearPantallaDePerfil(titulo, preparar) {
+  return crearPantallaDeMas(titulo, preparar, { conSesion: true });
+}
+
 // Pantallas disponibles. Las que no están en la barra muestran el botón de volver.
 const pantallas = {
   // El menú dibuja su propio encabezado
@@ -41,6 +62,13 @@ const pantallas = {
   },
   // No es una pantalla: es un panel que se abre encima de la anterior (Figma 40)
   "#/mas": { titulo: "Más", esPanel: true },
+  "#/mas/perfil": crearPantallaDePerfil("Mi perfil", (c) => dibujarPerfil(c)),
+  "#/mas/perfil/configuracion": crearPantallaDePerfil("Configuración", (c) => dibujarConfiguracion(c)),
+  "#/mas/perfil/correo": crearPantallaDePerfil("Cambiar correo", (c) => dibujarCambiarCorreo(c)),
+  "#/mas/perfil/correo/codigo": crearPantallaDePerfil("Cambiar correo", (c) => dibujarCodigoDeCorreo(c)),
+  "#/mas/perfil/contrasena": crearPantallaDePerfil("Cambiar contraseña", (c) => dibujarCambiarContrasena(c)),
+  "#/mas/perfil/buho": crearPantallaDePerfil("Cambiar mi búho", (c) => dibujarCambiarBuho(c)),
+  "#/mas/perfil/eliminar": crearPantallaDePerfil("Eliminar cuenta", (c) => dibujarEliminarCuenta(c)),
   // Se abre con el calendario del menú; también dibuja su propio encabezado
   "#/semana": {
     titulo: "Menú de la semana",

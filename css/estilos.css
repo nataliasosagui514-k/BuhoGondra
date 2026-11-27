@@ -327,6 +327,12 @@
   --alto-asa: 5px;
   --radio-asa: 3px;
 
+  /* Avatar grande de Mi perfil (Figma 1051:5422) */
+  --tamano-avatar-perfil: 96px;
+  --tamano-imagen-avatar-perfil: 144px;
+  --avatar-perfil-izquierda: -25px;
+  --avatar-perfil-arriba: -10px;
+
   /* Panel Más y sus filas (Figma 1050:4983) */
   --ancho-panel: 312px;
   --margen-izquierdo-panel: 78px;
@@ -4316,4 +4322,139 @@ dialog:focus {
   font-weight: var(--peso-media);
   line-height: var(--linea-nota);
   letter-spacing: var(--interletra-nota);
+}
+
+/* ---------- Pantallas de Más: piezas comunes (Figma 41 a 47) ---------- */
+.cuenta__titulos--mas .cuenta__titulo {
+  font-size: var(--letra-titulo-2);
+  line-height: var(--linea-titulo-2);
+  letter-spacing: var(--interletra-titulo-2);
+}
+
+.cuenta__titulos--mas .cuenta__descripcion {
+  font-size: var(--letra-texto);
+  line-height: var(--linea-texto);
+}
+
+.mas__subtitulo {
+  font-family: var(--fuente-titulos);
+  font-size: var(--letra-titulo-3);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-titulo-3);
+}
+
+.mas__filas {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-4);
+}
+
+.mas__filas .mas__subtitulo {
+  margin-bottom: var(--espacio-4);
+}
+
+.mas__nota {
+  color: var(--color-texto-secundario);
+  font-size: var(--letra-texto-pequeno);
+  line-height: var(--linea-texto-pequeno);
+  overflow-wrap: anywhere;
+}
+
+/* ---------- Mi perfil (Figma 41) ---------- */
+.perfil__resumen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-block: var(--espacio-24) var(--espacio-32);
+  text-align: center;
+}
+
+.avatar--grande {
+  overflow: visible; /* el búho sobresale del círculo */
+  width: var(--tamano-avatar-perfil);
+  height: var(--tamano-avatar-perfil);
+}
+
+.avatar--grande .avatar__buho {
+  top: var(--avatar-perfil-arriba);
+  left: var(--avatar-perfil-izquierda);
+  width: var(--tamano-imagen-avatar-perfil);
+  height: var(--tamano-imagen-avatar-perfil);
+}
+
+.perfil__nombre {
+  margin-top: var(--espacio-16);
+  font-size: var(--letra-titulo-2);
+  line-height: var(--linea-titulo-2);
+  letter-spacing: var(--interletra-titulo-2);
+  overflow-wrap: anywhere;
+}
+
+.perfil__correo {
+  margin-block: var(--espacio-8);
+  color: var(--color-texto-secundario);
+  font-size: var(--letra-texto);
+  line-height: var(--linea-texto);
+  overflow-wrap: anywhere;
+}
+
+.perfil__resumen .etiqueta {
+  align-self: center;
+}
+
+.perfil__salida {
+  margin-block: var(--espacio-16);
+  padding-top: var(--espacio-16);
+  border-top: var(--borde-fino) solid var(--color-borde-suave);
+}
+
+.perfil__eliminar {
+  margin-top: auto;
+}
+
+/* ---------- Configuración (Figma 42) ---------- */
+.configuracion {
+  margin-top: var(--espacio-24);
+}
+
+.configuracion > .cuenta__campos {
+  gap: var(--espacio-32);
+}
+
+.configuracion > .cuenta__campos > .cuenta__campos {
+  gap: var(--espacio-12);
+}
+
+/* ---------- Eliminar cuenta (Figma 47) ---------- */
+.eliminar__lista {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-12);
+  margin-block: var(--espacio-16);
+  padding: var(--espacio-16) var(--espacio-16) var(--espacio-16) var(--espacio-32);
+  border: var(--borde-fino) solid var(--color-borde-suave);
+  border-radius: var(--radio-imagen);
+  background: var(--color-superficie);
+  font-size: var(--letra-texto);
+  line-height: var(--linea-texto);
+}
+
+/* El aviso de pedidos en curso va antes de los títulos (47b) */
+.cuenta .encabezado-interno + .aviso {
+  margin-top: var(--espacio-16);
+}
+
+.cuenta .aviso + .cuenta__titulos {
+  margin-top: var(--espacio-24);
+}
+
+.ventana--peligro .ventana__circulo {
+  background: var(--color-fondo-error-suave);
+  color: var(--color-texto-sobre-error-suave);
+}
+
+.ventana .campo {
+  align-self: stretch;
+  margin-top: var(--espacio-16);
+  text-align: left;
 }

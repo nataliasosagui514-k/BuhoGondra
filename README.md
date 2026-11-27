@@ -51,7 +51,7 @@ Al abrir `index.html` sin nada después, aparece el Splash 4.5 segundos y luego 
 
 Sin sesión se puede ver el menú, los platillos y los comentarios, pero no apartar ni comentar.
 
-Mientras no exista la pantalla Más, la sesión se cierra desde la consola: ejecuta `cerrarSesion()` y recarga la página.
+La sesión se cierra en Más › Perfil › "Cerrar sesión". Como respaldo, también se puede ejecutar `cerrarSesion()` en la consola y recargar la página.
 
 Los puntos se calculan con los pedidos confirmados con la sesión de cada cuenta; los pedidos antiguos que quedaron como "invitado" no suman.
 
