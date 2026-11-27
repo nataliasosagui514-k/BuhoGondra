@@ -493,7 +493,7 @@ function dibujarCambiarCorreo(contenedor) {
           return;
         }
         correoNuevo = escrito;
-        // TODO: sin envío real de correos, este código solo aparece en la consola
+        // TODO: sin envío real de correos; el código se muestra en la pantalla siguiente
         generarCodigo(escrito);
         codigoEnviadoEn = Date.now();
         location.hash = "#/mas/perfil/correo/codigo";

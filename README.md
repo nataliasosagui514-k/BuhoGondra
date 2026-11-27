@@ -43,17 +43,17 @@ La app no tiene servidor y **no envía correos**. El código de 6 dígitos se ge
 
 | Cuándo se pide | Dónde se ve el código |
 |---|---|
-| Al registrarse | En la pantalla "Verifica tu correo": "Modo demostración: tu código es NNNNNN" (y en la consola) |
-| Al recuperar la contraseña | **Solo en la consola** (F12, pestaña "Consola"), y solo si el correo tiene cuenta |
-| Al cambiar de correo | **Solo en la consola** |
+| Al registrarse | En la pantalla "Verifica tu correo" (y en la consola) |
+| Al recuperar la contraseña | En la pantalla "Escribe el código" (y en la consola), solo si el correo tiene cuenta |
+| Al cambiar de correo | En la pantalla "Verifica tu nuevo correo" (y en la consola) |
 
-En la consola se ve así:
+En las tres pantallas aparece el aviso **"Modo demostración: tu código es NNNNNN"**. En la consola se ve así:
 
 ```text
 BúhoGondra (demostración) · Código para 00123425@uca.edu.sv: 482173. Vence en 10 minutos.
 ```
 
-El código vence a los 10 minutos, sirve una sola vez y deja de servir si se pide otro o se recarga la página. Para reenviarlo hay que esperar 60 segundos. Al recuperar la contraseña no se muestra en pantalla para no revelar si un correo tiene cuenta.
+El código es aleatorio, vence a los 10 minutos, sirve una sola vez y deja de servir si se pide otro o se recarga la página. Para reenviarlo hay que esperar 60 segundos. Al recuperar la contraseña, el aviso solo aparece si el correo tiene cuenta, así que en esta demostración se puede saber si un correo está registrado.
 
 ## Sesión de prueba y cómo cerrarla
 
@@ -168,6 +168,10 @@ Desarrollo individual por **Natalia Sosa**.
 - No hay pruebas automáticas en el repositorio; las pruebas son manuales.
 
 La lista completa está en [docs/limitaciones.md](docs/limitaciones.md).
+
+## Limitaciones conocidas
+
+La app es una demostración sin servidor y tiene cosas sin terminar. Antes de presentarla o publicarla, revisa **[docs/limitaciones.md](docs/limitaciones.md)**.
 
 ## Documentación
 

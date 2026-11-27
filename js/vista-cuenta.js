@@ -215,8 +215,21 @@ function crearFormularioDeCodigo({ textoBoton, alVerificar, alReenviar, alCambia
     boton.disabled = codigo.length < CIFRAS_DEL_CODIGO;
   });
 
+  // TODO: quitar este aviso cuando haya envío real de correos. La app no tiene servidor,
+  // así que en modo de demostración el código se muestra aquí, sobre sus casillas.
+  const demostracion = crearAviso("info", "");
+  demostracion.classList.add("codigo__demostracion");
+  // Sin código activo (ya se usó, o al recuperar un correo sin cuenta) no hay aviso
+  const mostrarCodigo = () => {
+    if (codigoActivo) {
+      demostracion.querySelector(".aviso__titulo").textContent =
+        `Modo demostración: tu código es ${codigoActivo.codigo}`;
+    }
+  };
+
   const reenviar = crearBotonDeTexto("", () => {
     alReenviar();
+    mostrarCodigo();
     codigoEnviadoEn = Date.now();
     contar();
     reloj = setInterval(contar, 1000);
@@ -262,6 +275,10 @@ function crearFormularioDeCodigo({ textoBoton, alVerificar, alReenviar, alCambia
     [boton],
   );
   formulario.classList.add("cuenta__formulario--codigo");
+  if (codigoActivo) {
+    mostrarCodigo();
+    formulario.querySelector(".cuenta__campos").prepend(demostracion);
+  }
   return formulario;
 }
 
@@ -423,17 +440,9 @@ function dibujarRegistroCodigo(contenedor) {
     return;
   }
   const cambiarCorreo = () => volverA("#/registro/correo");
-  // TODO: quitar este aviso cuando haya envío real de correos. La app no tiene servidor,
-  // así que en modo de demostración el código se muestra aquí, sobre sus casillas.
-  const demostracion = crearAviso("info", "");
-  demostracion.classList.add("codigo__demostracion");
-  const mostrarCodigo = (codigo) => {
-    demostracion.querySelector(".aviso__titulo").textContent =
-      `Modo demostración: tu código es ${codigo}`;
-  };
   const formulario = crearFormularioDeCodigo({
     textoBoton: "Verificar",
-    alReenviar: () => mostrarCodigo(generarCodigo(registro.correo)),
+    alReenviar: () => generarCodigo(registro.correo),
     alCambiarCorreo: cambiarCorreo,
     alVerificar: (codigo) => {
       if (!verificarCodigo(codigo)) {
@@ -445,11 +454,6 @@ function dibujarRegistroCodigo(contenedor) {
       return true;
     },
   });
-  // Un código ya usado no se vuelve a mostrar
-  if (codigoActivo) {
-    mostrarCodigo(codigoActivo.codigo);
-    formulario.querySelector(".cuenta__campos").prepend(demostracion);
-  }
   montarPantallaDeCuenta(
     contenedor,
     crearEncabezadoDeCuenta(cambiarCorreo),

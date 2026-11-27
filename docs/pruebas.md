@@ -25,7 +25,7 @@ Marca cada casilla cuando lo pruebes y veas el resultado esperado: cambia `[ ]` 
 - [ ] **Más › Perfil › Cerrar sesión** cierra la sesión.
 - [ ] Una contraseña equivocada muestra **Correo o contraseña incorrectos**.
 - [ ] Con los datos correctos se inicia sesión.
-- [ ] Al recuperar la contraseña, el código aparece solo en la consola.
+- [ ] Al recuperar la contraseña de una cuenta existente, el código de demostración aparece en la pantalla.
 - [ ] Después de **Guardar contraseña** puedo entrar con la nueva, y la anterior ya no funciona.
 - [ ] En `localStorage`, la clave `buhogondra.cuentas` tiene `sal` y `hash`, no la contraseña.
 
@@ -83,7 +83,7 @@ Primero aparta un pedido para hoy con `?hora=10:00`.
 - [ ] El botón **Más** abre el panel.
 - [ ] Como invitado, Perfil, Historial y Notificaciones piden una cuenta.
 - [ ] En Configuración puedo cambiar mi nombre.
-- [ ] Puedo cambiar mi correo con el código que aparece en la consola.
+- [ ] Puedo cambiar mi correo con el código de demostración que aparece en la pantalla.
 - [ ] Puedo cambiar mi contraseña escribiendo la actual.
 - [ ] Puedo cambiar mi búho.
 - [ ] Historial muestra mis pedidos y abre el detalle de cada uno.

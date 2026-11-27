@@ -44,7 +44,7 @@ Para salir: **Más › Perfil › Cerrar sesión**.
 
 1. En **Inicia sesión**, toca **¿Olvidaste tu contraseña?**
 2. Escribe tu correo y toca **Enviar código**.
-3. **El código no se ve en la pantalla.** Presiona **F12**, abre la pestaña **Consola** y cópialo. Solo aparece si ese correo tiene una cuenta en ese navegador.
+3. En **Escribe el código**, copia el número del aviso **Modo demostración: tu código es …** El aviso solo aparece si ese correo tiene una cuenta en ese navegador.
 4. Escríbelo y toca **Continuar**.
 5. Escribe la contraseña nueva dos veces y toca **Guardar contraseña**.
 6. Verás **Contraseña actualizada**. Inicia sesión con la nueva.
@@ -162,7 +162,7 @@ Toca **Más** (tres líneas). Sin sesión, **Perfil**, **Historial** y **Notific
 
 ### Perfil
 
-- **Configuración de la cuenta:** cambia tu nombre, correo o contraseña. Para cambiar el correo, el código aparece **solo en la consola** (F12).
+- **Configuración de la cuenta:** cambia tu nombre, correo o contraseña. Para cambiar el correo, copia el código del aviso **Modo demostración: tu código es …**
 - **Cambiar mi búhi:** elige otra foto de perfil.
 - **Cerrar sesión:** sales sin borrar tus datos.
 - **Eliminar cuenta:** pide tu contraseña y no se puede deshacer. No está permitido si tienes pedidos en curso.

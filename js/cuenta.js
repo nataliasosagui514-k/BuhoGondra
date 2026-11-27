@@ -2,7 +2,8 @@
 // Las pantallas están en js/vista-cuenta.js.
 //
 // Es un modo de demostración sin servidor: las cuentas viven en este navegador y el
-// código de verificación se muestra en la consola. No protege como un servidor real.
+// código de verificación se muestra en la pantalla y en la consola. No protege como un
+// servidor real.
 
 // Todas las cuentas van en una sola clave: { correo: datos de la cuenta }
 const CLAVE_CUENTAS = "buhogondra.cuentas";
@@ -324,8 +325,8 @@ function verificarCodigo(codigo, ahora = Date.now()) {
 
 /* ---------- Recuperar la contraseña ---------- */
 
-// Por seguridad, la pantalla no dice si el correo tiene cuenta: solo se "envía" el
-// código cuando la hay.
+// Solo se "envía" el código cuando el correo tiene cuenta. En modo de demostración
+// se muestra en pantalla, así que su ausencia deja ver que no hay cuenta.
 function enviarCodigoDeRecuperacion(correo) {
   if (obtenerCuenta(correo)) {
     generarCodigo(correo);
