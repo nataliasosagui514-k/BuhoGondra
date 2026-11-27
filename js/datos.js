@@ -65,14 +65,21 @@ const SOLO_LA_PORCION = {
 };
 
 /* "enCombo" es cómo se nombra cada alternativa en la caja "El combo incluye" del
-   detalle (Figma 1193:7688). Esa frase no menciona "Sin guarnición" ni "Sin ensalada". */
+   detalle (Figma 1193:7688). Esa frase no menciona "Sin guarnición" ni "Sin ensalada".
+   "imagen" es la foto de la tarjeta de "Personaliza tu plato", recortada como en Figma
+   (nota 1347:9329: algunas son ilustraciones provisionales). */
+const crearValor = (nombre, foto, enCombo) => ({
+  nombre,
+  imagen: `img/acomp-${foto}.png`,
+  ...(enCombo && { enCombo }),
+});
 const GUARNICION = {
   id: "guarnicion",
   nombre: "Guarnición",
   valores: [
-    { nombre: "Arroz", enCombo: "Arroz" },
-    { nombre: "Casamiento", enCombo: "casamiento" },
-    { nombre: "Sin guarnición" },
+    crearValor("Arroz", "arroz", "Arroz"),
+    crearValor("Casamiento", "casamiento", "casamiento"),
+    crearValor("Sin guarnición", "sin"),
   ],
   porDefecto: "Arroz",
 };
@@ -80,10 +87,10 @@ const ENSALADA = {
   id: "ensalada",
   nombre: "Ensalada",
   valores: [
-    { nombre: "Ensalada fresca", enCombo: "Ensalada fresca" },
-    { nombre: "Ensalada de coditos", enCombo: "de coditos" },
-    { nombre: "Vegetales al vapor", enCombo: "vegetales al vapor" },
-    { nombre: "Sin ensalada" },
+    crearValor("Ensalada fresca", "ensalada-fresca", "Ensalada fresca"),
+    crearValor("Ensalada de coditos", "ensalada-coditos", "de coditos"),
+    crearValor("Vegetales al vapor", "vegetales", "vegetales al vapor"),
+    crearValor("Sin ensalada", "sin"),
   ],
   porDefecto: "Ensalada fresca",
 };
@@ -91,19 +98,19 @@ const BEBIDA = {
   id: "bebida",
   nombre: "Bebida",
   valores: [
-    { nombre: "Fresco de Tamarindo", enCombo: "Fresco de tamarindo" },
-    { nombre: "Fresco de Jamaica", enCombo: "de Jamaica" },
+    crearValor("Fresco de tamarindo", "tamarindo", "Fresco de tamarindo"),
+    crearValor("Fresco de Jamaica", "jamaica", "de Jamaica"),
   ],
-  porDefecto: "Fresco de Tamarindo",
+  porDefecto: "Fresco de tamarindo",
 };
 const TORTILLAS = {
   id: "tortillas",
   nombre: "Tortillas",
   prefijoEnCombo: "Tortillas: ",
   valores: [
-    { nombre: "2 tortillas", enCombo: "2" },
-    { nombre: "1 tortilla", enCombo: "1" },
-    { nombre: "Sin tortillas", enCombo: "ninguna" },
+    crearValor("2 tortillas", "tortillas-2", "2"),
+    crearValor("1 tortilla", "tortillas-1", "1"),
+    crearValor("Sin tortillas", "sin", "ninguna"),
   ],
   porDefecto: "2 tortillas",
 };

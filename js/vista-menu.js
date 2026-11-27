@@ -494,7 +494,9 @@ function crearAccionesDeDetalle(platillo, esDeHoy) {
     const nota = llevaGuarnicion && esDeHoy ? "Los eliges en el siguiente paso." : "";
     return [
       crearCajaDeOpciones("El combo incluye", incluye, nota),
-      crearBotonInferior("Elegir acompañamientos", irAApartar),
+      crearBotonInferior("Elegir acompañamientos", () => {
+        location.hash = `#/personalizar/${platillo.id}`;
+      }),
     ];
   }
 
@@ -503,7 +505,7 @@ function crearAccionesDeDetalle(platillo, esDeHoy) {
   if (platillo.eligeCantidad) {
     const caja = crearCajaDeCantidad(platillo, (total) => {
       boton.disabled = total === 0;
-      const precio = formatearPrecio(platillo.precio * total);
+      const precio = formatearPrecio(calcularSubtotal(platillo.precio, total));
       boton.textContent = total > 1 ? `Apartar ${total} · ${precio}` : `Apartar · ${precio}`;
     });
     return [caja, boton];

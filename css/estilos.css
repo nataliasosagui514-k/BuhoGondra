@@ -293,6 +293,16 @@
   --alto-fondo-buho: 168px;
   --tamano-buho-sin-opiniones: 126px;
 
+  /* Tarjeta de acompañamiento (Figma 1345:4696) */
+  --ancho-acompanamiento: 104px;
+  --alto-acompanamiento: 136px;
+  --alto-imagen-acompanamiento: 84px;
+  --tamano-marca: 20px;
+  --borde-marca: 1.5px;
+  --relleno-pie-acompanamiento: 10px;
+  /* Separación entre el botón fijo y la barra de navegación */
+  --separacion-boton-fijo: 12px;
+
   /* Menú de la semana */
   --ancho-pestana-dia: 62px;
   --alto-pestana-dia: 60px;
@@ -1878,4 +1888,173 @@ main.contenido--completo {
 
 .no-encontrado .detalle__boton {
   margin-top: 0;
+}
+
+/* ---------- Apartar: Personaliza tu plato (Figma 1346:8841) ---------- */
+.platillo-resumido__precio {
+  margin-left: auto;
+  color: var(--color-texto-marca);
+  font-family: var(--fuente-titulos);
+  font-size: var(--letra-precio);
+  font-weight: var(--peso-negrita);
+  line-height: var(--linea-precio);
+}
+
+.personalizar__presentacion {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-16);
+}
+
+.personalizar__explicacion,
+.personalizar__resumen {
+  font-size: var(--letra-texto-pequeno);
+  line-height: var(--linea-texto-pequeno);
+  letter-spacing: var(--interletra-texto-pequeno);
+}
+
+.personalizar__explicacion {
+  color: var(--color-texto-secundario);
+}
+
+.personalizar__grupos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-24);
+}
+
+.grupo {
+  min-width: 0; /* un fieldset no se encoge sin esto y la fila no se desplazaría */
+  padding: 0;
+  border: 0;
+}
+
+/* Con float, la leyenda se acomoda como un renglón normal */
+.grupo__titulo {
+  display: flex;
+  float: left;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--espacio-12);
+  width: 100%;
+  margin-bottom: var(--espacio-12);
+  padding: 0;
+}
+
+.grupo__nombre {
+  font-family: var(--fuente-titulos);
+  font-size: var(--letra-titulo-3);
+  font-weight: var(--peso-seminegrita);
+  line-height: var(--linea-titulo-3);
+  letter-spacing: var(--interletra-titulo-3);
+}
+
+.grupo__ayuda {
+  color: var(--color-texto-secundario);
+  font-size: var(--letra-nota);
+  font-weight: var(--peso-media);
+  line-height: var(--linea-nota);
+  letter-spacing: var(--interletra-nota);
+}
+
+.grupo__opciones {
+  display: flex;
+  clear: both;
+  gap: var(--espacio-12);
+  overflow-x: auto;
+  scrollbar-width: none; /* como en Figma; se desliza con el dedo */
+}
+
+.acompanamiento {
+  position: relative;
+  display: flex;
+  flex: 0 0 var(--ancho-acompanamiento);
+  flex-direction: column;
+  height: var(--alto-acompanamiento);
+  overflow: hidden;
+  border: var(--borde-fino) solid var(--color-borde-suave);
+  border-radius: var(--radio-imagen);
+  background: var(--color-superficie);
+  cursor: pointer;
+}
+
+/* El botón de opción ocupa toda la tarjeta, pero no se ve */
+.acompanamiento__entrada {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.acompanamiento__imagen {
+  flex-shrink: 0;
+  width: 100%;
+  height: var(--alto-imagen-acompanamiento);
+  background: var(--color-fondo-atenuado);
+  object-fit: cover;
+}
+
+.acompanamiento__marca {
+  position: absolute;
+  top: var(--espacio-8);
+  right: var(--espacio-8);
+  display: flex;
+  width: var(--tamano-marca);
+  height: var(--tamano-marca);
+  border: var(--borde-marca) solid var(--color-borde-normal);
+  border-radius: var(--radio-pildora);
+  background: var(--color-superficie);
+}
+
+.acompanamiento__palomita {
+  display: none;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: var(--color-categoria-platos-fuertes);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.acompanamiento__pie {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  padding-inline: var(--relleno-pie-acompanamiento);
+  font-size: var(--letra-texto-pequeno);
+  line-height: var(--linea-texto-pequeno);
+  letter-spacing: var(--interletra-texto-pequeno);
+}
+
+/* Seleccionada: color de Platos fuertes */
+.acompanamiento:has(:checked) {
+  border: var(--borde-campo) solid var(--color-categoria-platos-fuertes);
+}
+
+.acompanamiento:has(:checked) .acompanamiento__marca {
+  border-color: var(--color-superficie);
+}
+
+.acompanamiento:has(:checked) .acompanamiento__palomita {
+  display: block;
+}
+
+.acompanamiento:has(:checked) .acompanamiento__pie {
+  background: var(--color-categoria-platos-fuertes);
+  color: var(--color-texto-sobre-primario);
+}
+
+.acompanamiento:has(:focus-visible) {
+  outline: var(--borde-campo) solid var(--color-anillo-foco);
+  outline-offset: calc(-1 * var(--separacion-foco));
+}
+
+/* El botón queda fijo abajo, encima de la barra de navegación */
+.personalizar__boton {
+  position: sticky;
+  z-index: 1;
+  bottom: calc(var(--alto-navegacion) + var(--distancia-navegacion) + var(--separacion-boton-fijo));
+  margin-top: calc(var(--espacio-16) - var(--espacio-24));
 }

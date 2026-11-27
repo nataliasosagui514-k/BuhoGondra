@@ -30,9 +30,17 @@ const pantallas = {
   },
 };
 
-// Rutas con el id de un platillo: #/platillo/ID, #/apartar/ID, #/comentarios/ID
-// y #/comentarios/ID/escribir
+// Rutas con el id de un platillo: #/platillo/ID, #/personalizar/ID, #/apartar/ID,
+// #/comentarios/ID y #/comentarios/ID/escribir
 const pantallasConId = {
+  personalizar: {
+    titulo: "Personaliza tu plato",
+    enBarra: false,
+    sinEncabezado: true,
+    pestana: "#/menu",
+    plantilla: "plantilla-apartar",
+    preparar: dibujarPersonalizar,
+  },
   platillo: {
     titulo: "Platillo",
     enBarra: false,
@@ -71,7 +79,7 @@ function buscarPantalla(hash) {
   if (Object.hasOwn(pantallas, ruta)) {
     return { ...pantallas[ruta], ruta, parametros };
   }
-  const partes = ruta.match(/^#\/(platillo|apartar|comentarios)\/([^/]+?)(\/escribir)?$/);
+  const partes = ruta.match(/^#\/(platillo|personalizar|apartar|comentarios)\/([^/]+?)(\/escribir)?$/);
   const tipo = partes && `${partes[1]}${partes[3] ?? ""}`;
   return Object.hasOwn(pantallasConId, tipo)
     ? { ...pantallasConId[tipo], ruta, parametros, id: partes[2] }
