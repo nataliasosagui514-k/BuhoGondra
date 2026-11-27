@@ -28,38 +28,67 @@ const CATEGORIAS = {
   "mas-complementos": { nombre: "Más complementos", sinPrecio: true },
 };
 
-// Los platillos que tienen foto en Figma. El archivo es img/platillos/ID.webp.
-const PLATILLOS_CON_FOTO = new Set([
-  "croissant-de-jamon-y-queso",
-  "croquetas-de-pollo",
-  "hamburguesa-de-res-y-pollo",
-  "espagueti-con-carne",
-  "papa-con-huevo",
-  "quesadilla-mexicana",
-  "chilaquila",
-  "club-sandwich",
-  "relleno-de-coli",
-  "filete-de-pollo",
-  "sopa-de-pollo",
-  "cuarto-de-pollo-horneado",
-  "chop-suey",
-  "crepa-de-res",
-  "empanada-de-leche",
-  "arroz-en-leche",
-  "pastelito-de-pollo",
-  "tamal-de-pollo",
-  "tamal-de-chipilin",
-  "pupusas",
-  "ensalada-cesar",
-  "papa-francesa",
-  "papa-sazonada",
-]);
-// En Figma estos platillos usan la misma foto que otro: apuntan a su archivo
-const FOTOS_COMPARTIDAS = { "empanada-de-frijol": "empanada-de-leche" };
+// El archivo de la foto de cada platillo, en img/platillos/. Casi todos se llaman
+// como su id; las dos lonjas empanizadas comparten uno. Sin línea aquí, foto: null.
+const ARCHIVOS_DE_FOTO = {
+  "arroz-en-leche": "arroz-en-leche.webp",
+  "atol-de-maiz-tostado": "atol-de-maiz-tostado.png",
+  "bistec-encebollado": "bistec-encebollad.png",
+  "canoa-de-frijol": "canoa de frijol.png",
+  "canoa-de-leche": "canoa-de-leche.png",
+  "carne-a-la-plancha": "carne-a-la-plancha.webp",
+  "carne-deshilada": "carne-deshilada.png",
+  "carne-guisada": "carne-guisada.png",
+  "chilaquila": "chilaquila.webp",
+  "chop-suey": "chop-suey.webp",
+  "club-sandwich": "club-sandwich.webp",
+  "crepa-de-res": "crepa-de-res.webp",
+  "croissant-de-jamon-y-queso": "croissant-de-jamon-y-queso.webp",
+  "croquetas-de-pollo": "croquetas-de-pollo.webp",
+  "cuarto-de-pollo-a-la-plancha": "cuarto-de-pollo-a-la-plancha.png",
+  "cuarto-de-pollo-empanizado": "cuarto-de-pollo-empanizado.png",
+  "cuarto-de-pollo-en-salsa-de-cilantro": "cuarto-de-pollo-en-salsa-de-cilantro.png",
+  "cuarto-de-pollo-guisado": "cuarto-de-pollo-guisado.png",
+  "cuarto-de-pollo-horneado": "cuarto-de-pollo-horneado.webp",
+  "empanada-de-frijol": "empanada-de-frijol.png",
+  "empanada-de-leche": "empanada-de-leche.webp",
+  "enchilada": "enchilada.png",
+  "ensalada-cesar": "ensalada-cesar.webp",
+  "espagueti-con-carne": "espagueti-con-carne.webp",
+  "filete-de-pollo": "filete-de-pollo.webp",
+  "hamburguesa-de-res-y-pollo": "hamburguesa-de-res-y-pollo.webp",
+  "lasana-bolonesa": "lasana-boloñesa.png",
+  "lasana-de-pollo": "lasana-de-pollo.png",
+  "lonja-empanizada-miercoles": "lonja-empanizada.png",
+  "lonja-empanizada-viernes": "lonja-empanizada.png",
+  "mas-complementos": "mas-complementos.png", // la tarjeta que agrupa los otros complementos
+  "nuegados": "nuegados.png",
+  "pancito-con-pollo": "pancito-con-pollo.png",
+  "papa-con-huevo": "papa-con-huevo.webp",
+  "papa-francesa": "papa-francesa.webp",
+  "papa-sazonada": "papa-sazonada.webp",
+  "pastel-de-platano": "pastel-de-platano.png",
+  "pastelito-de-pollo": "pastelito-de-pollo.webp",
+  "pastelito-de-res": "pastelito-de-res.png",
+  "platano-en-miel": "platano-en-miel.png",
+  "poleada": "poleada.png",
+  "pupusas": "pupusas.webp",
+  "quesadilla-mexicana": "quesadilla-mexicana.webp",
+  "raspado-de-elote": "raspado-de-elote.png",
+  "relleno-de-coli": "relleno-de-coli.webp",
+  "sopa-de-frijoles": "sopa-de-frijoles.png",
+  "sopa-de-pata": "sopa-de-pata.png",
+  "sopa-de-pollo": "sopa-de-pollo.webp",
+  "sopa-de-res": "sopa-de-res.png",
+  "sopa-de-tortillas": "sopa-de-tortilla.webp",
+  "tamal-de-chipilin": "tamal-de-chipilin.png",
+  "tamal-de-pollo": "tamal-de-pollo.png",
+  "tamales": "tamales.png",
+  "yuca-frita-o-sancochada": "yuca-frita-o-sancochada.png",
+};
 
 function buscarFoto(id) {
-  const archivo = FOTOS_COMPARTIDAS[id] ?? id;
-  return PLATILLOS_CON_FOTO.has(archivo) ? `img/platillos/${archivo}.webp` : null;
+  return id in ARCHIVOS_DE_FOTO ? `img/platillos/${ARCHIVOS_DE_FOTO[id]}` : null;
 }
 
 // Crea un platillo. "extras" cambia solo lo que no es igual al valor normal.

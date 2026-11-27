@@ -87,7 +87,7 @@ function crearResumenDeCategoria(categoria) {
     precio: null,
     ventana_recogida: categoria.platillos[0].ventana_recogida,
     disponible: categoria.platillos.some((platillo) => platillo.disponible),
-    foto: null,
+    foto: buscarFoto(categoria.id),
     elementos: categoria.platillos.map((platillo) => platillo.nombre),
   };
 }
